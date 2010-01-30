@@ -1,6 +1,6 @@
 //DontDestroyOnLoad(this);
-var remoteIP = "127.0.0.1";
-var remotePort = 25001;
+var remoteIP = "192.168.49.80";
+var remotePort = 25000;
 var listenPort = 25000;
 var useNAT = false;
 
