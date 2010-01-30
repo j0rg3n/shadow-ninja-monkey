@@ -128,7 +128,10 @@ public class FPSNinjaWalker : MonoBehaviour
 					
 					Vector3 pos = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
 					Vector3 dir = (pos - cam.transform.position).normalized;
-					
+					if (cam.orthographic)
+					{
+						dir = cam.transform.TransformDirection(Vector3.forward);															}
+											
 					Vector3 planeNormal = plane.transform.TransformDirection(Vector3.up);
 					float d = -Vector3.Dot(planeNormal, plane.transform.position);
 					float td = Vector3.Dot(planeNormal, dir);
