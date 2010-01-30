@@ -4,12 +4,15 @@ using System.Collections;
 public class NinjaBehaviour : MonoBehaviour {
 
 	
-	public enum NinjaColor {MyBlack, MyWhite, HisBlack, HisWhite};
+	public enum NinjaColor {Black, White};
 	
 	private static Color MyWhiteColor = new Color(0.8f,0.8f,0.8f);
 	private static Color MyBlackColor = new Color(0.5f,0.5f,0.5f);
 	private static Color HisWhiteColor = new Color(1,1,1);
 	private static Color HisBlackColor = new Color(0,0,0);
+	
+	
+	private bool noNetwork = true;
 	
 	private NinjaColor color;
 	
@@ -19,41 +22,44 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	public static int maxHealth = 10;
 	
-	/* Dubeg
+	/*
 	public void Start()
 	{
 		Initialize(NinjaColor.MyBlack);
 	}
 	*/
 	
-	public void Initialize(NinjaColor color)
+	
+	public void Initialize(NinjaColor color, bool useNetwork)
 	{
+		this.noNetwork = !useNetwork;
 		this.color = color;
-		setMaterial();
+		UpdateMaterial();
 		this.health = maxHealth;
 		this.score = 0;
 	}
 	
-	private void setMaterial()
+	// True if player is this ninja
+	public bool AmIMyself()
+	{
+		NetworkView networkView = GetComponent<NetworkView>();
+		return (noNetwork || networkView == null ||  networkView.isMine);
+	}
+	
+	private void UpdateMaterial()
 	{
 		switch(color)
 		{
-			case NinjaColor.MyWhite:
-				setColorOnAllChildren(MyWhiteColor);
+			case NinjaColor.White:
+				SetColorOnAllChildren(AmIMyself()? MyWhiteColor : HisWhiteColor);
 				break;
-			case NinjaColor.MyBlack:
-				setColorOnAllChildren(MyBlackColor);
-				break;
-			case NinjaColor.HisWhite:
-				setColorOnAllChildren(HisWhiteColor);
-				break;
-			case NinjaColor.HisBlack:
-				setColorOnAllChildren(HisBlackColor);
+			case NinjaColor.Black:
+				SetColorOnAllChildren(AmIMyself()? MyBlackColor : HisBlackColor);
 				break;
 		}
 	}
 	
-	private void setColorOnAllChildren(Color color)
+	private void SetColorOnAllChildren(Color color)
 	{
 		MeshRenderer[] children = gameObject.GetComponentsInChildren<MeshRenderer>();
 		
@@ -76,5 +82,16 @@ public class NinjaBehaviour : MonoBehaviour {
 	public NinjaColor Color
 	{
 		get { return color; }
+	}
+	
+	public void YouJustGotHit(int dam)
+	{
+		health-=dam;
+		if(health <= 0)
+		{
+			//TODO Die
+		}
+		
+		//TODO Blood splatter sounds.
 	}
 }

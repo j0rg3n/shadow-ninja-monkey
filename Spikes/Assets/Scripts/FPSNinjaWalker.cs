@@ -11,13 +11,12 @@ public class FPSNinjaWalker : MonoBehaviour
 	private enum State {Pouncing, Blocking ,ReadyToFight};
 	private State state = State.ReadyToFight;
 	
-	public NinjaPokerAnimation pokerAnimation;
+	private NinjaPokerAnimation pokerAnimation;
 	public string horizontalAxis = "Horizontal";
 	public string verticalAxis = "Vertical";
 	public string moveButton = "Fire1";
 	
 	public bool useMouse = true;
-	public bool noNetwork = false;
 	public float pounceSpeed = 8.0f;
 	public float speed = 4.0f;
 	public float gravity = 20.0f;
@@ -29,10 +28,14 @@ public class FPSNinjaWalker : MonoBehaviour
 		
 	private float stateResetTime = 0.0f;
 	
+	public void Start()
+	{
+		pokerAnimation  = GetComponentInChildren<NinjaPokerAnimation>();
+	}
+	
 	void FixedUpdate () 
 	{
-		NetworkView networkView = GetComponent<NetworkView>();
-		if (!noNetwork && networkView != null && !networkView.isMine)
+		if(!GetComponent<NinjaBehaviour>().AmIMyself())
 		{
 			// Avoid messing with objects owned by the other player.
 			return;
