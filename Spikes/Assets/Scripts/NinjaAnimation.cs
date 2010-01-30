@@ -7,6 +7,9 @@ public class NinjaAnimation : MonoBehaviour
 	
 	public float pokeDelay = 2.0f;
 	public float blockDelay = 1.0f;
+	
+	public string pokeButton = "Fire2";
+	public string blockButton = "Fire3";
 
 	private State state = State.Stand;
 	private float stateResetTime = 0.0f;
@@ -36,13 +39,13 @@ public class NinjaAnimation : MonoBehaviour
 		}
 		else
 		{			
-			if (Input.GetButton("Fire1"))
+			if (Input.GetButton(pokeButton))
 			{
 				pokerAnimation.Poke();
 				state = State.Poke;
 				stateResetTime = time + pokeDelay;
 			}
-			else if (Input.GetButton("Fire2"))
+			else if (Input.GetButton(blockButton))
 			{
 				pokerAnimation.Block();
 				state = State.Block;
