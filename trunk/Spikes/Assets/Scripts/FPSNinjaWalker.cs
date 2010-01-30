@@ -20,6 +20,13 @@ public class FPSNinjaWalker : MonoBehaviour
 	
 	void FixedUpdate () 
 	{
+		NetworkView networkView = GetComponent<NetworkView>();
+		if (networkView != null && !networkView.isMine)
+		{
+			// Avoid messing with objects owned by the other player.
+			return;
+		}
+
 		if (grounded) 
 		{
 			// We are grounded, so recalculate movedirection directly from axes
