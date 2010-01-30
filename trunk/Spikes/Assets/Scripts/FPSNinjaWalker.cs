@@ -6,6 +6,7 @@ public class FPSNinjaWalker : MonoBehaviour
 {
 	public string horizontalAxis = "Horizontal";
 	public string verticalAxis = "Vertical";
+	public string moveButton = "Fire1";
 	
 	public bool useMouse = true;
 	
@@ -17,13 +18,6 @@ public class FPSNinjaWalker : MonoBehaviour
 	
 	private float lastDropTime = 0.0f;
 	
-	private Vector3 mouseOnPlane;
-
-	void OnDrawGizmos()
-	{
-		Gizmos.DrawSphere(mouseOnPlane, 1.0f);
-	}	
-	
 	void FixedUpdate () 
 	{
 		if (grounded) 
@@ -31,18 +25,29 @@ public class FPSNinjaWalker : MonoBehaviour
 			// We are grounded, so recalculate movedirection directly from axes
 			if (useMouse)
 			{
-				//if (Input.mouseOverWindow)
+				if (Input.GetButton(moveButton))
 				{
 					Camera cam = Camera.main;
-					Vector3 pos = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
-					Vector3 dir = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane - 1)) - pos;
 					GameObject plane = GameObject.Find("Plane");
+					
+					Vector3 pos = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
+					Vector3 dir = (pos - cam.transform.position).normalized;
+					
 					Vector3 planeNormal = plane.transform.TransformDirection(Vector3.up);
 					float d = -Vector3.Dot(planeNormal, plane.transform.position);
-					
-					float planeDistance = Vector3.Dot(pos, planeNormal) + d;
-					mouseOnPlane = pos + dir.normalized * planeDistance;
-					//moveDirection = new Vector3(Input);
+					float td = Vector3.Dot(planeNormal, dir);
+					if (td != 0)
+					{
+						float t = -(Vector3.Dot(planeNormal, pos) + d) / td;
+
+						Vector3 mouseOnPlane = pos + dir * t;
+						
+						moveDirection = (mouseOnPlane - transform.position).normalized * speed;
+					}
+				}
+				else
+				{
+						moveDirection = Vector3.zero;
 				}
 			}
 			else
