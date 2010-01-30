@@ -1,22 +1,33 @@
-using UnityEngine;
+    using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
 public class FPSNinjaWalker : MonoBehaviour 
 {
+	
+	public string pokeButton = "Fire2";
+	public string blockButton = "Fire3";
+	
+	private enum State {Pouncing, Blocking ,ReadyToFight};
+	private State state = State.ReadyToFight;
+	
+	public NinjaPokerAnimation pokerAnimation;
 	public string horizontalAxis = "Horizontal";
 	public string verticalAxis = "Vertical";
 	public string moveButton = "Fire1";
 	
 	public bool useMouse = true;
 	
-	public float speed = 6.0f;
+	public float pounceSpeed = 8.0f;
+	public float speed = 4.0f;
 	public float gravity = 20.0f;
+	public float pouncingDuration = 1.0f;
 
 	private Vector3 moveDirection = Vector3.zero;
+	private Vector3 lastKnownMoveDir = Vector3.zero;
 	private bool grounded = false;
-	
-	private float lastDropTime = 0.0f;
+		
+	private float stateResetTime = 0.0f;
 	
 	void FixedUpdate () 
 	{
@@ -27,10 +38,88 @@ public class FPSNinjaWalker : MonoBehaviour
 			return;
 		}
 
-		if (grounded) 
+		switch(state)
+		{
+			case State.Pouncing:
+				pounceForwardWithSwordInHand();
+				break;
+			case State.Blocking:
+				standStillBlockingAttacks();
+				break;
+			case State.ReadyToFight:
+				handleUserInput();
+				break;
+		}
+		
+		if(stateResetTime < Time.time && state!=State.ReadyToFight)
+		{
+			state = State.ReadyToFight;
+			pokerAnimation.Stand();
+		}
+	}
+	
+	
+	
+	private void handleUserInput()
+	{
+		if (Input.GetButton(pokeButton))
+		{
+			pokerAnimation.Poke();
+			state = State.Pouncing;
+			stateResetTime = Time.time + pouncingDuration;
+		}
+		else if (Input.GetButton(blockButton))
+		{
+			//pokerAnimation.Block();
+			//state = State.Block;
+			//stateResetTime = time + blockDelay;
+		}
+		else
+		{
+			handleUserInputMovement();
+		}
+	
+	}
+	
+	private void standStillBlockingAttacks()
+	{
+		
+	}
+	private void pounceForwardWithSwordInHand()
+	{
+		MoveCharacter(lastKnownMoveDir * pounceSpeed);
+	}
+
+	/*	
+		if(state == State.None && pokerAnim.GetState() == NinjaAnimation.State.Poke)
+		{
+			pounceBeginTime = Time.time + pounceDelay;
+			state = State.PounceSoon;
+			Debug.Log("Begin pounce soon");
+		}
+		else if(state == State.PounceSoon && Time.time > pounceBeginTime)
+		{
+			pounceEndTime = Time.time + pounceTime;
+			state = State.Pouncing;
+			moveDirection.Normalize();
+			moveDirection = lastKnownMoveDir * 10;
+			Debug.Log("Begin pounce");
+		}
+		else if ( state == State.Pouncing && Time.time > pounceEndTime)
+		{
+			state = State.None;
+			Debug.Log("End pounce");
+		}
+		
+		
+	}
+	*/
+	private void handleUserInputMovement()
+	{
+		if (grounded && state != State.Pouncing) 
 		{
 			// We are grounded, so recalculate movedirection directly from axes
-			if (useMouse)
+			if (useMouse  )
 			{
 				if (Input.GetButton(moveButton))
 				{
@@ -60,16 +149,25 @@ public class FPSNinjaWalker : MonoBehaviour
 			else
 			{
 				moveDirection = new Vector3(Input.GetAxis(horizontalAxis), 0, Input.GetAxis(verticalAxis));
-				moveDirection = transform.TransformDirection(moveDirection);
+				//moveDirection = transform.TransformDirection(moveDirection);
 				moveDirection *= speed;
 			}
 		}
-
-		// Apply gravity
-		moveDirection.y -= gravity * Time.deltaTime;
+		MoveCharacter(moveDirection);
 		
-		// Move the controller
+		
+	}
+	
+	private void MoveCharacter(Vector3 moveDirection)
+	{
 		CharacterController controller = GetComponent<CharacterController>();
+		moveDirection.y = 0;
+		if(moveDirection.sqrMagnitude!= 0){
+			lastKnownMoveDir = moveDirection;
+			lastKnownMoveDir.Normalize();
+			controller.transform.rotation = Quaternion.LookRotation (moveDirection, Vector3.up);
+		}
+		moveDirection.y -= gravity * Time.deltaTime;
 		CollisionFlags flags = controller.Move(moveDirection * Time.deltaTime);
 		grounded = (flags & CollisionFlags.CollidedBelow) != 0;
 	}
