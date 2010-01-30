@@ -1,0 +1,22 @@
+fileFormatVersion: 1
+guid: 477e3b07af00d4ee49880989515eba98
+ModelImporter:
+  importerVersion: 4
+  meshes:
+    scaleFactor: 1
+    meshCompression: 0
+    generateColliders: 0
+    swapUVs: 0
+  tangentSpace:
+    generation: 0
+    calculateNormals: 0
+    smoothingAngle: 60
+    splitTangents: 0
+  materials:
+    generation: 1
+  animations:
+    generation: 3
+    bakeAnimations: 0
+    animationCompression: 1
+    animationWrapMode: 0
+    splitAnimations: 1
