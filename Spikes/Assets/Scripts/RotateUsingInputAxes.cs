@@ -10,6 +10,10 @@ public class RotateUsingInputAxes : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.Translate(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+		NetworkView networkView = GetComponent<NetworkView>();
+		if (networkView == nulll || networkView.isMine)
+		{
+			transform.Translate(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+		}
 	}
 }
