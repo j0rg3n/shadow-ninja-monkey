@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NetworkTestSpawnCapsule : MonoBehaviour {
+public class NetworkInstantiatePrefab : MonoBehaviour {
 
 	public Transform playerPrefab;
 
