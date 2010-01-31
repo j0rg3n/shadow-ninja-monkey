@@ -9,6 +9,10 @@ public class ConnectGui : MonoBehaviour
 	public int listenPort = 25000;
 	public bool useNAT = false;
 
+	public Font menuFont;
+	public Font textfieldFont;
+	public Texture2D blackBG;
+	
 	void Awake() 
 	{
 		//if (FindObjectOfType<ConnectGuiMasterServer>())
@@ -18,22 +22,25 @@ public class ConnectGui : MonoBehaviour
 	}
 
 	void OnGUI ()
-	{
-		GUILayout.Space(10);
-
-		GUILayout.BeginHorizontal();
-		GUILayout.Space(10);
+	{		
+		GUIStyle menuStyle = new GUIStyle();
+		menuStyle.font = menuFont;
+		menuStyle.normal.textColor = new Color(1,1,1,1);
+		menuStyle.alignment = TextAnchor.LowerLeft;	
 		
+		GUIStyle textFieldStyle = new GUIStyle();
+		textFieldStyle.font = textfieldFont;
+		textFieldStyle.normal.textColor = new Color(1,1,1,1);
+		textFieldStyle.normal.background = blackBG;
+		
+			
 		if (Network.peerType == NetworkPeerType.Disconnected)
 		{
-			GUILayout.BeginVertical();
-			if (GUILayout.Button ("Connect"))
-			{
-				Network.useNat = useNAT;
-				Network.Connect(remoteIP, remotePort);
-			}
-			if (GUILayout.Button ("Start Server"))
-			{
+			int titleWidth = Screen.height*2;
+			GUI.BeginGroup (new Rect ((Screen.width/2) - (Screen.height/2), 0, titleWidth, Screen.height));
+				
+			if (GUI.Button(new Rect (15,(Screen.height-225),150,60), "Start", menuStyle))
+			{		
 				Network.useNat = useNAT;
 				Network.InitializeServer(32, listenPort);
 				
@@ -43,20 +50,31 @@ public class ConnectGui : MonoBehaviour
 					go.SendMessage("OnNetworkLoadedLevel", SendMessageOptions.DontRequireReceiver);		
 				}
 			}
-			GUILayout.EndVertical();
-			remoteIP = GUILayout.TextField(remoteIP, GUILayout.MinWidth(100));
-			remotePort = int.Parse(GUILayout.TextField(remotePort.ToString()));
+	
+			if(GUI.Button(new Rect (15,(Screen.height-145),105,60), "Join", menuStyle))
+			{
+				//Debug.Log("Join FIGHT!");
+				Network.useNat = useNAT;
+				Network.Connect(remoteIP, remotePort);
+			}
+	
+			
+			textFieldStyle.alignment = TextAnchor.MiddleLeft;
+			textFieldStyle.padding.left = 10;
+			remoteIP = GUI.TextField(new Rect (130,(Screen.height-145),230,52), remoteIP, textFieldStyle);			
+			remotePort = int.Parse(GUI.TextField(new Rect (370,(Screen.height-145),100,52), remotePort.ToString(), textFieldStyle));
+
+			GUI.EndGroup ();
 		}
 		else
 		{
-			if (GUILayout.Button ("Disconnect"))
+			textFieldStyle.alignment = TextAnchor.LowerLeft;
+			//textFieldStyle.normal.background = null;
+			if (GUI.Button (new Rect (0, Screen.height-30,180,30), "Disconnect", textFieldStyle))
 			{
 				Network.Disconnect(200);
 			}
 		}
-		
-		GUILayout.FlexibleSpace();
-		GUILayout.EndHorizontal();
 	}
 
 	void OnConnectedToServer() {
