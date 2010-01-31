@@ -24,7 +24,7 @@ public class FPSNinjaWalker : MonoBehaviour
 
 	private Vector3 moveDirection = Vector3.zero;
 	private Vector3 lastKnownMoveDir = Vector3.zero;
-	private bool grounded = false;
+	private bool touchesGround = false;
 		
 	private float stateResetTime = 0.0f;
 	
@@ -59,9 +59,7 @@ public class FPSNinjaWalker : MonoBehaviour
 			state = State.ReadyToFight;
 			pokerAnimation.Stand();
 		}
-	}
-	
-	
+	}	
 	
 	private void handleUserInput()
 	{
@@ -89,41 +87,17 @@ public class FPSNinjaWalker : MonoBehaviour
 	{
 		
 	}
+	
 	private void pounceForwardWithSwordInHand()
 	{
 		MoveCharacter(lastKnownMoveDir * pounceSpeed);
 	}
 
-	/*	
-		if(state == State.None && pokerAnim.GetState() == NinjaAnimation.State.Poke)
-		{
-			pounceBeginTime = Time.time + pounceDelay;
-			state = State.PounceSoon;
-			Debug.Log("Begin pounce soon");
-		}
-		else if(state == State.PounceSoon && Time.time > pounceBeginTime)
-		{
-			pounceEndTime = Time.time + pounceTime;
-			state = State.Pouncing;
-			moveDirection.Normalize();
-			moveDirection = lastKnownMoveDir * 10;
-			Debug.Log("Begin pounce");
-		}
-		else if ( state == State.Pouncing && Time.time > pounceEndTime)
-		{
-			state = State.None;
-			Debug.Log("End pounce");
-		}
-		
-		
-	}
-	*/
 	private void handleUserInputMovement()
 	{
-		if (grounded && state != State.Pouncing) 
+		if (touchesGround && state != State.Pouncing) 
 		{
-			// We are grounded, so recalculate movedirection directly from axes
-			if (useMouse  )
+			if (useMouse)
 			{
 				if (Input.GetButton(moveButton))
 				{
@@ -160,9 +134,8 @@ public class FPSNinjaWalker : MonoBehaviour
 				moveDirection *= speed;
 			}
 		}
-		MoveCharacter(moveDirection);
 		
-		
+		MoveCharacter(moveDirection);		
 	}
 	
 	private void MoveCharacter(Vector3 moveDirection)
@@ -176,6 +149,6 @@ public class FPSNinjaWalker : MonoBehaviour
 		}
 		moveDirection.y -= gravity * Time.deltaTime;
 		CollisionFlags flags = controller.Move(moveDirection * Time.deltaTime);
-		grounded = (flags & CollisionFlags.CollidedBelow) != 0;
+		touchesGround = (flags & CollisionFlags.CollidedBelow) != 0;
 	}
 }
