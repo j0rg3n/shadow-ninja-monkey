@@ -46,7 +46,7 @@ public class LevelLoader : MonoBehaviour {
 		}
 		
 		//Set global game state to fighting
-		GetComponent<GlobalGameState>().GameState = GlobalGameState.State.Fighting;
+		GetComponent<GlobalGameState>().SetFightingState();
 		
 		return level;
 	}
