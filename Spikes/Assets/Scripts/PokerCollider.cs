@@ -62,5 +62,6 @@ public class PokerCollider : MonoBehaviour
 	private void Flash()
 	{
 		flashEndTime = Time.time + 4;
+		GetComponent<NinjaBehaviour>().YouJustGotHit(1);
 	}
 }

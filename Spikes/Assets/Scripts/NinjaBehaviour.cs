@@ -91,10 +91,13 @@ public class NinjaBehaviour : MonoBehaviour {
 	public void YouJustGotHit(int dam)
 	{
 		health-=dam;
+		GameObject.Find("GUIRoot").GetComponent<GameHUD>().SetHealth(color,health);
 		if(health <= 0)
 		{
-			//TODO Die
+			GameObject.Find("GUIRoot").GetComponent<GameHUD>().RegisterKill(color);
 		}
+		
+		
 		
 		//TODO Blood splatter sounds.
 	}
