@@ -7,11 +7,8 @@ public class ColliderSceneStartup : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		GameObject whiteNinja = (GameObject )Instantiate(templateNinja, new Vector3(2,5,0), Quaternion.identity);
-		GameObject blackNinja = (GameObject )Instantiate(templateNinja, new Vector3(-5,5,0), Quaternion.identity);
-		whiteNinja.GetComponent<NinjaBehaviour>().Initialize(NinjaBehaviour.NinjaColor.White,false);
-		blackNinja.GetComponent<NinjaBehaviour>().Initialize(NinjaBehaviour.NinjaColor.Black,false);
-		
+		Instantiate(templateNinja, new Vector3(2,5,0), Quaternion.identity);
+		Instantiate(templateNinja, new Vector3(-5,5,0), Quaternion.identity);		
 	}
 	
 	// Update is called once per frame
