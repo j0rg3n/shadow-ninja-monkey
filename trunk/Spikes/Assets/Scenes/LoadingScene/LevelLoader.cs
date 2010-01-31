@@ -27,6 +27,7 @@ public class LevelLoader : MonoBehaviour {
 	[RPC]
 	public void CreateYourBlackClientNinja(Vector3 blackNinjaPosition)
 	{
+		Debug.Log("WE ARE CREATING A BLACK CLIENT NINJA....");
 		const bool instantiateOnNetwork = true;
 		NinjaBehaviour blackNinja = FlexiInstantiate<NinjaBehaviour>(ninjaCharacter, blackNinjaPosition, Quaternion.identity, instantiateOnNetwork);
 		blackNinja.Initialize(NinjaBehaviour.NinjaColor.Black, instantiateOnNetwork);
