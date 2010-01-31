@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent(typeof(CharacterController))]
 public class FPSNinjaWalker : MonoBehaviour 
 {
+	public AudioSource runAndSlashSound;
+	public AudioSource selfRunAndSlashSound;
 	
 	public string pokeButton = "space";
 	public string blockButton = "left shift";
