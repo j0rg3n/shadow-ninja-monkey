@@ -28,14 +28,9 @@ public class PokerCollider : MonoBehaviour
 	{
 		if (other.tag == "Sword")
 		{
-			Debug.Log("I, the " + ninjaBehaviour.Color + " ninja, was Poked !");
-
 			if (ninjaBehaviour.AmIMyself())
 			{
-				// Tell the other player that he poked us.
-				// We have only two players, so RPCMode.Others is in effect the other player.
-				networkView.RPC("OnPokedOpponent", RPCMode.Others);
-				ninjaBehaviour.YouJustGotHit(1);
+				networkView.RPC("OnPoked", RPCMode.All);
 			}
 		}
 	}
@@ -59,9 +54,10 @@ public class PokerCollider : MonoBehaviour
 	}
 	
 	[RPC]
-	void OnPokedOpponent()
+	void OnPoked()
 	{
-		Debug.Log("I, the " + ninjaBehaviour.Color + " ninja, poked the opponent righteously!");
+		Debug.Log("The " + ninjaBehaviour.Color + " ninja was Poked!");
+		ninjaBehaviour.YouJustGotHit(1);
 		Flash();
 	}
 	

@@ -15,7 +15,7 @@ public class NinjaPokerAnimation : MonoBehaviour
 	// Interpolation state
 	private Quaternion targetRotation;
 	private Quaternion currentRotation;
-	private float moveStartTime = -1000.0f;
+	private float t;
 
 	public void Poke()
 	{
@@ -35,6 +35,9 @@ public class NinjaPokerAnimation : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
+		// Start at end of a key frame.
+		t = 1 * speed;
+		
 		defaultPosition = transform.localPosition;
 		defaultRotation = transform.localRotation;
 		targetRotation = defaultRotation;
@@ -43,7 +46,8 @@ public class NinjaPokerAnimation : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		float t = (Time.time - moveStartTime) * speed;
+		t += speed * Time.deltaTime;
+		
 		
 		Quaternion r;
 		if (t <= 0)
@@ -66,7 +70,7 @@ public class NinjaPokerAnimation : MonoBehaviour
 	private void SetTargetRotation(Quaternion newTargetRotation)
 	{
 		currentRotation = targetRotation;
-		moveStartTime = Time.time;
+		t = 0;
 		targetRotation = newTargetRotation;
 	}
 	
@@ -74,6 +78,6 @@ public class NinjaPokerAnimation : MonoBehaviour
 	{
 		stream.Serialize(ref currentRotation);
 		stream.Serialize(ref targetRotation);
-		stream.Serialize(ref moveStartTime);
+		stream.Serialize(ref t);
 	}
 }
