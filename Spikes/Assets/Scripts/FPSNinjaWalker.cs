@@ -70,6 +70,7 @@ public class FPSNinjaWalker : MonoBehaviour
 			pokerAnimation.Poke();
 			state = State.Pouncing;
 			stateResetTime = Time.time + pouncingDuration;
+			GetComponent<AudioSource>().Play();
 		}
 		else if (Input.GetButton(blockButton))
 		{
