@@ -49,6 +49,13 @@ public class NinjaBehaviour : MonoBehaviour {
 		UpdateMaterial();
 	}
 	
+	void Update()
+	{
+		// Keep HUD updated with our current health.
+		// TODO: Let HUD reference the actual NinjaBehaviour.
+		GameObject.Find("GUIRoot").GetComponent<GameHUD>().SetHealth(color, health);
+	}
+	
 	private void UpdateMaterial()
 	{
 		switch(color)
@@ -91,15 +98,19 @@ public class NinjaBehaviour : MonoBehaviour {
 	public void YouJustGotHit(int dam)
 	{
 		health-=dam;
-		GameObject.Find("GUIRoot").GetComponent<GameHUD>().SetHealth(color,health);
 		if(health <= 0)
 		{
-			GameObject.Find("GUIRoot").GetComponent<GameHUD>().RegisterKill(color);
+			// Tell all servers we were killed.
+			networkView.RPC("OnKilled", RPCMode.All);
 		}
 		
-		
-		
 		//TODO Blood splatter sounds.
+	}
+	
+	[RPC]
+	void OnKilled()
+	{
+		GameObject.Find("GUIRoot").GetComponent<GameHUD>().RegisterKill(color);
 	}
 	
 	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
@@ -107,5 +118,8 @@ public class NinjaBehaviour : MonoBehaviour {
 		int n = (int) color;
 		stream.Serialize(ref n);
 		color = (NinjaColor) n;
+		
+		stream.Serialize(ref health);
+		stream.Serialize(ref score);
 	}
 }

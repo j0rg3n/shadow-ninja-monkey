@@ -11,9 +11,12 @@ public class PokerCollider : MonoBehaviour
 
 	private MeshRenderer meshRenderer;
 	private float flashEndTime = 0;
-	
+	private NinjaBehaviour ninjaBehaviour;
+
 	void Start()
 	{
+		ninjaBehaviour = GetComponent<NinjaBehaviour>();
+		
 		meshRenderer = GetComponentInChildren<MeshRenderer>();
 		if (meshRenderer != null)
 		{
@@ -25,13 +28,14 @@ public class PokerCollider : MonoBehaviour
 	{
 		if (other.tag == "Sword")
 		{
-			NinjaBehaviour ninjaBehavior = GetComponent<NinjaBehaviour>();
-			Debug.Log(ninjaBehavior.Color + " was Poked !");
+			Debug.Log("I, the " + ninjaBehaviour.Color + " ninja, was Poked !");
 
-			if (GetComponent<NinjaBehaviour>().AmIMyself())
+			if (ninjaBehaviour.AmIMyself())
 			{
+				// Tell the other player that he poked us.
 				// We have only two players, so RPCMode.Others is in effect the other player.
 				networkView.RPC("OnPokedOpponent", RPCMode.Others);
+				ninjaBehaviour.YouJustGotHit(1);
 			}
 		}
 	}
@@ -57,12 +61,12 @@ public class PokerCollider : MonoBehaviour
 	[RPC]
 	void OnPokedOpponent()
 	{
+		Debug.Log("I, the " + ninjaBehaviour.Color + " ninja, poked the opponent righteously!");
 		Flash();
 	}
 	
 	private void Flash()
 	{
 		flashEndTime = Time.time + 4;
-		GetComponent<NinjaBehaviour>().YouJustGotHit(1);
 	}
 }
