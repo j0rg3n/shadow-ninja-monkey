@@ -1,0 +1,6 @@
+fileFormatVersion: 1
+guid: 348e4a5367876cb4db7fb18f0210dbda
+MonoImporter:
+  importerVersion: 1
+  defaultReferences:
+    level002: {fileID: 100000, guid: 8c7a4bb6fdeb9f147af926e9ae634792, type: 2}
