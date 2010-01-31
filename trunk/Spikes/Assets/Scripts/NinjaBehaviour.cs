@@ -9,8 +9,7 @@ public class NinjaBehaviour : MonoBehaviour {
 	private static Color MyBlackColor = new Color(0,0,1);
 	private static Color HisWhiteColor = new Color(1,1,1);
 	private static Color HisBlackColor = new Color(0,0,0);
-
-	public GameObject bloodSplatPrefab;
+	
 	
 	private bool noNetwork = true;
 	
@@ -114,7 +113,6 @@ public class NinjaBehaviour : MonoBehaviour {
 		}
 		
 		//TODO Blood splatter sounds.
-		Bleed();
 	}
 	
 	[RPC]
@@ -122,13 +120,12 @@ public class NinjaBehaviour : MonoBehaviour {
 	{
 		Debug.Log("I am killed, says the " + color + " ninja.");
 
-		if (AmIMyself())
+		health = maxHealth;
+		UpdateHUD();
+		
+		if (!AmIMyself())
 		{
 			++score;
-			
-			health = maxHealth;
-			
-			UpdateHUD();
 		}
 		
 		//Go to show death screen state:
@@ -156,10 +153,5 @@ public class NinjaBehaviour : MonoBehaviour {
 		{
 			UpdateHUD();
 		}
-	}
-	
-	private void Bleed()
-	{
-		Instantiate(bloodSplatPrefab, transform.position, Quaternion.identity);
 	}
 }
