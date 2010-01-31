@@ -101,4 +101,11 @@ public class NinjaBehaviour : MonoBehaviour {
 		
 		//TODO Blood splatter sounds.
 	}
+	
+	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	{
+		int n = (int) color;
+		stream.Serialize(ref n);
+		color = (NinjaColor) n;
+	}
 }
