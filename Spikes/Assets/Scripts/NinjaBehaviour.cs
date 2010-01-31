@@ -43,6 +43,11 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	void Start()
 	{
+		if (AmIMyself())
+		{
+			gameObject.AddComponent<AudioListener>();
+		}
+		
 		UpdateMaterial();
 		UpdateHUD();
 	}
