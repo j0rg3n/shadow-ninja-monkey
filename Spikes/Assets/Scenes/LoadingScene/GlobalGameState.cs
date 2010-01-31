@@ -14,12 +14,14 @@ public class GlobalGameState : MonoBehaviour {
 		set {this.state = value;}
 	}
 	
+	// Set global game state to showing death screen state
 	public void SetShowingDeathScreenState()
 	{
 		GameState = State.ShowingDeathScreen;
 		GetComponent<DeathMenu>().enabled = true;
 	}
 	
+	// Set global game state to loading state (main menu)
 	public void SetLoadingState()
 	{
 		if(GameState == State.Fighting)
@@ -35,13 +37,20 @@ public class GlobalGameState : MonoBehaviour {
 		GetComponent<GUIRootBehaviour>().enabled = true;
 	}
 	
+	// Set global game state to fighting state
 	public void SetFightingState()
 	{
 		if(GameState == State.ShowingDeathScreen)
 		{
 			GetComponent<DeathMenu>().enabled = false;
+			
+			//Reset ninja positions:
+			if(Network.peerType == NetworkPeerType.Server)
+			{
+				GetComponent<LevelLoader>().ServerRespawnGame();
+			}
 		}
-		else if(GameState == State.ShowingDeathScreen)
+		else if(GameState == State.Loading)
 		{
 			GetComponent<GUIRootBehaviour>().enabled = false;
 		}
