@@ -12,6 +12,7 @@ public class NinjaBehaviour : MonoBehaviour {
 	public AudioSource beingHitSound;
 	public AudioSource blockingSound;
 	
+	public GameObject bloodSplatPrefab;
 	
 	private bool noNetwork = true;
 	
@@ -158,5 +159,10 @@ public class NinjaBehaviour : MonoBehaviour {
 		{
 			UpdateHUD();
 		}
+	}
+
+	private void Bleed()
+	{
+		Instantiate(bloodSplatPrefab, transform.position, Quaternion.identity);
 	}
 }
