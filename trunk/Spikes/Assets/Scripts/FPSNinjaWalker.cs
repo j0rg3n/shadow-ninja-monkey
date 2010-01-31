@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent(typeof(CharacterController))]
 public class FPSNinjaWalker : MonoBehaviour 
 {
+	public AudioSource runAndSlashSound;
+	public AudioSource selfRunAndSlashSound;
 	
 	public string pokeButton = "Fire2";
 	public string blockButton = "Fire3";
@@ -29,7 +31,7 @@ public class FPSNinjaWalker : MonoBehaviour
 	private bool touchesGround = false;
 		
 	private float stateResetTime = 0.0f;
-	
+	private NinjaBehaviour ninjaBehaviour;
 	
 	public bool IsBlocking()
 	{
@@ -37,12 +39,13 @@ public class FPSNinjaWalker : MonoBehaviour
 	}
 	public void Start()
 	{
-		pokerAnimation  = GetComponentInChildren<NinjaPokerAnimation>();
+		ninjaBehaviour = GetComponent<NinjaBehaviour>();
+		pokerAnimation = GetComponentInChildren<NinjaPokerAnimation>();
 	}
 	
 	void FixedUpdate () 
 	{
-		if(!GetComponent<NinjaBehaviour>().AmIMyself())
+		if(!ninjaBehaviour.AmIMyself())
 		{
 			// Avoid messing with objects owned by the other player.
 			return;
@@ -93,7 +96,14 @@ public class FPSNinjaWalker : MonoBehaviour
 	[RPC]
 	public void OnPounce()
 	{
-		GetComponent<AudioSource>().Play();
+		if (ninjaBehaviour.AmIMyself())
+		{
+			selfRunAndSlashSound.Play();
+		}
+		else
+		{
+			runAndSlashSound.Play();
+		}
 	}
 	
 	private void standStillBlockingAttacks()
