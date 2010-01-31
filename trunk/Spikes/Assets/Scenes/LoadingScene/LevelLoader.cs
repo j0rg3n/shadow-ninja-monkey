@@ -67,7 +67,7 @@ public class LevelLoader : MonoBehaviour {
 	
 	public void ServerRespawnGame()
 	{
-		localNinja.position = level.whiteNinjaPosition;
+		localNinja.gameObject.transform.position = level.whiteNinjaPosition;
 		networkView.RPC("PositionYourBlackNinja", RPCMode.Others, level.blackNinjaPosition);
 	}
 	
@@ -75,7 +75,7 @@ public class LevelLoader : MonoBehaviour {
 	public void PositionYourBlackNinja(Vector3 blackNinjaPosition)
 	{
 		Debug.Log("WE ARE Positioning A BLACK CLIENT NINJA....");
-		localNinja.position = blackNinjaPosition;
+		localNinja.gameObject.transform.position = blackNinjaPosition;
 	}
 	
 	
