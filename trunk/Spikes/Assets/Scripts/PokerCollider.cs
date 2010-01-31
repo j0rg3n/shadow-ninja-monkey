@@ -9,13 +9,15 @@ public class PokerCollider : MonoBehaviour
 	
 	private Material defaultMaterial;
 
-	private MeshRenderer meshRenderer;
 	private float flashEndTime = 0;
+	private MeshRenderer meshRenderer;
 	private NinjaBehaviour ninjaBehaviour;
+	private FPSNinjaWalker ninjaWalker;
 
 	void Start()
 	{
 		ninjaBehaviour = GetComponent<NinjaBehaviour>();
+		ninjaWalker = GetComponent<FPSNinjaWalker>();
 		
 		meshRenderer = GetComponentInChildren<MeshRenderer>();
 		if (meshRenderer != null)
@@ -28,13 +30,9 @@ public class PokerCollider : MonoBehaviour
 	{
 		if (other.tag == "Sword")
 		{
-			if(GetComponent<FPSNinjaWalker>().IsBlocking())
+			if (ninjaBehaviour.AmIMyself())
 			{
-				//Play blocking sound.
-			}
-			else if (ninjaBehaviour.AmIMyself())
-			{
-				networkView.RPC("OnPoked", RPCMode.All);
+				networkView.RPC("OnPoked", RPCMode.All, ninjaWalker.IsBlocking());
 			}
 		}
 	}
@@ -58,11 +56,19 @@ public class PokerCollider : MonoBehaviour
 	}
 	
 	[RPC]
-	void OnPoked()
+	void OnPoked(bool blocked)
 	{
-		Debug.Log("The " + ninjaBehaviour.Color + " ninja was Poked!");
-		ninjaBehaviour.YouJustGotHit(1);
-		Flash();
+		if (blocked)
+		{
+			Debug.Log("The " + ninjaBehaviour.Color + " ninja was Poked, but the attack was thwarted!");
+			ninjaBehaviour.YouJustGotHit(0);
+		}
+		else
+		{
+			Debug.Log("The " + ninjaBehaviour.Color + " ninja was Poked, and bled precious red stuff!");
+			ninjaBehaviour.YouJustGotHit(1);
+			//Flash();
+		}
 	}
 	
 	private void Flash()
