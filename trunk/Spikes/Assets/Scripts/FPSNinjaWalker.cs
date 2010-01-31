@@ -68,7 +68,7 @@ public class FPSNinjaWalker : MonoBehaviour
 			pokerAnimation.Poke();
 			state = State.Pouncing;
 			stateResetTime = Time.time + pouncingDuration;
-			GetComponent<AudioSource>().Play();
+			networkView.RPC("OnPounce", RPCMode.All);
 		}
 		else if (Input.GetButton(blockButton))
 		{
@@ -81,6 +81,12 @@ public class FPSNinjaWalker : MonoBehaviour
 			handleUserInputMovement();
 		}
 	
+	}
+	
+	[RPC]
+	public void OnPounce()
+	{
+		GetComponent<AudioSource>().Play();
 	}
 	
 	private void standStillBlockingAttacks()

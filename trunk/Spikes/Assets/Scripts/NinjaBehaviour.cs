@@ -31,8 +31,6 @@ public class NinjaBehaviour : MonoBehaviour {
 		{
 			return color == NinjaColor.White;
 		}
-		//NetworkView networkView = GetComponent<NetworkView>();
-		//return (noNetwork || networkView == null ||  networkView.isMine);
 	}
 	
 	public void Initialize(NinjaBehaviour.NinjaColor ninjaColor, bool useNetwork)
