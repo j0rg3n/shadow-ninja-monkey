@@ -8,6 +8,9 @@ public class DeathMenu : MonoBehaviour {
 	public Texture2D blackBG ;
 	public bool whiteKilledBlack;
 	
+	public string continueButton = "space";
+	public string quitButton = "escape";
+	
 	public void OnGUI () {
 		int HUDWidth = Screen.width;
 		int HUDHeight = 330;
@@ -71,5 +74,17 @@ public class DeathMenu : MonoBehaviour {
 		
 		GUI.EndGroup ();	
 	
+	}
+	
+	void FixedUpdate()
+	{
+		if(Input.GetKey(continueButton))
+		{
+			GetComponent<GlobalGameState>().SetFightingState();
+		}
+		else if(Input.GetKey(quitButton))
+		{
+			Application.Quit();
+		}
 	}
 }

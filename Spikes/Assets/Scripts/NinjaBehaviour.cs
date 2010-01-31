@@ -36,14 +36,12 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	public void Initialize(NinjaBehaviour.NinjaColor ninjaColor, bool useNetwork)
 	{
+		Debug.Log("Init "+color);
 		this.noNetwork = !useNetwork;
 		this.color = ninjaColor;
 		this.health = maxHealth;
 		this.score = 0;
-	}
-	
-	void Start()
-	{
+		
 		if (AmIMyself())
 		{
 			Debug.Log("The " + color + " ninja is listening.");
@@ -52,6 +50,11 @@ public class NinjaBehaviour : MonoBehaviour {
 		
 		UpdateMaterial();
 		UpdateHUD();
+	}
+	
+	void Start()
+	{
+		Debug.Log("Start "+color);
 	}
 	
 	private void UpdateMaterial()
@@ -123,11 +126,13 @@ public class NinjaBehaviour : MonoBehaviour {
 		{
 			++score;
 			
-			// TODO: End game here.
 			health = maxHealth;
 			
 			UpdateHUD();
 		}
+		
+		//Go to show death screen state:
+		GameObject.Find("GUIRoot").GetComponent<GlobalGameState>().SetShowingDeathScreenState();
 	}
 
 	// Keep HUD updated with our current health and score.
