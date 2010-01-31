@@ -21,11 +21,8 @@ public class GUIRootBehaviour : MonoBehaviour {
 	// Called by ConnectGui once connected.
 	public void OnNetworkLoadedLevel ()
 	{
-		if (Network.peerType == NetworkPeerType.Server)
-		{
-			const bool instantiateOnNetwork = true;
-			currentLevel = GetComponent<LevelLoader>().LoadLevel002(instantiateOnNetwork);
-		}
+		const bool instantiateOnNetwork = true;
+		currentLevel = GetComponent<LevelLoader>().LoadLevel002(instantiateOnNetwork);
 	}
 
 	void OnGUI()
