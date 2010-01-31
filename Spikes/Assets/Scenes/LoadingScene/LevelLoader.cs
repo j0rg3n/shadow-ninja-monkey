@@ -5,6 +5,7 @@ public class LevelLoader : MonoBehaviour {
 
 	public Camera mainCamera;
 	public GameObject level002;
+	public GameObject tutorialLevel;
 	public GameObject ninjaCharacter;
 	private NinjaBehaviour localNinja = null;
 	
@@ -15,7 +16,10 @@ public class LevelLoader : MonoBehaviour {
 		get {return level;}
 	}
 	
-	
+	public NinjaLevel LoadTutorial(bool instantiateOnNetwork)
+	{
+		return null;
+	}
 	
 	public NinjaLevel LoadLevel002(bool instantiateOnNetwork)
 	{
