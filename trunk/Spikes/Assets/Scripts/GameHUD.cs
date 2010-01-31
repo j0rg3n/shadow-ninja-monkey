@@ -28,7 +28,6 @@ public class GameHUD : MonoBehaviour {
 	
 	int blackWidth = (int)Mathf.Max(blackHealth/100.0f * maxBarWidth, 0.0f);
 	int whiteWidth = (int)Mathf.Max(whiteHealth/100.0f * maxBarWidth, 0.0f);
-	Debug.Log(blackWidth);
 	GUI.DrawTexture(new Rect (52,8,blackWidth,22), blackBarBG, ScaleMode.StretchToFill, true, 0);
 	GUI.DrawTexture(new Rect ((HUDWidth-52)-whiteWidth,8,whiteWidth,22), whiteBarBG, ScaleMode.StretchToFill, true, 0);
 	
@@ -53,6 +52,34 @@ public class GameHUD : MonoBehaviour {
 
 	// End the group we started above. This is very important to remember!
 	GUI.EndGroup ();
+}
+
+public void SetHealth(NinjaBehaviour.NinjaColor color, int health)
+{
+	switch(color)
+	{
+		case NinjaBehaviour.NinjaColor.Black:
+			blackHealth = health*10;
+		break;
+		case NinjaBehaviour.NinjaColor.White:
+			whiteHealth = health*10;
+		break;
+		
+	}
+}
+
+public void RegisterKill(NinjaBehaviour.NinjaColor color)
+{
+	switch(color)
+	{
+		case NinjaBehaviour.NinjaColor.Black:
+			whiteScore++;
+		break;
+		case NinjaBehaviour.NinjaColor.White:
+			blackScore++;
+		break;
+		
+	}
 }
 
 private string pad(int number, int length) {
