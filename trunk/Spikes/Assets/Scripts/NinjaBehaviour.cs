@@ -24,28 +24,28 @@ public class NinjaBehaviour : MonoBehaviour {
 	// True if player is this ninja
 	public bool AmIMyself()
 	{
-		NetworkView networkView = GetComponent<NetworkView>();
-		return (noNetwork || networkView == null ||  networkView.isMine);
-	}
-	
-	void Start()
-	{
-		bool useNetwork = Network.peerType != NetworkPeerType.Disconnected;
-		NinjaBehaviour.NinjaColor ninjaColor;
-		if (Network.peerType == NetworkPeerType.Server)
+		if (Network.peerType == NetworkPeerType.Client)
 		{
-			ninjaColor = NinjaBehaviour.NinjaColor.White;
+			return color == NinjaColor.Black;
 		}
 		else
 		{
-			ninjaColor = NinjaBehaviour.NinjaColor.Black;
+			return color == NinjaColor.White;
 		}
-		
+		//NetworkView networkView = GetComponent<NetworkView>();
+		//return (noNetwork || networkView == null ||  networkView.isMine);
+	}
+	
+	public void Initialize(NinjaBehaviour.NinjaColor ninjaColor, bool useNetwork)
+	{
 		this.noNetwork = !useNetwork;
 		this.color = ninjaColor;
 		this.health = maxHealth;
 		this.score = 0;
-
+	}
+	
+	void Start()
+	{
 		UpdateMaterial();
 	}
 	
