@@ -42,7 +42,7 @@ public class NinjaBehaviour : MonoBehaviour {
 		}
 		
 		this.noNetwork = !useNetwork;
-		this.color = color;
+		this.color = ninjaColor;
 		this.health = maxHealth;
 		this.score = 0;
 

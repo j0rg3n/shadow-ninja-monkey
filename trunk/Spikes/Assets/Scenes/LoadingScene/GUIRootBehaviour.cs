@@ -32,6 +32,7 @@ public class GUIRootBehaviour : MonoBehaviour {
 			if(currentSubmenu != null)
 				Destroy(currentSubmenu);
 			currentSubmenu = ((GameObject)Instantiate(directConnect));
+			ConnectGui connectGui = currentSubmenu.GetComponent<ConnectGui>();
 		}
 	}
 }
