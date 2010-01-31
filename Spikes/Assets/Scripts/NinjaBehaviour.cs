@@ -95,6 +95,14 @@ public class NinjaBehaviour : MonoBehaviour {
 		get { return color; }
 	}
 	
+	public void Update()
+	{
+		if(AmIMyself() && Input.GetKey("g"))
+		{
+			YouJustGotHit(3);
+		}
+	}
+	
 	public void YouJustGotHit(int dam)
 	{
 		if (dam > 0)
@@ -106,6 +114,14 @@ public class NinjaBehaviour : MonoBehaviour {
 				{
 					// Tell all servers we were killed.
 					networkView.RPC("OnKilled", RPCMode.All);
+					
+					foreach (NinjaBehaviour ninja in FindObjectsOfType(typeof(NinjaBehaviour)))
+					{
+						if (ninja.color != color)
+						{
+							ninja.networkView.RPC("OnWon", RPCMode.All);
+						}
+					}
 				}
 				UpdateHUD();
 			}
@@ -127,15 +143,19 @@ public class NinjaBehaviour : MonoBehaviour {
 	void OnKilled()
 	{
 		Debug.Log("I am killed, says the " + color + " ninja.");
+		GameObject.Find("GUIRoot").GetComponent<GlobalGameState>().SetShowingDeathScreenState();
+	}
 
-		health = maxHealth;
-		
-		if (!AmIMyself())
+	[RPC]
+	void OnWon()
+	{
+		Debug.Log("I am the victor, says the " + color + " ninja.");
+
+		if (AmIMyself())
 		{
 			++score;
+			UpdateHUD();
 		}
-		
-		UpdateHUD();
 	}
 
 	// Keep HUD updated with our current health and score.
