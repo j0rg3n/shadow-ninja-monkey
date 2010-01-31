@@ -69,4 +69,11 @@ public class NinjaPokerAnimation : MonoBehaviour
 		moveStartTime = Time.time;
 		targetRotation = newTargetRotation;
 	}
+	
+	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	{
+		stream.Serialize(ref currentRotation);
+		stream.Serialize(ref targetRotation);
+		stream.Serialize(ref moveStartTime);
+	}
 }
