@@ -16,24 +16,29 @@ public class LevelLoader : MonoBehaviour {
 		get {return level;}
 	}
 	
-	public NinjaLevel LoadTutorial(bool instantiateOnNetwork)
+	public NinjaLevel LoadTutorialLevel(bool instantiateOnNetwork)
 	{
-		return null;
+		return LoadSomeLevel(tutorialLevel, instantiateOnNetwork);
 	}
 	
 	public NinjaLevel LoadLevel002(bool instantiateOnNetwork)
+	{
+		return LoadSomeLevel(level002, instantiateOnNetwork);
+	}
+	
+	private NinjaLevel LoadSomeLevel(GameObject originalLevel, bool instantiateOnNetwork)
 	{
 		if (instantiateOnNetwork)
 		{
 			if (Network.peerType == NetworkPeerType.Server)
 			{
-				level = FlexiInstantiate<NinjaLevel>(level002, new Vector3(0,0,0), Quaternion.identity, instantiateOnNetwork);
+				level = FlexiInstantiate<NinjaLevel>(originalLevel, new Vector3(0,0,0), Quaternion.identity, instantiateOnNetwork);
 				mainCamera.transform.position = level.cameraPosition;
 			}
 		}
 		else
 		{
-			level = FlexiInstantiate<NinjaLevel>(level002, new Vector3(0,0,0), Quaternion.identity, instantiateOnNetwork);
+			level = FlexiInstantiate<NinjaLevel>(originalLevel, new Vector3(0,0,0), Quaternion.identity, instantiateOnNetwork);
 			mainCamera.transform.position = level.cameraPosition;
 
 			localNinja = CreateNinja(NinjaBehaviour.NinjaColor.White, level.whiteNinjaPosition, instantiateOnNetwork);
