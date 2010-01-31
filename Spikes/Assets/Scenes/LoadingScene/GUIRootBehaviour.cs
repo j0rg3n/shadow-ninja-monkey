@@ -5,6 +5,7 @@ public class GUIRootBehaviour : MonoBehaviour {
 
 	private NinjaLevel currentLevel;
 	public GameObject directConnect;
+	private bool hasPlayedTutorial = false;
 	
 	private GameObject currentSubmenu;
 	
@@ -21,8 +22,17 @@ public class GUIRootBehaviour : MonoBehaviour {
 	// Called by ConnectGui once connected.
 	public void OnNetworkLoadedLevel ()
 	{
+		DisposeCurrentLevel();
 		const bool instantiateOnNetwork = true;
-		currentLevel = GetComponent<LevelLoader>().LoadLevel002(instantiateOnNetwork);
+		if(hasPlayedTutorial)
+		{
+			currentLevel = GetComponent<LevelLoader>().LoadLevel002(instantiateOnNetwork);
+		}
+		else
+		{
+			currentLevel = GetComponent<LevelLoader>().LoadTutorialLevel(instantiateOnNetwork);
+			hasPlayedTutorial = true;
+		}
 	}
 	
 	public void DisposeCurrentLevel()

@@ -52,6 +52,9 @@ public class GlobalGameState : MonoBehaviour {
 			//Reset ninja positions:
 			if(Network.peerType == NetworkPeerType.Server)
 			{
+				//HACK: Load a new game
+				GetComponent<GUIRootBehaviour>().OnNetworkLoadedLevel ();
+				
 				GetComponent<LevelLoader>().ServerRespawnGame();
 			}
 			
