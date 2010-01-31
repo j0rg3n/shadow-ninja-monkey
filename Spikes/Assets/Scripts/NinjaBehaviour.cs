@@ -9,6 +9,8 @@ public class NinjaBehaviour : MonoBehaviour {
 	private static Color MyBlackColor = new Color(0,0,1);
 	private static Color HisWhiteColor = new Color(1,1,1);
 	private static Color HisBlackColor = new Color(0,0,0);
+	public AudioSource beingHitSound;
+	public AudioSource blockingSound;
 	
 	
 	private bool noNetwork = true;
@@ -35,12 +37,14 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	public void Initialize(NinjaBehaviour.NinjaColor ninjaColor, bool useNetwork)
 	{
-		Debug.Log("Init "+color);
 		this.noNetwork = !useNetwork;
 		this.color = ninjaColor;
 		this.health = maxHealth;
 		this.score = 0;
-		
+	}
+	
+	void Start()
+	{
 		if (AmIMyself())
 		{
 			Debug.Log("The " + color + " ninja is listening.");
@@ -49,11 +53,6 @@ public class NinjaBehaviour : MonoBehaviour {
 		
 		UpdateMaterial();
 		UpdateHUD();
-	}
-	
-	void Start()
-	{
-		Debug.Log("Start "+color);
 	}
 	
 	private void UpdateMaterial()
@@ -97,22 +96,30 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	public void YouJustGotHit(int dam)
 	{
-		if (AmIMyself())
+		if (dam > 0)
 		{
-			health-=dam;
-			if(health <= 0)
+			if (AmIMyself())
 			{
-				// Tell all servers we were killed.
-				networkView.RPC("OnKilled", RPCMode.All);
+				health-=dam;
+				if(health <= 0)
+				{
+					// Tell all servers we were killed.
+					networkView.RPC("OnKilled", RPCMode.All);
+				}
+				UpdateHUD();
 			}
-			UpdateHUD();
+			else
+			{
+				// WHO AM I!!??!
+			}
+			
+			beingHitSound.Play();
+			Bleed();
 		}
 		else
 		{
-			// WHO AM I!!??!
+			blockingSound.Play();
 		}
-		
-		//TODO Blood splatter sounds.
 	}
 	
 	[RPC]
@@ -121,15 +128,13 @@ public class NinjaBehaviour : MonoBehaviour {
 		Debug.Log("I am killed, says the " + color + " ninja.");
 
 		health = maxHealth;
-		UpdateHUD();
 		
 		if (!AmIMyself())
 		{
 			++score;
 		}
 		
-		//Go to show death screen state:
-		GameObject.Find("GUIRoot").GetComponent<GlobalGameState>().SetShowingDeathScreenState();
+		UpdateHUD();
 	}
 
 	// Keep HUD updated with our current health and score.
