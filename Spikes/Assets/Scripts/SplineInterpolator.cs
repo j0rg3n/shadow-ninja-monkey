@@ -201,8 +201,6 @@ public class SplineInterpolator : MonoBehaviour
 		return MathUtils.GetQuatSquad(t, Q1, Q2, T1, T2);
 	}
 
-
-
 	public Vector3 GetHermiteInternal(int idxFirstPoint, float t)
 	{
 		float t2 = t * t;
@@ -226,7 +224,6 @@ public class SplineInterpolator : MonoBehaviour
 		return Blend1 * P1 + Blend2 * P2 + Blend3 * T1 + Blend4 * T2;
 	}
 
-
 	public Vector3 GetHermiteAtTime(float timeParam)
 	{
 		if (timeParam >= mNodes[mNodes.Count - 2].Time)
@@ -244,5 +241,11 @@ public class SplineInterpolator : MonoBehaviour
 		param = MathUtils.Ease(param, mNodes[idx].EaseIO.x, mNodes[idx].EaseIO.y);
 
 		return GetHermiteInternal(idx, param);
+	}
+	
+	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	{
+		stream.Serialize(ref mCurrentIdx);
+		stream.Serialize(ref mCurrentTime);
 	}
 }
