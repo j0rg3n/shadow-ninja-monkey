@@ -25,7 +25,8 @@ public class PokerCollider : MonoBehaviour
 	{
 		if (other.tag == "Sword")
 		{
-			Debug.Log(name + " was Poked !");
+			NinjaBehaviour ninjaBehavior = GetComponent<NinjaBehaviour>();
+			Debug.Log(ninjaBehavior.Color + " was Poked !");
 
 			if (GetComponent<NinjaBehaviour>().AmIMyself())
 			{
