@@ -157,6 +157,12 @@ public class NinjaBehaviour : MonoBehaviour {
 			UpdateHUD();
 		}
 	}
+	
+	public void ResetHealth()
+	{
+		health = maxHealth;
+		UpdateHUD();
+	}
 
 	// Keep HUD updated with our current health and score.
 	public void UpdateHUD()
