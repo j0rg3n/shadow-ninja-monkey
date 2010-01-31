@@ -17,24 +17,36 @@ public class GUIRootBehaviour : MonoBehaviour {
 	void Update () {
 	
 	}
-	
+
+	// Called by ConnectGui once connected.
+	public void OnNetworkLoadedLevel ()
+	{
+		const bool instantiateOnNetwork = true;
+		currentLevel = GetComponent<LevelLoader>().LoadLevel002(instantiateOnNetwork);
+	}
+
 	void OnGUI()
 	{
-		GetComponent<GameHUD>().whiteScore = 2;
 		if (GUI.Button (new Rect (10,110,150,40), "Singleplayer")) {
 			if(currentLevel!=null)
 				currentLevel.Dispose();
-			currentLevel = GetComponent<LevelLoader>().LoadLevel002();
+
+			const bool instantiateOnNetwork = false;
+			currentLevel = GetComponent<LevelLoader>().LoadLevel002(instantiateOnNetwork);
 			
 		}
-		if (GUI.Button (new Rect (10,160,150,40), "Dualplayer")) {
-			//if(currentLevel!=null)
-			//	currentLevel.Dispose();
-			//currentLevel = GetComponent<LevelLoader>().LoadLevel002();
+		
+		if (GUI.Button (new Rect (10,160,150,40), "Dualplayer")) 
+		{
+			if (currentLevel!=null)
+			{
+				currentLevel.Dispose();
+			}
+
 			if(currentSubmenu != null)
 				Destroy(currentSubmenu);
-			currentSubmenu = ((GameObject)Instantiate(directConnect));
-			ConnectGui connectGui = currentSubmenu.GetComponent<ConnectGui>();
+			
+			currentSubmenu = (GameObject) Instantiate(directConnect);
 		}
 	}
 }

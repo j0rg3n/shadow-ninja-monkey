@@ -7,7 +7,7 @@ public class NetworkInstantiateNinja : MonoBehaviour {
 
 	public void OnNetworkLoadedLevel ()
 	{
-		Network.Instantiate(playerPrefab, transform.position, transform.rotation, 0);
+		//Network.Instantiate(playerPrefab, transform.position, transform.rotation, 0);
 	}
 
 	void OnPlayerDisconnected (NetworkPlayer player)
