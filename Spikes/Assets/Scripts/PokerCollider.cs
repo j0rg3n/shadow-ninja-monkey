@@ -27,7 +27,7 @@ public class PokerCollider : MonoBehaviour
 		{
 			Debug.Log(name + " was Poked !");
 
-			if (networkView != null && networkView.isMine)
+			if (GetComponent<NinjaBehaviour>().AmIMyself())
 			{
 				// We have only two players, so RPCMode.Others is in effect the other player.
 				networkView.RPC("OnPokedOpponent", RPCMode.Others);
