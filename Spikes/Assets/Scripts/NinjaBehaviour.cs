@@ -2,12 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 public class NinjaBehaviour : MonoBehaviour {
-
 	
 	public enum NinjaColor {Black, White};
 	
-	private static Color MyWhiteColor = new Color(0.8f,0.8f,0.8f);
-	private static Color MyBlackColor = new Color(0.5f,0.5f,0.5f);
+	private static Color MyWhiteColor = new Color(1,0,0);
+	private static Color MyBlackColor = new Color(0,0,1);
 	private static Color HisWhiteColor = new Color(1,1,1);
 	private static Color HisBlackColor = new Color(0,0,0);
 	
@@ -22,23 +21,6 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	public static int maxHealth = 10;
 	
-	/*
-	public void Start()
-	{
-		Initialize(NinjaColor.MyBlack);
-	}
-	*/
-	
-	
-	public void Initialize(NinjaColor color, bool useNetwork)
-	{
-		this.noNetwork = !useNetwork;
-		this.color = color;
-		UpdateMaterial();
-		this.health = maxHealth;
-		this.score = 0;
-	}
-	
 	// True if player is this ninja
 	public bool AmIMyself()
 	{
@@ -46,15 +28,37 @@ public class NinjaBehaviour : MonoBehaviour {
 		return (noNetwork || networkView == null ||  networkView.isMine);
 	}
 	
+	void Start()
+	{
+		bool useNetwork = Network.peerType != NetworkPeerType.Disconnected;
+		NinjaBehaviour.NinjaColor ninjaColor;
+		if (Network.peerType == NetworkPeerType.Server)
+		{
+			ninjaColor = NinjaBehaviour.NinjaColor.White;
+		}
+		else
+		{
+			ninjaColor = NinjaBehaviour.NinjaColor.Black;
+		}
+		
+		this.noNetwork = !useNetwork;
+		this.color = color;
+		this.health = maxHealth;
+		this.score = 0;
+
+		UpdateMaterial();
+	}
+	
 	private void UpdateMaterial()
 	{
 		switch(color)
 		{
 			case NinjaColor.White:
-				SetColorOnAllChildren(AmIMyself()? MyWhiteColor : HisWhiteColor);
+				SetColorOnAllChildren(AmIMyself() ? MyWhiteColor : HisWhiteColor);
 				break;
+			
 			case NinjaColor.Black:
-				SetColorOnAllChildren(AmIMyself()? MyBlackColor : HisBlackColor);
+				SetColorOnAllChildren(AmIMyself() ? MyBlackColor : HisBlackColor);
 				break;
 		}
 	}
