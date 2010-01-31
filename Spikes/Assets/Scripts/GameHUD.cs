@@ -11,10 +11,12 @@ public class GameHUD : MonoBehaviour {
 	public Font scoreFont;
 	public Texture2D whiteBarBG ;
 	public Texture2D blackBarBG ;
-
+	public bool showMe = false;
+	
 	public void OnGUI () {
 	//GUI.skin = ninjaSkin;
-	
+	if (!showMe) return;
+		
 	int HUDWidth = 446;
 	int HUDHeight = 38;
 	int maxBarWidth = 168;

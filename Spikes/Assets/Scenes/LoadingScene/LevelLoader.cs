@@ -48,6 +48,8 @@ public class LevelLoader : MonoBehaviour {
 		//Set global game state to fighting
 		GetComponent<GlobalGameState>().SetFightingState();
 		
+		((GameHUD)FindObjectOfType(typeof(GameHUD))).showMe = true;
+		
 		return level;
 	}
 	
@@ -74,7 +76,7 @@ public class LevelLoader : MonoBehaviour {
 	}
 
 	private NinjaBehaviour CreateNinja(NinjaBehaviour.NinjaColor color, Vector3 position, bool instantiateOnNetwork)
-	{
+	{		
 		Debug.Log("Creating " + color + " local");
 		NinjaBehaviour ninja = FlexiInstantiate<NinjaBehaviour>(ninjaCharacter, position, Quaternion.identity, instantiateOnNetwork);
 		ninja.Initialize(color, instantiateOnNetwork);
