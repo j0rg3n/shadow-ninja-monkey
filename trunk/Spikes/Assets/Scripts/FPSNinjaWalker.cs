@@ -21,6 +21,8 @@ public class FPSNinjaWalker : MonoBehaviour
 	public float speed = 4.0f;
 	public float gravity = 20.0f;
 	public float pouncingDuration = 1.0f;
+	
+	public float blockDuration = 0.4f;
 
 	private Vector3 moveDirection = Vector3.zero;
 	private Vector3 lastKnownMoveDir = Vector3.zero;
@@ -28,6 +30,11 @@ public class FPSNinjaWalker : MonoBehaviour
 		
 	private float stateResetTime = 0.0f;
 	
+	
+	public bool IsBlocking()
+	{
+		return state == State.Blocking;
+	}
 	public void Start()
 	{
 		pokerAnimation  = GetComponentInChildren<NinjaPokerAnimation>();
@@ -72,9 +79,9 @@ public class FPSNinjaWalker : MonoBehaviour
 		}
 		else if (Input.GetButton(blockButton))
 		{
-			//pokerAnimation.Block();
-			//state = State.Block;
-			//stateResetTime = time + blockDelay;
+			pokerAnimation.Block();
+			state = State.Blocking;
+			stateResetTime = Time.time + blockDuration;
 		}
 		else
 		{

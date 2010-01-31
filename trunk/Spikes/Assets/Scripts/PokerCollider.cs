@@ -28,7 +28,11 @@ public class PokerCollider : MonoBehaviour
 	{
 		if (other.tag == "Sword")
 		{
-			if (ninjaBehaviour.AmIMyself())
+			if(GetComponent<FPSNinjaWalker>().IsBlocking())
+			{
+				//Play blocking sound.
+			}
+			else if (ninjaBehaviour.AmIMyself())
 			{
 				networkView.RPC("OnPoked", RPCMode.All);
 			}
