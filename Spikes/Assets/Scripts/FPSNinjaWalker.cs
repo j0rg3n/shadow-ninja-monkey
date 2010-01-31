@@ -4,11 +4,9 @@ using System.Collections;
 [RequireComponent(typeof(CharacterController))]
 public class FPSNinjaWalker : MonoBehaviour 
 {
-	public AudioSource runAndSlashSound;
-	public AudioSource selfRunAndSlashSound;
 	
-	public string pokeButton = "Fire2";
-	public string blockButton = "Fire3";
+	public string pokeButton = "space";
+	public string blockButton = "left shift";
 	
 	private enum State {Pouncing, Blocking ,ReadyToFight};
 	private State state = State.ReadyToFight;
@@ -19,10 +17,10 @@ public class FPSNinjaWalker : MonoBehaviour
 	public string moveButton = "Fire1";
 	
 	public bool useMouse = true;
-	public float pounceSpeed = 8.0f;
+	public float pounceSpeed = 16.0f;
 	public float speed = 4.0f;
 	public float gravity = 20.0f;
-	public float pouncingDuration = 1.0f;
+	public float pouncingDuration = 0.5f;
 	
 	public float blockDuration = 0.4f;
 
@@ -32,6 +30,7 @@ public class FPSNinjaWalker : MonoBehaviour
 		
 	private float stateResetTime = 0.0f;
 	private NinjaBehaviour ninjaBehaviour;
+	
 	
 	public bool IsBlocking()
 	{
@@ -73,14 +72,14 @@ public class FPSNinjaWalker : MonoBehaviour
 	
 	private void handleUserInput()
 	{
-		if (Input.GetButton(pokeButton))
+		if (Input.GetKey(pokeButton))
 		{
 			pokerAnimation.Poke();
 			state = State.Pouncing;
 			stateResetTime = Time.time + pouncingDuration;
 			networkView.RPC("OnPounce", RPCMode.All);
 		}
-		else if (Input.GetButton(blockButton))
+		else if (Input.GetKey(blockButton))
 		{
 			pokerAnimation.Block();
 			state = State.Blocking;

@@ -49,6 +49,9 @@ public class GlobalGameState : MonoBehaviour {
 			{
 				GetComponent<LevelLoader>().ServerRespawnGame();
 			}
+			
+			//Todo Switch level
+			//GetComponent<LevelLoader>().
 		}
 		else if(GameState == State.Loading)
 		{

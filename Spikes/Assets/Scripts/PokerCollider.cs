@@ -66,7 +66,7 @@ public class PokerCollider : MonoBehaviour
 		else
 		{
 			Debug.Log("The " + ninjaBehaviour.Color + " ninja was Poked, and bled precious red stuff!");
-			ninjaBehaviour.YouJustGotHit(1);
+			ninjaBehaviour.YouJustGotHit(5);
 			//Flash();
 		}
 	}
