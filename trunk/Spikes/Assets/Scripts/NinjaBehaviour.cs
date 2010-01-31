@@ -45,6 +45,7 @@ public class NinjaBehaviour : MonoBehaviour {
 	{
 		if (AmIMyself())
 		{
+			Debug.Log("The " + color + " ninja is listening.");
 			gameObject.AddComponent<AudioListener>();
 		}
 		
