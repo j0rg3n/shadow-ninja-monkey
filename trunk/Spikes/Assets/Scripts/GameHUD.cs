@@ -68,15 +68,15 @@ public void SetHealth(NinjaBehaviour.NinjaColor color, int health)
 	}
 }
 
-public void RegisterKill(NinjaBehaviour.NinjaColor color)
+public void SetScore(NinjaBehaviour.NinjaColor color, int score)
 {
 	switch(color)
 	{
 		case NinjaBehaviour.NinjaColor.Black:
-			whiteScore++;
+			whiteScore = score;
 		break;
 		case NinjaBehaviour.NinjaColor.White:
-			blackScore++;
+			blackScore = score;
 		break;
 		
 	}

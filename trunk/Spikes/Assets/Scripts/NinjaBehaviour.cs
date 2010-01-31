@@ -15,11 +15,10 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	private NinjaColor color;
 	
-	private int score;
-	
+	private int score;	
 	private int health;
 	
-	public static int maxHealth = 10;
+	public const int maxHealth = 10;
 	
 	// True if player is this ninja
 	public bool AmIMyself()
@@ -47,13 +46,7 @@ public class NinjaBehaviour : MonoBehaviour {
 	void Start()
 	{
 		UpdateMaterial();
-	}
-	
-	void Update()
-	{
-		// Keep HUD updated with our current health.
-		// TODO: Let HUD reference the actual NinjaBehaviour.
-		GameObject.Find("GUIRoot").GetComponent<GameHUD>().SetHealth(color, health);
+		UpdateHUD();
 	}
 	
 	private void UpdateMaterial()
@@ -97,11 +90,19 @@ public class NinjaBehaviour : MonoBehaviour {
 	
 	public void YouJustGotHit(int dam)
 	{
-		health-=dam;
-		if(health <= 0)
+		if (AmIMyself())
 		{
-			// Tell all servers we were killed.
-			networkView.RPC("OnKilled", RPCMode.All);
+			health-=dam;
+			if(health <= 0)
+			{
+				// Tell all servers we were killed.
+				networkView.RPC("OnKilled", RPCMode.All);
+			}
+			UpdateHUD();
+		}
+		else
+		{
+			// WHO AM I!!??!
 		}
 		
 		//TODO Blood splatter sounds.
@@ -110,7 +111,25 @@ public class NinjaBehaviour : MonoBehaviour {
 	[RPC]
 	void OnKilled()
 	{
-		GameObject.Find("GUIRoot").GetComponent<GameHUD>().RegisterKill(color);
+		Debug.Log("I am killed, says the " + color + " ninja.");
+
+		if (AmIMyself())
+		{
+			++score;
+			
+			// TODO: End game here.
+			health = maxHealth;
+			
+			UpdateHUD();
+		}
+	}
+
+	// Keep HUD updated with our current health and score.
+	public void UpdateHUD()
+	{
+		// TODO: Let HUD reference the actual NinjaBehaviour.
+		GameObject.Find("GUIRoot").GetComponent<GameHUD>().SetHealth(color, health);
+		GameObject.Find("GUIRoot").GetComponent<GameHUD>().SetScore(color, score);
 	}
 	
 	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
@@ -121,5 +140,10 @@ public class NinjaBehaviour : MonoBehaviour {
 		
 		stream.Serialize(ref health);
 		stream.Serialize(ref score);
+
+		if (!stream.isWriting)
+		{
+			UpdateHUD();
+		}
 	}
 }
