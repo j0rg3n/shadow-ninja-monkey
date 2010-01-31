@@ -20,10 +20,12 @@ public class GUIRootBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
+		GetComponent<GameHUD>().whiteScore = 2;
 		if (GUI.Button (new Rect (10,110,150,40), "Singleplayer")) {
 			if(currentLevel!=null)
 				currentLevel.Dispose();
 			currentLevel = GetComponent<LevelLoader>().LoadLevel002();
+			
 		}
 		if (GUI.Button (new Rect (10,160,150,40), "Dualplayer")) {
 			//if(currentLevel!=null)
