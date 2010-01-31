@@ -28,6 +28,9 @@ public class LevelLoader : MonoBehaviour {
 			CreateNinja(NinjaBehaviour.NinjaColor.Black, level.blackNinjaPosition, instantiateOnNetwork);
 		}
 		
+		//Set global game state to fighting
+		GetComponent<GlobalGameState>().GameState = GlobalGameState.State.Fighting;
+		
 		return level;
 	}
 	
