@@ -6,7 +6,7 @@ public class LevelLoader : MonoBehaviour {
 	public Camera mainCamera;
 	public GameObject level002;
 	public GameObject ninjaCharacter;
-	private NinjaBehaviour localNinja;
+	private NinjaBehaviour localNinja = null;
 	
 	private NinjaLevel level = null;
 
@@ -52,9 +52,16 @@ public class LevelLoader : MonoBehaviour {
 	
 	public void OnPlayerConnected(NetworkPlayer player)
 	{
+		if(localNinja!=null)
+		{
+			//Ninjas already instantiated:
+			ServerRespawnGame();
+			return;
+		}
 		const bool instantiateOnNetwork = true;
 		localNinja = CreateNinja(NinjaBehaviour.NinjaColor.White, level.whiteNinjaPosition, instantiateOnNetwork);
 		networkView.RPC("CreateYourBlackClientNinja", RPCMode.Others, level.blackNinjaPosition);
+		
 	}
 
 	private NinjaBehaviour CreateNinja(NinjaBehaviour.NinjaColor color, Vector3 position, bool instantiateOnNetwork)
@@ -62,19 +69,32 @@ public class LevelLoader : MonoBehaviour {
 		Debug.Log("Creating " + color + " local");
 		NinjaBehaviour ninja = FlexiInstantiate<NinjaBehaviour>(ninjaCharacter, position, Quaternion.identity, instantiateOnNetwork);
 		ninja.Initialize(color, instantiateOnNetwork);
+		GetComponent<GlobalGameState>().SetFightingState();
 		return ninja;
 	}
-	
+	/*
+	public void Update()
+	{
+		if(Input.GetKey("t"))
+		{
+			ServerRespawnGame();
+		}
+	}
+	*/
 	public void ServerRespawnGame()
 	{
+		Debug.Log("Server respawn");
 		localNinja.gameObject.transform.position = level.whiteNinjaPosition;
+		localNinja.ResetHealth();
 		networkView.RPC("PositionYourBlackNinja", RPCMode.Others, level.blackNinjaPosition);
 	}
 	
 	[RPC]
 	public void PositionYourBlackNinja(Vector3 blackNinjaPosition)
 	{
+		Debug.Log("Client respawn");
 		Debug.Log("WE ARE Positioning A BLACK CLIENT NINJA....");
+		localNinja.ResetHealth();
 		localNinja.gameObject.transform.position = blackNinjaPosition;
 	}
 	

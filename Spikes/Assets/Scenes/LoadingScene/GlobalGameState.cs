@@ -24,14 +24,19 @@ public class GlobalGameState : MonoBehaviour {
 	// Set global game state to loading state (main menu)
 	public void SetLoadingState()
 	{
+		//TODO Dispose level
+		GetComponent<GUIRootBehaviour>().DisposeCurrentLevel();
+		
 		if(GameState == State.Fighting)
 		{
-			//TODO Dispose level
+			
 			
 		}
 		else if(GameState == State.ShowingDeathScreen)
 		{
-			GetComponent<GUIRootBehaviour>().enabled = false;
+			GetComponent<DeathMenu>().enabled = false;
+			
+			
 		}
 		GameState = State.Loading;
 		GetComponent<GUIRootBehaviour>().enabled = true;

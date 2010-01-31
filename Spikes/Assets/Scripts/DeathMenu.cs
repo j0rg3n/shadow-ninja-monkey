@@ -84,7 +84,7 @@ public class DeathMenu : MonoBehaviour {
 		}
 		else if(Input.GetKey(quitButton))
 		{
-			Application.Quit();
+			GetComponent<GlobalGameState>().SetLoadingState();
 		}
 	}
 }
