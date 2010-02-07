@@ -1,0 +1,4 @@
+List of refactorings before we're done:
+---
+1. Move behaviors from Scripts to Components. Keep helper scripts (MathUtils etc.) in Scripts.
+2. Kill standard assets that are not used, including the pro assets.
