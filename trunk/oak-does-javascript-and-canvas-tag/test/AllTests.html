@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script src="../lib/jquery-1.4.1.min.js"></script>
+<link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+<script type="text/javascript" src="qunit.js"></script>
+
+<script type="text/javascript" src="../WebContent/js/Point.js"></script>
+<script type="text/javascript" src="../WebContent/js/Edge.js"></script>
+<script type="text/javascript" src="../WebContent/js/Scene.js"></script>
+<script type="text/javascript" src="../WebContent/js/EdgeSorter.js"></script>
+<script type="text/javascript" >
+
+$(document).ready(function(){
+
+	Point.unitTests();
+	Edge.unitTests();
+	Scene.unitTests();
+	EdgeSorter.unitTests();
+});
+</script>
+  
+</head>
+<body>
+ <h1 id="qunit-header">QUnit example</h1>
+ <h2 id="qunit-banner"></h2>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+</body>
+</html>
