@@ -82,7 +82,7 @@ Point.prototype.multiplyLocal = function(s)
 };
 
 /**
- * @param p 
+ * @param Point p 
  * @return float
  */
 Point.prototype.distanceToSquared = function(p)

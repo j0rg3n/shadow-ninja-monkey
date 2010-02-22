@@ -25,7 +25,7 @@ EdgeSorter.prototype.findNearestEdge = function(light,edges)
 };
 
 /**
- * This method will return a sorted list of edges (end/start-points) used for light-calculation.
+ * This method will return a sorted (counter-clockwise) list of edges (end/start-points) used for light-calculation.
  * 
  * @param Point light - The light to sort around
  * @param Edge[] edges - An array of visible edges.

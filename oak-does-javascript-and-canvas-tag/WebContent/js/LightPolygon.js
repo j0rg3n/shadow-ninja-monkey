@@ -1,5 +1,5 @@
 
-function LightLayer()
+function LightPolygon()
 {
 	this.polygon = [];
 }
@@ -10,7 +10,7 @@ function LightLayer()
  * @param Point p
  * @return
  */
-LightLayer.prototype.addPolygonPoint = function(p)
+LightPolygon.prototype.addPoint = function(p)
 {
 	this.polygon.push(p);
 };
@@ -20,22 +20,22 @@ LightLayer.prototype.addPolygonPoint = function(p)
  * 
  * @return Point[] - The array of points that describe the light polygon.
  */
-LightLayer.prototype.getPolygon = function()
+LightPolygon.prototype.getPoints = function()
 {
 	return this.polygon;
 };
 
 
 
-LightLayer.unitTests = function()
+LightPolygon.unitTests = function()
 {
-	module('LightLayer');
+	module('LightPolygon');
 
-	test("addPolygonPoint", function() {
-		var lightLayer = new LightLayer();
-		lightLayer.addPolygonPoint(new Point(42, 43));
-		lightLayer.addPolygonPoint(new Point(14, -56));
-		var poly = lightLayer.getPolygon();
+	test("addPoint and getPoints", function() {
+		var lightPolygon = new LightPolygon();
+		lightPolygon.addPoint(new Point(42, 43));
+		lightPolygon.addPoint(new Point(14, -56));
+		var poly = lightPolygon.getPoints();
 		equals( poly.length, 2, "Two points in the polygon");
 		equals( poly[0].x, 42, "x-value of point[0]");
 		equals( poly[0].y, 43, "y-value of point[0]");

@@ -30,7 +30,7 @@ Edge.prototype.isVisible = function(light)
 
 /**
  * Get the nearest point on the edge, it might be the end-points. 
- * @param fromPoint
+ * @param Point fromPoint
  * @return
  */
 Edge.prototype.nearestPoint = function(fromPoint)
@@ -47,9 +47,27 @@ Edge.prototype.nearestPoint = function(fromPoint)
 };
 
 /**
+ * Get the distance to the given point. 
+ * @param Point fromPoint
+ * @return
+ */
+Edge.prototype.distanceToPointSquared = function(fromPoint)
+{
+	var u = ((fromPoint.x - this.from.x)*(this.to.x - this.from.x) + (fromPoint.y - this.from.y)*(this.to.y - this.from.y)) /
+		(this.lengthSquared());
+	
+	// Clamp to [0,1]
+	u = Math.max(0, Math.min(1, u));
+	var dx = (this.from.x + u * (this.to.x - this.from.x)) - fromPoint.x; 
+	var dy = (this.from.y + u * (this.to.y - this.from.y)) - fromPoint.y;
+	
+	return dx*dx + dy*dy;
+};
+
+/**
  * Calculate the square of the length of the edge.
  * 
- * @return
+ * @return float
  */
 Edge.prototype.lengthSquared = function()
 {
@@ -61,7 +79,7 @@ Edge.prototype.lengthSquared = function()
 /**
  * Calculate the length of the edge.
  * 
- * @return
+ * @return float
  */
 Edge.prototype.length = function()
 {
@@ -146,6 +164,18 @@ Edge.unitTests = function()
 		var p2 = edge.nearestPoint(new Point(0, 0));
 		equals( p2.x, 1, "x-value");
 		equals( p2.y, 1, "y-value");
+	});
+	
+	test("distanceToPointSquared", function() {
+		var from = new Point(1, 1);
+		var to = new Point(5, 1);
+		var edge = new Edge(from, to);
+		
+		var d1 = edge.distanceToPointSquared(new Point(3, 2));
+		equals( d1, 1, "distance: (1+0)");
+		
+		var d2 = edge.distanceToPointSquared(new Point(0, 0));
+		equals( d2, 1+1, "distance: (1+1)");
 	});
 	
 	test("intersection", function(){
