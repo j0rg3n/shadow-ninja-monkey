@@ -15,7 +15,11 @@ function LightCalculator(light, scene, edgeSorter)
 LightCalculator.prototype.calculateLight = function()
 {
 	var visibleEdges = this.scene.visibleEdges(this.light);
-	var sortedEdges = this.edgeSorter.sortEdgePoints(light, visibleEdges);
+	var sortedEdges = this.edgeSorter.sortEdgePoints(this.light, visibleEdges);
+	
+	// Scan through once (to build a starting stack)
+	
+	// Scan through again to create the light-polygon
 };
 
 
@@ -25,17 +29,19 @@ LightCalculator.unitTests = function()
 
 	test("light is passed to scene.visibleEdges", function() {
 		var light = new Point(0,0);
-		var mockScene = {
-				light:null,
-				visibleEdges:function(l)
-				{
-					this.light = l;
-				}
+		var scene = {
+			visibleEdges:function(l)
+			{
+				this.testLight = l;
+			}
 		};
-		var lightCalculator = new LightCalculator(light, mockScene, new EdgeSorter());
+		var sorter = {
+				sortEdgePoints:function(){}
+		};
+		var lightCalculator = new LightCalculator(light, scene, sorter);
 		lightCalculator.calculateLight();
 		
-		equals( mockScene.light, light, "Something other than the light was passed to visibleEdges");
+		equals( scene.testLight, light, "Something other than the light was passed to visibleEdges");
 	});
 	test("sortEdgePoints(light,edges) is called with expected params", function() {
 		var mockLight = {};
