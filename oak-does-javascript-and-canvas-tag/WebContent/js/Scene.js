@@ -1,4 +1,11 @@
 
+/**
+ * Create a new scene with the given width and height.
+ * 
+ * @param width
+ * @param height
+ * @return
+ */
 function Scene(width,height)
 {
 	this.width = width;
@@ -7,6 +14,11 @@ function Scene(width,height)
 	this.lights = [];
 }
 
+/**
+ * Create an inverted rectangle used to "catch" all light.
+ * 
+ * @return
+ */
 Scene.prototype.addLightBoundingBox = function()
 {
 	// Add an inverse box around the scene to avoid light getting 'out'
@@ -16,11 +28,25 @@ Scene.prototype.addLightBoundingBox = function()
 	this.addEdge(new Point(0,   0),   new Point(0+w, 0));
 };
 
+/**
+ * Add a new edge between p1 and p2.
+ * @param Point p1
+ * @param Point p2
+ * @return
+ */
 Scene.prototype.addEdge = function(p1, p2)
 {
 	this.edges.push(new Edge(p1, p2));
 };
 
+/**
+ * Create a closed rectangle.
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return
+ */
 Scene.prototype.addRectangle = function(x, y, w, h)
 {
 	this.addEdge(new Point(x,   y),   new Point(x,   y+h));
@@ -29,6 +55,12 @@ Scene.prototype.addRectangle = function(x, y, w, h)
 	this.addEdge(new Point(x+w, y),   new Point(x,   y));
 };
 
+/**
+ * Return an array of visible edges.
+ * 
+ * @param Point light - the position of the light source.
+ * @return
+ */
 Scene.prototype.visibleEdges = function(light)
 {
 	var result = [];
@@ -65,7 +97,7 @@ Scene.unitTests = function()
 		var edges = scene.visibleEdges(new Point(2, 2));
 		equals(edges.length, 1, 'Visible edge accepted');
 	});
-	test("visibleEdges (visible)", function(){
+	test("visibleEdges (not visible)", function(){
 		var scene = new Scene(100, 100);
 		scene.addEdge(new Point(1, 3), new Point(3, 3));
 		
