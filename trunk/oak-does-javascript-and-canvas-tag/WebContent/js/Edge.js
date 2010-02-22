@@ -1,7 +1,8 @@
 
 /**
- * Create an edge between two point, 
- * it is only visible from it's left side.
+ * Create an edge between two point - also known as a line segment.
+ *   
+ * An edge is only visible from it's left side.
  * 
  * @param from
  * @param to
@@ -27,7 +28,11 @@ Edge.prototype.isVisible = function(light)
 	return light.leftOf(this.from, this.to);
 };
 
-
+/**
+ * Get the nearest point on the edge, it might be the end-points. 
+ * @param fromPoint
+ * @return
+ */
 Edge.prototype.nearestPoint = function(fromPoint)
 {
 	var u = ((fromPoint.x - this.from.x)*(this.to.x - this.from.x) + (fromPoint.y - this.from.y)*(this.to.y - this.from.y)) /
@@ -41,6 +46,11 @@ Edge.prototype.nearestPoint = function(fromPoint)
 	);
 };
 
+/**
+ * Calculate the square of the length of the edge.
+ * 
+ * @return
+ */
 Edge.prototype.lengthSquared = function()
 {
 	var dx = this.to.x - this.from.x;
@@ -48,11 +58,25 @@ Edge.prototype.lengthSquared = function()
 	return dx*dx + dy*dy;
 };
 
+/**
+ * Calculate the length of the edge.
+ * 
+ * @return
+ */
 Edge.prototype.length = function()
 {
 	return Math.sqrt(this.lengthSquared());
 };
 
+/**
+ * Calculate the intersection between the edge and the edge defined by the two points.
+ * 
+ * If the lines are parallel or the intersection occurs "outside" this edge the method returns null. 
+ * 
+ * @param Point p3
+ * @param Point p4
+ * @return Point
+ */
 Edge.prototype.intersection = function(p3, p4)
 {
 	var p1 = this.from;

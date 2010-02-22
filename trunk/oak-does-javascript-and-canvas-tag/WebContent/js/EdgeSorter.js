@@ -3,6 +3,13 @@ function EdgeSorter()
 {
 }
 
+/**
+ * Find the edge nearest the light.
+ * 
+ * @param Point light
+ * @param Edge[] edges
+ * @return
+ */
 EdgeSorter.prototype.findNearestEdge = function(light,edges)
 {
 	var result = null;
@@ -17,6 +24,13 @@ EdgeSorter.prototype.findNearestEdge = function(light,edges)
 	return result;
 };
 
+/**
+ * This method will return a sorted list of edges (end/start-points) used for light-calculation.
+ * 
+ * @param Point light - The light to sort around
+ * @param Edge[] edges - An array of visible edges.
+ * @return
+ */
 EdgeSorter.prototype.sortEdgePoints = function(light,edges)
 {
 	var nearestEdge = this.findNearestEdge(light, edges);
@@ -32,24 +46,20 @@ EdgeSorter.prototype.sortEdgePoints = function(light,edges)
 			edgePoints.push(edge.from, edge.to);
 		}
 	}
-	// TODO: sort these counter-clockwise 
+	// Sort these counter-clockwise, with  (light -> nearestPoint)
+	edgePoints.sort(function(p1, p2){
+		var p1LeftOfStart = p1.leftOf(light, nearestPoint);
+		var p2LeftOfStart = p2.leftOf(light, nearestPoint);
+		if(p1LeftOfStart != p2LeftOfStart)
+			return (p2LeftOfStart - p1LeftOfStart);
+		return p1.leftOfRaw(light, p2);
+	});
+	
 	
 	// Insert the divided edge at the start and at the end.
 	edgePoints.unshift(nearestEdgePart1.from);
 	edgePoints.push(nearestEdgePart2.to);
 	return edgePoints;
-	/*
-	edgePoints.sort(function(p1, p2){
-		var p1LeftOfStart = p1.leftOfRaw(light, nearestPoint);
-		var p2LeftOfStart = p2.leftOfRaw(light, nearestPoint);
-		if(p1LeftOfStart != p2LeftOfStart)
-			return p1LeftOfStart - p2LeftOfStart;
-		//var leftVal = p1.leftOfRaw(light, p2);
-		//if(leftVal == 0)
-		return (p1 == p1.edge.from) ? 1 : -1;
-		//return leftVal;
-	});
-	*/
 };
 
 EdgeSorter.unitTests = function()
