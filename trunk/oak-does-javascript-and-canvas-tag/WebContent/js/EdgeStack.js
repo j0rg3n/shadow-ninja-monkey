@@ -24,13 +24,14 @@ EdgeStack.prototype.addEdgePoint = function(p)
 	{
 		for(var i = 0; i < this.edges.length; i++)
 		{
-			if(p.edge.distanceToPointSquared(this.light) <= this.edges[i].distanceToPointSquared(this.light))
+			var intersect = this.edges[i].intersection(this.light, p);
+			if(p.distanceToSquared(this.light) <= intersect.distanceToSquared(this.light))
 			{
 				this.edges.splice(i, 0, p.edge);
 				if(i == 0)
 				{
 					// a point on the previous edge, and the new point
-					return [this.edges[i+1].intersection(this.light, p), p];
+					return [intersect, p];
 				}
 				// We have been added behind an other edge
 				return [];
@@ -55,14 +56,22 @@ EdgeStack.prototype.addEdgePoint = function(p)
 			if(this.edges[i] == p.edge)
 			{
 				this.edges.splice(i, 1);
-				if(this.edges.length == 0)
+				if(i == 0) // Was it the front edge that ended?
 				{
-					// This was the last edge
-					return [p];
+					if(this.edges.length == 0)
+					{
+						// This was the last edge
+						return [p];
+					}
+					else
+					{
+						return [p, this.edges[0].intersection(this.light, p)];
+					}
 				}
 				else
 				{
-					return [p, this.edges[0].intersection(this.light, p)];
+					// It was not the front-edge that ended
+					return [];
 				}
 			}
 		}

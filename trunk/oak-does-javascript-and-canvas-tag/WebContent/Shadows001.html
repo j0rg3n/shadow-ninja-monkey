@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Shadows 001</title>
+<script src="../lib/jquery-1.4.1.min.js"></script>
+<script type="text/javascript" src="js/Point.js"></script>
+<script type="text/javascript" src="js/Edge.js"></script>
+<script type="text/javascript" src="js/Scene.js"></script>
+<script type="text/javascript" src="js/EdgeSorter.js"></script>
+<script type="text/javascript" src="js/LightPolygon.js"></script>
+<script type="text/javascript" src="js/LightCalculator.js"></script>
+<script type="text/javascript" src="js/EdgeStack.js"></script>
+
+<script type="text/javascript">
+
+// setup the scene
+var light = new Point(35, 75);
+var scene = new Scene(800, 600);
+scene.addLightBoundingBox();
+scene.addRectangle(400, 200, 100, 25);
+scene.addRectangle(40, 150, 40, 35);
+scene.addRectangle(250, 300, 200, 25);
+
+
+$(document).ready(function(){
+	
+	$('#MyCanvas').mousemove(function(e){
+		light.x = e.clientX;
+		light.y = e.clientY;
+		drawScene();
+	});
+});
+
+
+
+function drawScene()
+{
+	var lightCalculator = new LightCalculator();
+	var lightPolygon = lightCalculator.calculateLightPolygon(light, scene);
+
+	var context = document.getElementById('MyCanvas').getContext('2d');
+	context.clearRect(0, 0, 800, 600);
+	context.beginPath();
+	context.fillStyle = 'white';
+	context.strokeStyle = 'red';
+	var polyPoints = lightPolygon.getPoints();
+	context.moveTo(polyPoints[0].x, polyPoints[0].y);
+	for(var i = 1; i < polyPoints.length; i++)
+	{
+		context.lineTo(polyPoints[i].x, polyPoints[i].y);
+	}
+	context.fill();
+	context.stroke();
+	context.closePath();
+
+	// Draw the light-source
+	context.beginPath();
+	context.fillStyle = 'red';
+	context.strokeStyle = 'black';
+	context.rect(light.x-5, light.y-5, 10, 10);
+	context.fill();
+	context.stroke();
+	context.closePath();
+}
+</script>
+</head>
+<body>
+	<p>
+		<canvas id="MyCanvas" width="800" height="600" style="background-color:black;">
+		</canvas>
+	</p>
+</body>
+</html>
