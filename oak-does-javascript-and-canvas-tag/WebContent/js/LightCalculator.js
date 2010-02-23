@@ -68,4 +68,16 @@ LightCalculator.unitTests = function()
 		equals( polyPoints[5].x, 4, "End Cross-point (x)");
 		equals( polyPoints[5].y, 2, "End Cross-point (y)");
 	});
+	
+	test("calculateLightPolygon with light bounding box and a rectangle", function() {
+		var light = new Point(50, 50);
+		var scene = new Scene(200, 200);
+		scene.addLightBoundingBox();
+		scene.addRectangle(10, 10, 20, 20);
+		var lightCalculator = new LightCalculator();
+		var lightPolygon = lightCalculator.calculateLightPolygon(light, scene);
+		
+		var polyPoints = lightPolygon.getPoints();
+	});
+	
 };

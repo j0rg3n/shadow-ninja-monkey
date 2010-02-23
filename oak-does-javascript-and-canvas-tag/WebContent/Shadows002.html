@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Shadows 001</title>
+<script src="../lib/jquery-1.4.1.min.js"></script>
+<script type="text/javascript" src="js/Point.js"></script>
+<script type="text/javascript" src="js/Edge.js"></script>
+<script type="text/javascript" src="js/Scene.js"></script>
+<script type="text/javascript" src="js/EdgeSorter.js"></script>
+<script type="text/javascript" src="js/LightPolygon.js"></script>
+<script type="text/javascript" src="js/LightCalculator.js"></script>
+<script type="text/javascript" src="js/EdgeStack.js"></script>
+
+<script type="text/javascript">
+
+// setup the scene
+var lights = [new Point(35, 75), new Point(75, 35), new Point(75, 35)];
+var scene = new Scene(800, 600);
+scene.addLightBoundingBox();
+scene.addRectangle(400, 200, 100, 25);
+scene.addRectangle(40, 150, 40, 35);
+scene.addRectangle(250, 300, 200, 25);
+scene.addRectangle(50, 500, 200, 50);
+
+for(var i = 0; i < 5; i++)
+{
+	scene.addRectangle(150+Math.sin(i), 50+i*40, 40+i*25, 10);
+}
+
+
+$(document).ready(function(){
+	
+	$('#MyCanvas').mousemove(function(e){
+		lights[0].x = e.clientX;
+		lights[0].y = e.clientY;
+		lights[1].x = 800-e.clientX;
+		lights[1].y = e.clientY;
+		//lights[2].x = (800-e.clientX)/2;
+		//lights[2].y = 600-e.clientY;
+		drawScene();
+	});
+});
+
+
+
+function drawScene()
+{
+	var context = document.getElementById('MyCanvas').getContext('2d');
+	context.clearRect(0, 0, 800, 600);
+	for(var l = 0; l < lights.length; l++)
+	{
+		var light = lights[l];
+		var lightCalculator = new LightCalculator();
+		var lightPolygon = lightCalculator.calculateLightPolygon(light, scene);
+	
+		context.beginPath();
+		context.fillStyle = 'white';
+		//context.strokeStyle = 'red';
+		var polyPoints = lightPolygon.getPoints();
+		context.moveTo(polyPoints[0].x, polyPoints[0].y);
+		for(var i = 1; i < polyPoints.length; i++)
+		{
+			context.lineTo(polyPoints[i].x, polyPoints[i].y);
+		}
+		context.fill();
+		//context.stroke();
+		context.closePath();
+	}
+	
+	for(var l = 0; l < lights.length; l++)
+	{
+		var light = lights[l];
+		// Draw the light-source
+		context.beginPath();
+		context.fillStyle = 'red';
+		context.strokeStyle = 'black';
+		context.rect(light.x-5, light.y-5, 10, 10);
+		context.fill();
+		context.stroke();
+		context.closePath();
+	}
+
+	context.beginPath();
+	context.strokeStyle = '#aaa';
+	// Draw edges
+	for(var i = 0; i < scene.edges.length; i++)
+	{
+		var edge = scene.edges[i];
+		context.moveTo(edge.from.x, edge.from.y);
+		context.lineTo(edge.to.x, edge.to.y);
+	}
+	context.stroke();
+	context.closePath();
+}
+</script>
+</head>
+<body>
+	<p>
+		<canvas id="MyCanvas" width="800" height="600" style="background-color:black;">
+		</canvas>
+	</p>
+</body>
+</html>
