@@ -5,21 +5,39 @@
  * 
  * @return
  */
-function LightCalculator(light, scene, edgeSorter)
+function LightCalculator()
 {
-	this.light = light;
-	this.scene = scene;
-	this.edgeSorter = edgeSorter;
 }
 
-LightCalculator.prototype.calculateLight = function()
+/**
+ * Create a LightPolygon from the given light and scene
+ * @return LightPolygon
+ */
+LightCalculator.prototype.calculateLightPolygon = function(light, scene)
 {
-	var visibleEdges = this.scene.visibleEdges(this.light);
-	var sortedEdges = this.edgeSorter.sortEdgePoints(this.light, visibleEdges);
-	
+	var visibleEdges = scene.visibleEdges(light);
+	var sorter = new EdgeSorter();
+	var sortedEdges = sorter.sortEdgePoints(light, visibleEdges);
+	var edgeStack = new EdgeStack(light);
+
 	// Scan through once (to build a starting stack)
+	for(var i = 0; i < sortedEdges.length; i++)
+	{
+		edgeStack.addEdgePoint(sortedEdges[i]);
+	}
 	
 	// Scan through again to create the light-polygon
+	var lightPolygon = new LightPolygon();
+	for(var i = 0; i < sortedEdges.length; i++)
+	{
+		var polyPoints = edgeStack.addEdgePoint(sortedEdges[i]);
+		for(var j = 0; j < polyPoints.length; j++)
+		{
+			lightPolygon.addPoint(polyPoints[j]);
+		}
+	}
+	
+	return lightPolygon;
 };
 
 
@@ -27,44 +45,27 @@ LightCalculator.unitTests = function()
 {
 	module('LightCalculator');
 
-	test("light is passed to scene.visibleEdges", function() {
-		var light = new Point(0,0);
-		var scene = {
-			visibleEdges:function(l)
-			{
-				this.testLight = l;
-			}
-		};
-		var sorter = {
-				sortEdgePoints:function(){}
-		};
-		var lightCalculator = new LightCalculator(light, scene, sorter);
-		lightCalculator.calculateLight();
+	test("calculateLightPolygon with light bounding box", function() {
+		var light = new Point(3, 2);
+		var scene = new Scene(4, 4);
+		scene.addLightBoundingBox();
+		var lightCalculator = new LightCalculator();
+		var lightPolygon = lightCalculator.calculateLightPolygon(light, scene);
 		
-		equals( scene.testLight, light, "Something other than the light was passed to visibleEdges");
-	});
-	test("sortEdgePoints(light,edges) is called with expected params", function() {
-		var mockLight = {};
-		var mockEdges = {};
-		var mockScene = {
-				visibleEdges:function(l)
-				{
-					return mockEdges;
-				}
-		};
-		var mockSorter = {
-				light:null,
-				edges:null,
-				sortEdgePoints:function(l,e)
-				{
-					this.light = l;
-					this.edges = e;
-				}
-		};
-		var lightCalculator = new LightCalculator(mockLight, mockScene, mockSorter);
-		lightCalculator.calculateLight();
+		var polyPoints = lightPolygon.getPoints();
 		
-		equals( mockSorter.light, mockLight, "Something other than the light was passed to sortEdgePoints");
-		equals( mockSorter.edges, mockEdges, "Something other than the visible edges was passed to sortEdgePoints");
+		equals( polyPoints.length, 6, "6 poly-points expected");
+		equals( polyPoints[0].x, 4, "Start Cross-point (x)");
+		equals( polyPoints[0].y, 2, "Start Cross-point (y)");
+		equals( polyPoints[1].x, 4, "Upper-Right corner (x)");
+		equals( polyPoints[1].y, 4, "Upper-Right corner (y)");
+		equals( polyPoints[2].x, 0, "Upper-Left corner (x)");
+		equals( polyPoints[2].y, 4, "Upper-Left corner (y)");
+		equals( polyPoints[3].x, 0, "Lower-Left corner (x)");
+		equals( polyPoints[3].y, 0, "Lower-Left corner (y)");
+		equals( polyPoints[4].x, 4, "Lower-Right corner (x)");
+		equals( polyPoints[4].y, 0, "Lower-Right corner (y)");
+		equals( polyPoints[5].x, 4, "End Cross-point (x)");
+		equals( polyPoints[5].y, 2, "End Cross-point (y)");
 	});
 };

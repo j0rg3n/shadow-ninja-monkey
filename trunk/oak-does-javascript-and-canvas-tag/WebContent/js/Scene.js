@@ -22,10 +22,10 @@ function Scene(width,height)
 Scene.prototype.addLightBoundingBox = function()
 {
 	// Add an inverse box around the scene to avoid light getting 'out'
-	this.addEdge(new Point(0,   0+h), new Point(0,   0));
-	this.addEdge(new Point(0+w, 0+h), new Point(0,   0+h));
-	this.addEdge(new Point(0+w, 0),   new Point(0+w, 0+h));
-	this.addEdge(new Point(0,   0),   new Point(0+w, 0));
+	this.addEdge(new Point(0,            0+this.height), new Point(0,            0));
+	this.addEdge(new Point(0+this.width, 0+this.height), new Point(0,            0+this.height));
+	this.addEdge(new Point(0+this.width, 0),             new Point(0+this.width, 0+this.height));
+	this.addEdge(new Point(0,            0),             new Point(0+this.width, 0));
 };
 
 /**
@@ -103,5 +103,12 @@ Scene.unitTests = function()
 		
 		var edges = scene.visibleEdges(new Point(2, 2));
 		equals(edges.length, 0, 'Invisible edge declined');
+	});
+	
+	test("addLightBoundingBox", function(){
+		var scene = new Scene(200, 300);
+		scene.addLightBoundingBox();
+		
+		equals(scene.edges.length, 4, '4 edges');
 	});
 };
