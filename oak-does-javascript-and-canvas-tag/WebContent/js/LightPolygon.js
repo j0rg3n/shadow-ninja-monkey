@@ -12,7 +12,10 @@ function LightPolygon()
  */
 LightPolygon.prototype.addPoint = function(p)
 {
-	this.polygon.push(p);
+	if(this.polygon.length == 0 || this.polygon[this.polygon.length-1].distanceToSquared(p) > 0.00001)
+	{
+		this.polygon.push(p);
+	}
 };
 
 /**
@@ -42,4 +45,15 @@ LightPolygon.unitTests = function()
 		equals( poly[1].x, 14, "x-value of point[1]");
 		equals( poly[1].y, -56, "y-value of point[1]");
 	});
+	
+	test("addPoint eliminates points that are the same", function() {
+		var lightPolygon = new LightPolygon();
+		lightPolygon.addPoint(new Point(42, 43));
+		lightPolygon.addPoint(new Point(42, 43));
+		var poly = lightPolygon.getPoints();
+		equals( poly.length, 1, "One point in the polygon");
+		equals( poly[0].x, 42, "x-value of point[0]");
+		equals( poly[0].y, 43, "y-value of point[0]");
+	});
+	
 };
