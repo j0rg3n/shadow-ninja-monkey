@@ -37,7 +37,15 @@ EdgeSorter.prototype.sortEdgePoints = function(light,edges)
 	var nearestPoint = nearestEdge.nearestPoint(light);
 	var nearestEdgePart2 = new Edge(new Point(nearestEdge.from.x, nearestEdge.from.y), new Point(nearestPoint.x, nearestPoint.y));
 	var nearestEdgePart1 = new Edge(new Point(nearestPoint.x, nearestPoint.y), new Point(nearestEdge.to.x, nearestEdge.to.y));
-	var edgePoints = [nearestEdgePart1.to, nearestEdgePart2.from];
+	var edgePoints = [];
+	if(nearestEdgePart1.lengthSquared() > 0)
+	{
+		edgePoints.push(nearestEdgePart1.to);
+	}
+	if(nearestEdgePart2.lengthSquared() > 0)
+	{
+		edgePoints.push(nearestEdgePart2.from);
+	}
 	for(var i = 0; i < edges.length; i++)
 	{
 		var edge = edges[i];
@@ -57,8 +65,15 @@ EdgeSorter.prototype.sortEdgePoints = function(light,edges)
 	
 	
 	// Insert the divided edge at the start and at the end.
-	edgePoints.unshift(nearestEdgePart1.from);
-	edgePoints.push(nearestEdgePart2.to);
+	if(nearestEdgePart1.lengthSquared() > 0)
+	{
+		edgePoints.unshift(nearestEdgePart1.from);
+	}
+	if(nearestEdgePart2.lengthSquared() > 0)
+	{
+		edgePoints.push(nearestEdgePart2.to);
+	}
+	
 	return edgePoints;
 };
 
@@ -92,6 +107,7 @@ EdgeSorter.unitTests = function()
 		equals(edgePoints[3].x, 2, "x value of point 4/1");
 		equals(edgePoints[3].y, 1, "y value of point 4/1");
 	});
+	
 	test("sortEdgePoints (two edges)", function() {
 		var e1 = new Edge(new Point(1, 1), new Point(3, 1));
 		var e2 = new Edge(new Point(4, 4), new Point(0, 4));
@@ -113,5 +129,29 @@ EdgeSorter.unitTests = function()
 		equals(edgePoints[4].y, 1, "y value of e1.from");
 		equals(edgePoints[5].x, 2, "x value of point 6/1");
 		equals(edgePoints[5].y, 1, "y value of point 6/1");
+	});
+	
+	test("sortEdgePoints(e1.from is nearest point)", function() {
+		var e1 = new Edge(new Point(1, 1), new Point(3, 1));
+		var sorter = new EdgeSorter();
+		var edgePoints = sorter.sortEdgePoints(new Point(0, 2), [e1]);
+		
+		equals(edgePoints.length, 2, "The nearest edge is not divided into two");
+		equals(edgePoints[0].x, 1, "x value of e1.from.x");
+		equals(edgePoints[0].y, 1, "y value of e1.from.y");
+		equals(edgePoints[1].x, 3, "x value of e1.to.x");
+		equals(edgePoints[1].y, 1, "y value of e1.to.y");
+	});
+	
+	test("sortEdgePoints(e1.to is nearest point)", function() {
+		var e1 = new Edge(new Point(-3, 1), new Point(-1, 1));
+		var sorter = new EdgeSorter();
+		var edgePoints = sorter.sortEdgePoints(new Point(0, 2), [e1]);
+		
+		equals(edgePoints.length, 2, "The nearest edge is not divided into two");
+		equals(edgePoints[0].x, -3, "x value of e1.from.x");
+		equals(edgePoints[0].y, 1, "y value of e1.from.y");
+		equals(edgePoints[1].x, -1, "x value of e1.to.x");
+		equals(edgePoints[1].y, 1, "y value of e1.to.y");
 	});
 };

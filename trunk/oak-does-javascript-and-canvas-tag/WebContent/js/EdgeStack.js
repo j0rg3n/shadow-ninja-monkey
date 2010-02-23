@@ -65,7 +65,8 @@ EdgeStack.prototype.addEdgePoint = function(p)
 					}
 					else
 					{
-						return [p, this.edges[0].intersection(this.light, p)];
+						var intersect = this.edges[0].intersection(this.light, p);
+						return [p, intersect];
 					}
 				}
 				else
