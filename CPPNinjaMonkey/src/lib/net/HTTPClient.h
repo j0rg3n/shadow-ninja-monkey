@@ -5,7 +5,9 @@
 #include <string>
 #include "boost/cstdint.hpp"
 
-typedef unsigned int SOCKET;
+
+// -----------------------------------------------------------------------------
+
 
 class HTTPClient
 {
@@ -19,18 +21,13 @@ public:
 	bool Get(std::string sPath, std::string& sResult);
 
 private:
-	bool ConnectSocket(std::string sAddress, boost::uint32_t nPort);
-	void DisconnectSocket();
+	class Impl;
 
-	bool Write(std::string sMessage);
-	bool Read(std::string& sMessage);
-
-	static void InitNetwork();
-	static void DeinitNetwork();
-
-	std::string m_sURL;
-	SOCKET m_socket;
-	static const size_t RECEIVE_BUFFER_LENGTH = 1024;
+	Impl* pImpl;
 };
+
+
+// -----------------------------------------------------------------------------
+
 
 #endif // HTTP_CLIENT_H
