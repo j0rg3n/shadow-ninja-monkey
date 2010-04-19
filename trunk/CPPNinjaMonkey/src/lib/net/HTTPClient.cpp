@@ -8,6 +8,9 @@
 #include <cassert>
 #include <sstream>
 
+#include "Neon.h"
+#include "boost/smart_ptr/scoped_ptr.hpp"
+
 
 // ----------------------------------------------------------------------------
 
@@ -19,162 +22,59 @@ using namespace std;
 // ----------------------------------------------------------------------------
 
 
-HTTPClient::HTTPClient() : m_socket(INVALID_SOCKET)
+class HTTPClient::Impl
 {
-	InitNetwork();
-}
-
-
-HTTPClient::~HTTPClient()
-{
-	DisconnectSocket();
-	DeinitNetwork();
-}
-
-
-bool HTTPClient::Connect(std::string sAddress, boost::uint32_t nPort)
-{
-	if(!ConnectSocket(sAddress, nPort))
+public:
+	Impl()
 	{
-		return false;
 	}
 
-	return true;
-}
-
-
-void HTTPClient::Disconnect()
-{
-	DisconnectSocket();
-}
-
-
-bool HTTPClient::Get(std::string sPath, std::string& sResult)
-{
-	assert(m_socket != INVALID_SOCKET);
-
-	printf("Query: %s\n", sPath.c_str());
-	printf("Result: %s\n", sResult.c_str());
-
-	std::ostringstream out;
-	out << "GET " << sPath << " HTTP/1.1\r\n";
-
-	// TODO: Add additional headers here.
-
-	out << "\r\n";
-
-	if(!Write(out.str().c_str()))
+	bool Connect(string sAddress, uint32_t nPort)
 	{
-		return false;
+		assert(NULL == pSession.get());
+		pSession.reset(new NeonSession("http", sAddress.c_str(), nPort));
+		return true;
 	}
 
-	if(!Read(sResult))
+	bool Get(std::string sPath, std::string& sResult)
 	{
-		return false;
+		assert(NULL == pRequest.get());
+		pRequest.reset(new NeonRequest(*pSession, "GET", sPath.c_str()));
+		return pRequest->Dispatch();
 	}
 
-	return true;
-}
+private:
+	scoped_ptr<NeonSession> pSession;
+	scoped_ptr<NeonRequest> pRequest;
+};
 
 
 // ----------------------------------------------------------------------------
 
 
-bool HTTPClient::ConnectSocket(std::string sAddress, boost::uint32_t nPort)
+HTTPClient::HTTPClient() : pImpl(new Impl())
 {
-	addrinfo hints;
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-
-	char szPort[32];
-	_itoa(nPort, szPort, 10);
-
-	addrinfo *pIPAddress = NULL;
-	int nResult = getaddrinfo(sAddress.c_str(), szPort, &hints, &pIPAddress);
-	if(nResult != 0)
-	{
-		return false;
-	}
-
-	m_socket = socket(pIPAddress->ai_family, pIPAddress->ai_socktype, pIPAddress->ai_protocol);
-	if(m_socket == INVALID_SOCKET)
-	{
-		freeaddrinfo(pIPAddress);
-		return false;
-	}
-
-	nResult = connect(m_socket, pIPAddress->ai_addr, (int) pIPAddress->ai_addrlen);
-	freeaddrinfo(pIPAddress);
-
-	if(nResult != 0)
-	{
-		closesocket(m_socket);
-		return false;
-	}
-
-	return true;
 }
 
 
-void HTTPClient::DisconnectSocket()
+HTTPClient::~HTTPClient()
 {
-	if(m_socket == INVALID_SOCKET)
-	{
-		return;
-	}
-
-	closesocket(m_socket);
 }
 
 
-bool HTTPClient::Write(std::string sMessage)
+bool HTTPClient::Connect(std::string sAddress, boost::uint32_t nPort)
 {
-	const char* pszSendPos = sMessage.c_str();
-	const char* pszSendEnd = sMessage.c_str() + sMessage.length();
-	while(pszSendPos < pszSendEnd)
-	{
-		int nResult = send(m_socket, pszSendPos, pszSendEnd - pszSendPos, 0);
-		if(nResult == SOCKET_ERROR)
-		{
-			return false;
-		}
-
-		pszSendPos += (size_t) nResult;
-	}
-
-	return true;
+	return pImpl->Connect(sAddress, nPort);
 }
 
 
-bool HTTPClient::Read(std::string& sMessage)
+void HTTPClient::Disconnect()
 {
-	char szBuffer[RECEIVE_BUFFER_LENGTH];
-	int nResult = recv(m_socket, szBuffer, RECEIVE_BUFFER_LENGTH, 0);
-	if(nResult == SOCKET_ERROR)
-	{
-		return false;
-	}
-
-	sMessage.assign(szBuffer, (size_t) nResult);
-	return true;
+	//pImpl->Disconnect();
 }
 
 
-void HTTPClient::InitNetwork()
+bool HTTPClient::Get(std::string sPath, std::string& sResult)
 {
-#ifdef _WINDOWS
-	WSADATA wsaData;
-	int nResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-	assert(nResult == 0);
-#endif
-}
-
-
-void HTTPClient::DeinitNetwork()
-{
-#ifdef _WINDOWS
-	WSACleanup();
-#endif
+	return pImpl->Get(sPath, sResult);
 }

@@ -5,6 +5,9 @@ SET(NET_SRCS
   ${PROJECT_SOURCE_DIR}/include/net/Mediator.h
   HTTPClient.cpp
   HTTPClient.h
+  Socket.cpp
+  Socket.h
+  Neon.h
   #internal/Peer.cpp 
   #Peer.h
 )
