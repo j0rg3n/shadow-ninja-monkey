@@ -32,6 +32,8 @@ Socket::~Socket()
 
 bool Socket::Connect(std::string sAddress, boost::uint32_t nPort)
 {
+	assert(m_socket == INVALID_SOCKET);
+
 	addrinfo hints;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;

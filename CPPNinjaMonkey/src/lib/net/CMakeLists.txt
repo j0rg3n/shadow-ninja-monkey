@@ -7,6 +7,8 @@ SET(NET_SRCS
   HTTPClient.h
   Socket.cpp
   Socket.h
+  JSONRPC.cpp
+  JSONRPC.h
   Neon.h
   #internal/Peer.cpp 
   #Peer.h

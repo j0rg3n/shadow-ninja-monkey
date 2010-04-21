@@ -32,20 +32,20 @@ public:
 	bool Connect(string sAddress, uint32_t nPort)
 	{
 		assert(NULL == pSession.get());
-		pSession.reset(new NeonSession("http", sAddress.c_str(), nPort));
+		pSession.reset(new HTTPSession("http", sAddress.c_str(), nPort));
 		return true;
 	}
 
 	bool Get(std::string sPath, std::string& sResult)
 	{
 		assert(NULL == pRequest.get());
-		pRequest.reset(new NeonRequest(*pSession, "GET", sPath.c_str()));
+		pRequest.reset(new HTTPRequest(*pSession, "GET", sPath.c_str()));
 		return pRequest->Dispatch();
 	}
 
 private:
-	scoped_ptr<NeonSession> pSession;
-	scoped_ptr<NeonRequest> pRequest;
+	scoped_ptr<HTTPSession> pSession;
+	scoped_ptr<HTTPRequest> pRequest;
 };
 
 
