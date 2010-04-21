@@ -1,0 +1,67 @@
+td, p, div, a
+{
+    font-family: Tahoma, "Sans Serif", Helvetica;
+}
+
+/****************************************************************************/
+
+/**
+ * Page centering setup.
+ * 
+ * The page should be contained within a top-level table within a top-level 
+ * div, the latter a direct child component of the body tag. Both should have
+ * the class @c pageCenter. 
+ */
+
+/* Required for IE centering. */
+div.pageCenter
+{
+  text-align: center;
+  width: 100%;
+} 
+
+/* Required for Firefox centering. */
+table.pageCenter
+{
+  /* Cancels the effect of the IE alignment in firefox. */
+  text-align: left; 
+  
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+/****************************************************************************/
+
+div.header
+{
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    border: solid 1px #aaaabb;
+    background-color: #eeeeff;
+    color: #ccccdd;
+    font-size: x-small;
+}
+
+div#commit
+{
+    width: 40em;
+}
+
+pre.code
+{
+    border: solid 1px blue;
+    background-color: #aaaaff;
+}
+
+div#pollStatus
+{
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    border: solid 1px #aaaabb;
+    background-color: #eeeeff;
+    color: #0000ff;
+    font-size: x-small;
+}
+
