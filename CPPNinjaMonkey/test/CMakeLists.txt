@@ -2,7 +2,8 @@
 SET(UNIT_TEST_SRCS
   Point.cpp
   Mediator.cpp
-  HTTPClient.cpp
+  #HTTPClient.cpp
+  JSONRPC.cpp
   Main.cpp
 )
 

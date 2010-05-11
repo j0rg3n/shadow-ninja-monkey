@@ -1,7 +1,7 @@
 <?php
 require_once('debug.inc');
 require_once('util.inc');
-require_once('piece.inc');
+//require_once('piece.inc');
 
 class GameDB
 {
@@ -14,6 +14,11 @@ class GameDB
     {
         $this->closeConnection();
     }
+	
+	public function handleHelloWorld()
+	{
+		return "Hello, world!";
+	}
     
     /**
      * @param array $pieces
@@ -56,7 +61,7 @@ class GameDB
     
     public function getPieces()
     {
-        return $this->pieces;
+        return "";
     }
     
     public function commit()
@@ -75,17 +80,13 @@ class GameDB
         {
             $this->gameID = $this->getRunningGame();
             $_SESSION['playerID'] = $this->playerID = $this->createPlayer();
-            $this->addPiece(PieceFactory::GetPiece($this->playerID, 'Player', null, null, PLAYER_STATE_NOT_STARTED));
-            for ($i = 0; $i < 4; ++$i)
-            {
-                $this->addPiece(PieceFactory::GetRandomPiece($this->playerID));
-            }
+            //$this->addPiece(PieceFactory::GetPiece($this->playerID, 'Player', null, null, PLAYER_STATE_NOT_STARTED));
             $this->commit();
         }
         session_write_close();
         
         $this->loadPlayer();
-        $this->loadPieces();
+        //$this->loadPieces();
     }
     
     public function loadPlayer()
@@ -95,73 +96,11 @@ class GameDB
         mysql_free_result($result);
     }
     
-    public function loadPieces()
-    {
-        $this->pieces = array();
-
-        $result = $this->queryOrDie('SELECT `id`, `player_id`, `type`, `r`, `c`, `state` FROM `piece` WHERE `game_id`=' . $this->gameID, 'pieces');
-        while ($row = mysql_fetch_assoc($result))
-        {
-            $this->pieces[$row['id']] = PieceFactory::GetPiece($row['player_id'], $row['type'], $row['r'], $row['c'], $row['state']);
-        }
-        mysql_free_result($result);
-    }
-
-    /**
-     * Performs diff of the structures, and performs inserts, updates and deletes as necessary.
-     * @param array $pieces Associative array retreived using JSON.
-     */
-    public function updatePieces($pieces)
-    {
-        foreach ($this->pieces as $id => $piece)
-        {
-            // Rules: Ignore other player's pieces.
-            if ($piece->player == $this->playerID && array_key_exists($id, $pieces))
-            {
-                $newPiece = $pieces[$id];
-                $newState = $newPiece['state'];
-                $newR = Util::getSanitizedInt($newPiece['r']);
-                $newC = Util::getSanitizedInt($newPiece['c']);
-                if ($newState != $piece->state || $newR != $piece->r || $newC != $piece->c)
-                {
-                    // TODO: Rules: Make sure the move is legal
-                    // TODO: Rules: Make sure the state is legal
-                    $query = 'UPDATE `piece` ' .
-                        'SET `r`=' . $this->getSQLInt($newR) . ', ' . 
-                        '`c`=' . $this->getSQLInt($newC)  . ', ' .
-                        '`state`=' . $this->getSQLString($newState) . ' ' . 
-                        'WHERE `id` = ' . $id;
-                    $this->queryOrDie($query, 'update piece');
-                    
-                    $piece->r = $newR;
-                    $piece->c = $newC;
-                    $piece->state = $newState;
-                }
-            }
-        }
-    }
-    
     private function createPlayer()
     {
         $insert = 'INSERT INTO `player` (`game_id`, `magic`) VALUES (' . $this->gameID . ', ' . '\'' . Util::getMagic(16) . '\')';
         $this->queryOrDie($insert, 'create new player');
         return mysql_insert_id($this->connection);
-    }
-    
-    /**
-     * @desc Add the given piece to the game (only to the database!).
-     * @param PlayerPiece $piece
-     */
-    private function addPiece($piece)
-    {
-        $query = 'INSERT INTO `piece` (`game_id`, `player_id`, `type`, `r`, `c`, `state`) VALUES (' .
-            $this->getSQLInt($this->gameID) . ', ' . 
-            $this->getSQLInt($piece->player) . ', ' .
-            $this->getSQLString($piece->type) . ', ' .
-            $this->getSQLInt($piece->r) . ', ' .
-            $this->getSQLInt($piece->c) . ', ' .
-            $this->getSQLString($piece->state) . ')';
-        $this->queryOrDie($query, 'add piece');
     }
     
     /**
@@ -238,6 +177,5 @@ class GameDB
     private $playerID;
     private $magic;
     private $connection;
-    private $pieces;
 }
 ?>

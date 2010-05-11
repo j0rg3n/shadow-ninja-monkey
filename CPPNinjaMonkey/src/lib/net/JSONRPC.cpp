@@ -41,11 +41,22 @@ public:
 		if (m_httpRequest.Dispatch())
 		{
 			istringstream resultStream(m_httpRequest.GetResult());
-			json_parser::read_json(resultStream, resultProps);
+			try
+			{
+				json_parser::read_json(resultStream, resultProps);
+			}
+			catch (const json_parser::json_parser_error& e)
+			{
+				resultProps.clear();
+				resultProps.put("error", e.what());
+				resultProps.put("path", m_sPath);
+				resultProps.put("content", resultStream.str());
+			}
 		}
 		else
 		{
 			// TODO: Include error details from HTTP request.
+			resultProps.clear();
 			resultProps.put("error", "Yes, indeed.");
 		}
 
@@ -91,11 +102,13 @@ public:
 		json_parser::write_json(jsonStream, argProps);
 
 		ostringstream pathStream;
-		pathStream << "ajax.php";
+		pathStream << "/snm/ajax.php";
+		/*
 		pathStream << "?id=" << m_callID;
 		// TODO: URL-encode values.
-		pathStream << "?name=" << sFunction;
-		pathStream << "&arg=" << jsonStream;
+		pathStream << "&name=" << sFunction;
+		pathStream << "&arg=" << jsonStream.str();
+		*/
 		
 		CallInfo* pCallInfo = new CallInfo(*m_pSession, pathStream.str(), fResultCallback);
 
@@ -128,6 +141,7 @@ JSONRPC::JSONRPC() : m_pImpl(new Impl())
 
 JSONRPC::~JSONRPC()
 {
+	delete m_pImpl;
 }
 
 
