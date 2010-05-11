@@ -10,6 +10,7 @@ SET(NET_SRCS
   JSONRPC.cpp
   JSONRPC.h
   Neon.h
+  Neon.cpp
   #internal/Peer.cpp 
   #Peer.h
 )

@@ -13,12 +13,12 @@
 class JSONRPC
 {
 public:
-	typedef boost::function<void (boost::property_tree::ptree)> ResultCallback;
+	typedef boost::function<void (const boost::property_tree::ptree&)> ResultCallback;
 
 	JSONRPC();
 	~JSONRPC();
 
-	bool Connect(std::string sAddress, boost::uint32_t nPort);
+	bool Connect(std::string sAddress, boost::uint32_t nPort = 80);
 	void Disconnect();
 
 	bool Call(std::string sFunction, const boost::property_tree::ptree& argProps, ResultCallback fResultCallback);

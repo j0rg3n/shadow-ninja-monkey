@@ -12,6 +12,7 @@ function getDispatchTable()
     return array(
         'commitBoard' => array($db, 'handleCommitBoard'),
         'poll' => array($db, 'handlePoll'),
+        'helloWorld' => array($db, 'handleHelloWorld'),
     );
 }
 
