@@ -15,9 +15,12 @@ class GameDB
         $this->closeConnection();
     }
 	
-	public function handleHelloWorld()
+	/**
+	 * @param array $props
+	 */
+	public function handleHelloWorld($props)
 	{
-		return "Hello, world!";
+		return array('message' => sprintf('Hello, %s!', $props['name']));
 	}
     
     /**

@@ -8,7 +8,8 @@ class Util
     
     public static function getParameter($key)
     {
-        $value = array_key_exists($key, $_POST) ? $_POST[$key] : '';
+        //$value = array_key_exists($key, $_POST) ? $_POST[$key] : '';
+        $value = array_key_exists($key, $_GET) ? $_GET[$key] : '';
         return get_magic_quotes_gpc() ? stripslashes($value) : $value;
     }
     
