@@ -85,6 +85,24 @@ public:
 	}
 
 
+	static std::string GetURLEscaped(const std::string& sText)
+	{
+		char* pszEscapedText = ne_path_escape(sText.c_str());
+		string result(pszEscapedText);
+		free(pszEscapedText);
+
+		return result;
+	}
+
+
+	static void WriteURLEscaped(std::ostream& out, const std::string& sText)
+	{
+		char* pszEscapedText = ne_path_escape(sText.c_str());
+		out << pszEscapedText;
+		free(pszEscapedText);
+	}
+
+
 	const std::string& GetProxy() const { return m_sProxy; }
 	const std::string& GetUsername() const { return m_sUsername; }
 	const std::string& GetPassword() const { return m_sPassword; }
@@ -102,11 +120,9 @@ private:
 class HTTPRequest::Impl
 {
 public:
-	Impl(HTTPSession& session, const char* pszMethod, const char* pszPath) : m_session(session)
+	Impl(HTTPSession& session, const char* pszMethod, const string& sPath) : m_session(session)
 	{
-		char* pszEscapedPath = ne_path_escape(pszPath);
-		m_pRequest = ne_request_create(GetNeonSession(), pszMethod, pszEscapedPath);
-		free(pszEscapedPath);
+		m_pRequest = ne_request_create(GetNeonSession(), pszMethod, sPath.c_str());
 
 		ne_add_response_body_reader(m_pRequest, Accept, Read, this);
 	}
@@ -228,6 +244,18 @@ HTTPSession::~HTTPSession()
 void* HTTPSession::GetInternalSession()
 {
 	return pImpl->GetInternalSession();
+}
+
+
+std::string HTTPSession::GetURLEscaped(const std::string& sText)
+{
+	return Impl::GetURLEscaped(sText);
+}
+
+
+void HTTPSession::WriteURLEscaped(std::ostream& out, const std::string& sText)
+{
+	Impl::WriteURLEscaped(out, sText);
 }
 
 

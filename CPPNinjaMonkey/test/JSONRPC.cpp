@@ -66,8 +66,10 @@ BOOST_AUTO_TEST_CASE(MakeSimpleCall)
 		c.Connect("fabeljet.com");
 
 		ptree arguments;
+		arguments.put("name", "Sanchez");
 		cout << "Arguments: " << endl;
 		xml_parser::write_xml(cout, arguments);
+		cout << endl;
 
 		ptree result;
 		bool bResult = c.Call("helloWorld", arguments, ResultCapturer(result));
@@ -75,7 +77,13 @@ BOOST_AUTO_TEST_CASE(MakeSimpleCall)
 
 		cout << "Result: " << endl;
 		xml_parser::write_xml(cout, result);
-		getchar();
+		cout << endl;
+
+		boost::optional<string> error = result.get_optional<string>("error");
+		BOOST_CHECK(!error.is_initialized());
+
+		boost::optional<string> message = result.get_optional<string>("message");
+		BOOST_CHECK(message.is_initialized() && message.get() == "Hello, Sanchez!");
 	}
 	Socket::DeinitNetwork();
 }

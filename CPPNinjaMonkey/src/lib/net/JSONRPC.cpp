@@ -103,12 +103,11 @@ public:
 
 		ostringstream pathStream;
 		pathStream << "/snm/ajax.php";
-		/*
 		pathStream << "?id=" << m_callID;
-		// TODO: URL-encode values.
-		pathStream << "&name=" << sFunction;
-		pathStream << "&arg=" << jsonStream.str();
-		*/
+		pathStream << "&name=";
+		HTTPSession::WriteURLEscaped(pathStream, sFunction);
+		pathStream << "&args=";
+		HTTPSession::WriteURLEscaped(pathStream, jsonStream.str());
 		
 		CallInfo* pCallInfo = new CallInfo(*m_pSession, pathStream.str(), fResultCallback);
 
