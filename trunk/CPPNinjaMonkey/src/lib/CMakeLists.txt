@@ -1,1 +1,1 @@
-SUBDIRS(math net)
+SUBDIRS(math net framework)
