@@ -1,9 +1,14 @@
 
 SET(UNIT_TEST_SRCS
+
+  Dispatcher.cpp
+
   Point.cpp
+
   Mediator.cpp
   #HTTPClient.cpp
   JSONRPC.cpp
+
   Main.cpp
 )
 
@@ -29,4 +34,4 @@ elseif(CMAKE_HOST_UNIX)
 	# (on windows, auto-linking through the header is used)
 endif(CMAKE_HOST_WIN32)
 
-TARGET_LINK_LIBRARIES(unitTests shadowNinjaMath shadowNinjaNet)
+TARGET_LINK_LIBRARIES(unitTests shadowNinjaMath shadowNinjaNet shadowNinjaFramework)
