@@ -1,6 +1,6 @@
 
 
-SET(FRAMEWORK_SRCS
+set(FRAMEWORK_SRCS
   Dispatcher.cpp
   ${PROJECT_SOURCE_DIR}/include/framework/Dispatcher.h
   #internal/Peer.cpp 
@@ -16,5 +16,5 @@ SET(FRAMEWORK_SRCS
 #elseif(CMAKE_HOST_UNIX)
 #endif(CMAKE_HOST_WIN32)
 
-ADD_LIBRARY(shadowNinjaFramework STATIC ${FRAMEWORK_SRCS})
+add_library(shadowNinjaFramework STATIC ${FRAMEWORK_SRCS})
 
