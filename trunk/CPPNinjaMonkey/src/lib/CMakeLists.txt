@@ -1,1 +1,1 @@
-SUBDIRS(math net framework)
+SUBDIRS(math net framework render)
