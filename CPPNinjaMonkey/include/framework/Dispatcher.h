@@ -3,7 +3,7 @@
 #define DISPATCHER_H_INCLUDED
 
 
-#include <boost/function.hpp>
+#include "boost/function.hpp"
 
 
 // -----------------------------------------------------------------------------

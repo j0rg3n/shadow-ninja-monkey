@@ -15,5 +15,8 @@ SET(NET_SRCS
   #Peer.h
 )
 
+# Comment this line to disable precompiled headers.
+add_msvc_precompiled_header(build/PrecompiledHeaders.h ${PROJECT_SOURCE_DIR}/src/build/PrecompiledHeaders.cpp NET_SRCS)
+
 ADD_LIBRARY(shadowNinjaNet STATIC ${NET_SRCS})
 

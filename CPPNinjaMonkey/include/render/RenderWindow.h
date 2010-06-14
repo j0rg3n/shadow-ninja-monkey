@@ -3,6 +3,12 @@
 #define RENDERWINDOW_H_INCLUDED
 
 
+#include "boost/signal.hpp"
+
+
+// -----------------------------------------------------------------------------
+
+
 class RenderThreadContext;
 
 
@@ -18,7 +24,15 @@ public:
 	void Init();
 	void Shutdown();
 
+	void Swap();
+
+	int Width() const;
+	int Height() const;
+
 	RenderThreadContext* CreateRenderThreadContext();
+
+	boost::signal<void (int, int)>& SizeChanged();
+	boost::signal<void ()>& Closed();
 
 private:
 	class Impl;
