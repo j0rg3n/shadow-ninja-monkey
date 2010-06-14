@@ -5,6 +5,8 @@
 
 set(DEBUG_LAUNCH_SRCS
   Main.cpp
+  RenderWorker.cpp
+  RenderWorker.h
   ${PROJECT_SOURCE_DIR}/include/build/PrecompiledHeaders.h 
 )
 
@@ -23,7 +25,7 @@ if(CMAKE_HOST_WIN32)
 	target_link_libraries(debugLaunch wsock32.lib ws2_32.lib)
 
 	# Link with OpenGL
-	target_link_libraries(debugLaunch Opengl32.lib) # glut32.lib glu32.lib)
+	target_link_libraries(debugLaunch Opengl32.lib glu32.lib)
 
 	# Link with neon
 	# Required by net library.

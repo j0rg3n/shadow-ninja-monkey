@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 project(ShadowNinjaMonkey)
 
+# Remove underscore in _MSVC to enable precompiled headers.
+# Note: Currently broken: Causes lots of unresolved externals.
+# TODO: Make work.
 macro(add_msvc_precompiled_header PrecompiledHeader PrecompiledSource SourcesVar)
-  if(MSVC)
+  if(_MSVC)
     get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
     set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
     set(Sources ${${SourcesVar}})

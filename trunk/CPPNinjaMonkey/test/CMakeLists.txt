@@ -19,6 +19,9 @@ SET(UNIT_TEST_SRCS
 link_directories(${BOOST_PATH}/lib 
 	${PROJECT_SOURCE_DIR}/neon-0.29.3)
 
+# Comment this line to disable precompiled headers.
+add_msvc_precompiled_header(build/PrecompiledHeaders.h ${PROJECT_SOURCE_DIR}/src/build/PrecompiledHeaders.cpp UNIT_TEST_SRCS)
+
 ADD_EXECUTABLE(unitTests ${UNIT_TEST_SRCS})
 
 if(CMAKE_HOST_WIN32)

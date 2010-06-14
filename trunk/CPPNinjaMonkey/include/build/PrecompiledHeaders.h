@@ -8,6 +8,9 @@
 #include <windows.h>
 #endif // _WINDOWS
 
+#include <GL.h>
+#include <GLU.h>
+
 #include <vector>
 #include <list>
 #include <string>
@@ -23,6 +26,8 @@
 #include "boost/bind.hpp"
 
 #include "boost/function.hpp"
+
+#include "boost/signal.hpp"
 
 #endif // USING_PRECOMPILED_HEADERS
 

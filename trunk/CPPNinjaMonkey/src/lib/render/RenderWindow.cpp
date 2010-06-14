@@ -1,4 +1,3 @@
-#include "build/PrecompiledHeaders.h"
 #include "render/RenderWindow.h"
 #include "RenderThreadContextInternal.h"
 
@@ -13,6 +12,12 @@
 // ----------------------------------------------------------------------------
 
 
+using namespace boost;
+
+
+// ----------------------------------------------------------------------------
+
+
 class RenderWindow::Impl
 {
 public:
@@ -20,14 +25,16 @@ public:
 	{
 	}
 
+
 	void Init()
 	{
 		m_hInstance = (HINSTANCE) GetModuleHandle(NULL);
 		m_windowClass = RegisterWindowClass(m_hInstance);
-		m_hWnd = CreateMainWindow(m_windowClass, m_hInstance);
+		m_hWnd = CreateMainWindow(m_windowClass, m_hInstance, this);
 
 		EnableOpenGL(m_hWnd, &m_hDC);
 	}
+
 
 	void Shutdown()
 	{
@@ -37,6 +44,16 @@ public:
 		UnregisterWindowClass(m_windowClass, m_hInstance);
 		m_windowClass = 0;
 	}
+
+
+	void Swap()
+	{
+		SwapBuffers(m_hDC);
+	}
+
+
+	int Width() const { return m_nWidth; }
+	int Height() const { return m_nHeight; }
 
 
 	~Impl()
@@ -52,17 +69,57 @@ public:
 	}
 
 
+	boost::signal<void (int, int)>& SizeChanged() { return m_sizeChanged; }
+	boost::signal<void ()>& Closed() { return m_quit; }
+
 private:
 	static LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (uMsg)
 		{
-		case WM_CLOSE:
-			PostMessage(hwnd, WM_QUIT, 0, 0);
+		case WM_CREATE:
+			{
+				CREATESTRUCT* pCreateStruct = (CREATESTRUCT*) lParam;
+				SetUserDataFromCreateStruct(hwnd, pCreateStruct);
+				GetThis(hwnd)->m_sizeChanged(pCreateStruct->cx, pCreateStruct->cy);
+			}
 			break;
+
+		case WM_CLOSE:
+			GetThis(hwnd)->m_quit();
+			break;
+
+		case WM_SIZE:
+			{
+				int width = LOWORD(lParam);
+				int height = HIWORD(lParam);
+				Impl* pThis = GetThis(hwnd);
+				pThis->m_nWidth = width;
+				pThis->m_nHeight = height;
+				pThis->m_sizeChanged(width, height);
+			}
+            break;
 		}
 
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
+
+
+	//!\brief Do not call before calling SetUserDataFromCreateStruct
+	static Impl* GetThis(HWND hwnd)
+	{
+		Impl* pThis = (Impl*) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		assert(pThis != NULL);
+		return pThis;
+	}
+
+
+	static void SetUserDataFromCreateStruct(HWND hwnd, CREATESTRUCT* pCreateStruct)
+	{
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) pCreateStruct->lpCreateParams);
+		// Force cached window long values to be flushed.
+		// (See SetWindowLongPtr or SetWindowPos documentation for more.)
+		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
 
@@ -89,7 +146,7 @@ private:
 	}
 
 
-	static HWND CreateMainWindow(ATOM windowClass, HINSTANCE hInstance)
+	static HWND CreateMainWindow(ATOM windowClass, HINSTANCE hInstance, void* pParam)
 	{
 		DWORD nExStyle = 0;
 		const char* pszWindowName = "Foo";
@@ -100,7 +157,6 @@ private:
 		int nHeight = 600;
 		HWND hWndParent = GetDesktopWindow();
 		HMENU hMenu = NULL;
-		void* pParam = NULL;
 
 		HWND hwnd = CreateWindowEx(nExStyle, (LPCTSTR) windowClass, pszWindowName, nStyle, nX, nY, nWidth, nHeight, hWndParent, hMenu, hInstance, pParam);
 		assert(hwnd != NULL);
@@ -141,10 +197,14 @@ private:
 	}
 
 
+	int m_nWidth;
+	int m_nHeight;
 	HDC m_hDC;
 	ATOM m_windowClass;
 	HWND m_hWnd;
 	HINSTANCE m_hInstance;
+	signal<void (int, int)> m_sizeChanged;
+	signal<void ()> m_quit;
 };
 
 
@@ -174,7 +234,37 @@ void RenderWindow::Shutdown()
 }
 
 
+void RenderWindow::Swap()
+{
+	m_pImpl->Swap();
+}
+
+
+int RenderWindow::Width() const
+{
+	return m_pImpl->Width();
+}
+
+
+int RenderWindow::Height() const
+{
+	return m_pImpl->Height();
+}
+
+
 RenderThreadContext* RenderWindow::CreateRenderThreadContext()
 {
 	return m_pImpl->CreateRenderThreadContext();
+}
+
+
+boost::signal<void (int, int)>& RenderWindow::SizeChanged()
+{
+	return m_pImpl->SizeChanged();
+}
+
+
+boost::signal<void ()>& RenderWindow::Closed()
+{
+	return m_pImpl->Closed();
 }

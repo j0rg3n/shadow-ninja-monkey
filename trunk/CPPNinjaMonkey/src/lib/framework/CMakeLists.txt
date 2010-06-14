@@ -7,14 +7,8 @@ set(FRAMEWORK_SRCS
   #Peer.h
 )
 
-#if(CMAKE_HOST_WIN32)
-	# Reduce size and crud in windows headers.
-#	add_definitions(-DWIN32_LEAN_AND_MEAN)
-	
-	# Silence warnings about insecure stdlib functions. We already know what they are.
-#	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-#elseif(CMAKE_HOST_UNIX)
-#endif(CMAKE_HOST_WIN32)
+# Comment this line to disable precompiled headers.
+add_msvc_precompiled_header(build/PrecompiledHeaders.h ${PROJECT_SOURCE_DIR}/src/build/PrecompiledHeaders.cpp FRAMEWORK_SRCS)
 
 add_library(shadowNinjaFramework STATIC ${FRAMEWORK_SRCS})
 
