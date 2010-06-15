@@ -11,6 +11,8 @@ public:
 	RenderThreadContext(Impl* pImpl);
 	~RenderThreadContext();
 
+	void SetupFont();
+
 private:
 	Impl* m_pImpl;
 };
