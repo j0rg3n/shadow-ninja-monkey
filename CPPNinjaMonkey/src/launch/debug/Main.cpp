@@ -6,8 +6,9 @@
 
 #include "render/RenderWindow.h"
 #include "RenderWorker.h"
-#include "boost/scoped_ptr.hpp"
 
+#include "boost/scoped_ptr.hpp"
+#include "boost/bind.hpp"
 
 #include <GL.h>
 #include <GLU.h>
@@ -23,53 +24,90 @@ using namespace boost;
 // -----------------------------------------------------------------------------
 
 
-static WPARAM MessageLoop(RenderWorker &worker, RenderWindow& renderWindow)
+class App
 {
-	while(true)
+public:
+	void Init()
 	{
-		MSG msg;
-		BOOL bResult = PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
-		if(bResult == TRUE)
+		renderWindow.Init();
+
+		renderWindow.SizeChanged().connect(bind(&App::OnSizeChanged, this, _1, _2));
+		renderWindow.Closed().connect(bind(&App::OnClosed, this));
+
+		// Create worker before calling OnSizeChanged, as the worker internally
+		// creates an OpenGL render context for this thread.
+		// TODO: Solve this encapsulation issue.
+		worker.reset(new RenderWorker(renderWindow));
+
+		OnSizeChanged(renderWindow.Width(), renderWindow.Height());
+	}
+
+
+	void Shutdown()
+	{
+		worker.reset();
+		renderWindow.Shutdown();
+	}
+
+
+	WPARAM MessageLoop()
+	{
+		while(true)
 		{
-			if(msg.message == WM_QUIT)
+			MSG msg;
+			BOOL bResult = PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
+			if(bResult == TRUE)
 			{
-				return msg.wParam;
+				if(msg.message == WM_QUIT)
+				{
+					return msg.wParam;
+				}
+				else
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
 			}
 			else
 			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
+				OnIdle();
 			}
 		}
-		else
-		{
-			worker.Run();
-			renderWindow.Swap();
-		}
 	}
-}
+
+private:
+	void OnIdle()
+	{
+		worker->Run();
+		renderWindow.Swap();
+	}
 
 
-static void OnSizeChanged(int width, int height)
-{
-    if (height == 0)
-    {
-        height = 1;
-    }
+	void OnSizeChanged(int width, int height)
+	{
+		if (height == 0)
+		{
+			height = 1;
+		}
 
-	// TODO: Move away: Perspective matrix should be set in render code, not here.
-    glViewport(0, 0, width, height);
+		// TODO: Move away: Perspective matrix should be set in render code, not here.
+		glViewport(0, 0, width, height);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(54.0f, (GLfloat) width / (GLfloat) height, 1.0f, 1000.0f);
-}
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(54.0f, (GLfloat) width / (GLfloat) height, 1.0f, 1000.0f);
+	}
 
 
-static void OnClosed()
-{
-	PostQuitMessage(0);
-}
+	void OnClosed()
+	{
+		PostQuitMessage(0);
+	}
+
+
+	RenderWindow renderWindow;
+	scoped_ptr<RenderWorker> worker;
+};
 
 
 // -----------------------------------------------------------------------------
@@ -79,21 +117,13 @@ int main(int argc, char* argv[])
 {
 	cout << "Hello world." << endl;
 
-	RenderWindow renderWindow;
-	renderWindow.Init();
+	App app;
 
-	renderWindow.SizeChanged().connect(OnSizeChanged);
-	renderWindow.Closed().connect(OnClosed);
+	app.Init();
 
-	WPARAM exitCode;
-	{
-		RenderWorker worker(renderWindow);
-		OnSizeChanged(renderWindow.Width(), renderWindow.Height());
+	WPARAM exitCode = app.MessageLoop();
 
-		exitCode = MessageLoop(worker, renderWindow);
-	}
-
-	renderWindow.Shutdown();
+	app.Shutdown();
 
 	return exitCode;
 }
