@@ -78,6 +78,12 @@ public:
 private:
 	void OnIdle()
 	{
+		// TODO: Generalize with nice pool of worker threads and a barrier-style
+		// gizmo for letting them all complete before the swap, and restart after 
+		// the swap.
+
+		// This requires more knowledge about the main game logic thread, so
+		// postponing for now.
 		worker->Run();
 		renderWindow.Swap();
 	}
