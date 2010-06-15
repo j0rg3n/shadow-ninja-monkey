@@ -29,24 +29,24 @@ class App
 public:
 	void Init()
 	{
-		renderWindow.Init();
+		m_renderWindow.Init();
 
-		renderWindow.SizeChanged().connect(bind(&App::OnSizeChanged, this, _1, _2));
-		renderWindow.Closed().connect(bind(&App::OnClosed, this));
+		m_renderWindow.SizeChanged().connect(bind(&App::OnSizeChanged, this, _1, _2));
+		m_renderWindow.Closed().connect(bind(&App::OnClosed, this));
 
 		// Create worker before calling OnSizeChanged, as the worker internally
 		// creates an OpenGL render context for this thread.
 		// TODO: Solve this encapsulation issue.
-		worker.reset(new RenderWorker(renderWindow));
+		m_pWorker.reset(new RenderWorker(m_renderWindow));
 
-		OnSizeChanged(renderWindow.Width(), renderWindow.Height());
+		OnSizeChanged(m_renderWindow.Width(), m_renderWindow.Height());
 	}
 
 
 	void Shutdown()
 	{
-		worker.reset();
-		renderWindow.Shutdown();
+		m_pWorker.reset();
+		m_renderWindow.Shutdown();
 	}
 
 
@@ -84,8 +84,8 @@ private:
 
 		// This requires more knowledge about the main game logic thread, so
 		// postponing for now.
-		worker->Run();
-		renderWindow.Swap();
+		m_pWorker->Run();
+		m_renderWindow.Swap();
 	}
 
 
@@ -111,8 +111,8 @@ private:
 	}
 
 
-	RenderWindow renderWindow;
-	scoped_ptr<RenderWorker> worker;
+	RenderWindow m_renderWindow;
+	scoped_ptr<RenderWorker> m_pWorker;
 };
 
 

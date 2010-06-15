@@ -8,6 +8,8 @@
 
 #include <GL.h>
 
+#include <string>
+
 #include "boost/scoped_ptr.hpp"
 
 
@@ -15,6 +17,7 @@
 
 
 using namespace boost;
+using namespace std;
 
 
 // ----------------------------------------------------------------------------
@@ -24,13 +27,17 @@ class RenderWorker::Impl
 {
 public:
 	Impl(RenderWindow& renderWindow) : 
-		renderThreadContext(renderWindow.CreateRenderThreadContext())
+		m_pRenderThreadContext(renderWindow.CreateRenderThreadContext()),
+		m_nAngle(0)
 	{
+		m_pRenderThreadContext->SetupFont();
 	}
 
 
 	void Run()
 	{
+		m_nAngle += 0.08f;
+
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.2f, 0.1f, 0.3f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -38,6 +45,7 @@ public:
 		glMatrixMode(GL_MODELVIEW);
 
 		glLoadIdentity();
+
 		glPushMatrix();
 		{
 			glLoadIdentity();
@@ -47,6 +55,16 @@ public:
 			{
 				glColor3f(1.0f, 0.0f, 0.0f);
 				glTranslatef(0, 0, 0);
+
+                // Draw text. 1000 is an arbitrary constant used in SetupFont().
+				string msg = "A box with text attached";
+				glRasterPos3f(0, 0, 0);
+				glListBase(1000); 
+				glCallLists(msg.size(), GL_UNSIGNED_BYTE, msg.c_str()); 
+
+				glRotatef(m_nAngle * 1.00f, 0, 0, 1);
+				glRotatef(m_nAngle * 1.13f, 0, 1, 0);
+				glRotatef(m_nAngle * 1.07f, 1, 0, 0);
 				glScalef(1.0f, 4.0f, 1.0f);
 
 				glPushMatrix();
@@ -99,7 +117,8 @@ public:
 	}
 	
 private:
-	scoped_ptr<RenderThreadContext> renderThreadContext;
+	scoped_ptr<RenderThreadContext> m_pRenderThreadContext;
+	float m_nAngle;
 };
 
 
