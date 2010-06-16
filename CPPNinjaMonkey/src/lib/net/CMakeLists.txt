@@ -5,6 +5,14 @@ SET(NET_SRCS
   ${PROJECT_SOURCE_DIR}/include/net/Mediator.h
   HTTPClient.cpp
   HTTPClient.h
+  PeerClient.cpp
+  PeerClient.h
+  PeerServerConnectionListener.cpp
+  PeerServerConnectionListener.h
+  PeerServer.cpp
+  PeerServer.h
+  PeerServerSession.cpp
+  PeerServerSession.h
   Socket.cpp
   Socket.h
   JSONRPC.cpp

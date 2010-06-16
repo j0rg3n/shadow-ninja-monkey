@@ -30,6 +30,12 @@ Socket::~Socket()
 }
 
 
+bool Socket::IsConnected() const
+{
+	return m_socket != INVALID_SOCKET;
+}
+
+
 bool Socket::Connect(std::string sAddress, boost::uint32_t nPort)
 {
 	assert(m_socket == INVALID_SOCKET);
@@ -62,7 +68,7 @@ bool Socket::Connect(std::string sAddress, boost::uint32_t nPort)
 
 	if(nResult != 0)
 	{
-		closesocket(m_socket);
+		Disconnect();
 		return false;
 	}
 
@@ -70,14 +76,67 @@ bool Socket::Connect(std::string sAddress, boost::uint32_t nPort)
 }
 
 
-void Socket::Disconnect()
+bool Socket::Listen(boost::uint32_t nPort)
 {
+	assert(m_socket == INVALID_SOCKET);
+
+	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(m_socket == INVALID_SOCKET)
 	{
-		return;
+		return false;
 	}
 
+	sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = inet_addr("127.0.0.1");
+	address.sin_port = htons((u_short) nPort);
+
+	int nResult = bind(m_socket, (SOCKADDR*) &address, sizeof(address));
+	if(nResult != 0)
+	{
+		Disconnect();
+		return false;
+	}
+
+	// "If set to SOMAXCONN, the underlying service provider responsible for 
+	// socket s will set the backlog to a maximum reasonable value."
+	// - ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/winsock/winsock/listen_2.htm
+	const int nBacklog = SOMAXCONN;
+	nResult = listen(m_socket, nBacklog);
+	if(nResult != 0)
+	{
+		Disconnect();
+		return false;
+	}
+
+	return true;
+}
+
+
+bool Socket::Accept(Socket** ppConnection)
+{
+	sockaddr* pConnectionAddress = NULL;
+	int *pnConnectionAddressLength = NULL;
+	SOCKET incomingConnection = accept(m_socket, pConnectionAddress, pnConnectionAddressLength);
+	
+	// Note: After returning here, on errors, we must not access m_socket,
+	// as it might have been cleared by another thread calling Disconnect.
+	if(incomingConnection == INVALID_SOCKET)
+	{
+		*ppConnection = NULL;
+		Disconnect();
+		return false;
+	}
+
+	*ppConnection = new Socket(incomingConnection);
+	return true;
+}
+
+
+void Socket::Disconnect()
+{
 	closesocket(m_socket);
+	m_socket = INVALID_SOCKET;
 }
 
 
@@ -129,4 +188,12 @@ void Socket::DeinitNetwork()
 #ifdef _WINDOWS
 	WSACleanup();
 #endif
+}
+
+
+// -----------------------------------------------------------------------------
+
+
+Socket::Socket(SOCKET socket) : m_socket(socket)
+{ 
 }
