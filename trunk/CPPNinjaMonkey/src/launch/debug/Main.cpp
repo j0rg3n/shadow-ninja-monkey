@@ -10,6 +10,10 @@
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
 
+#include "lib/net/PeerServer.h"
+#include "lib/net/PeerClient.h"
+#include "lib/net/Socket.h"
+
 #include <GL.h>
 #include <GLU.h>
 
@@ -29,24 +33,15 @@ class App
 public:
 	void Init()
 	{
-		m_renderWindow.Init();
-
-		m_renderWindow.SizeChanged().connect(bind(&App::OnSizeChanged, this, _1, _2));
-		m_renderWindow.Closed().connect(bind(&App::OnClosed, this));
-
-		// Create worker before calling OnSizeChanged, as the worker internally
-		// creates an OpenGL render context for this thread.
-		// TODO: Solve this encapsulation issue.
-		m_pWorker.reset(new RenderWorker(m_renderWindow));
-
-		OnSizeChanged(m_renderWindow.Width(), m_renderWindow.Height());
+		InitRender();
+		InitNetwork();
 	}
 
 
 	void Shutdown()
 	{
-		m_pWorker.reset();
-		m_renderWindow.Shutdown();
+		ShutdownNetwork();
+		ShutdownRender();
 	}
 
 
@@ -111,6 +106,47 @@ private:
 	}
 
 
+	void InitRender()
+	{
+		m_renderWindow.Init();
+
+		m_renderWindow.SizeChanged().connect(bind(&App::OnSizeChanged, this, _1, _2));
+		m_renderWindow.Closed().connect(bind(&App::OnClosed, this));
+
+		// Create worker before calling OnSizeChanged, as the worker internally
+		// creates an OpenGL render context for this thread.
+		// TODO: Solve this encapsulation issue.
+		m_pWorker.reset(new RenderWorker(m_renderWindow));
+
+		OnSizeChanged(m_renderWindow.Width(), m_renderWindow.Height());
+	}
+
+
+	void ShutdownRender()
+	{
+		m_pWorker.reset();
+		m_renderWindow.Shutdown();
+	}
+
+
+	void InitNetwork()
+	{
+		Socket::InitNetwork();
+		m_pServer.reset(new PeerServer());
+		m_pClient.reset(new PeerClient());
+	}
+
+
+	void ShutdownNetwork()
+	{
+		m_pClient.reset();
+		m_pServer.reset();
+		Socket::DeinitNetwork();
+	}
+
+
+	scoped_ptr<PeerServer> m_pServer;
+	scoped_ptr<PeerClient> m_pClient;
 	RenderWindow m_renderWindow;
 	scoped_ptr<RenderWorker> m_pWorker;
 };
