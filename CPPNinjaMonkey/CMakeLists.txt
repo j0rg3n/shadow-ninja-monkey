@@ -27,13 +27,22 @@ endmacro(add_msvc_precompiled_header)
 
 include_directories(src 
 	include)
+
+
+# include boost for all
+set(BOOST_PATH ${PROJECT_SOURCE_DIR}/external/boost_1_42_0
+	CACHE PATH "Path to boost 1.42.0.")
+
+include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3
+	${BOOST_PATH})
+
 	
 if(CMAKE_HOST_WIN32)
-	set(BOOST_PATH C:/Program\ Files/boost/boost_1_42
-		CACHE PATH "Path to boost 1.42.0.")
+#	set(BOOST_PATH C:/Program\ Files/boost/boost_1_42
+#		CACHE PATH "Path to boost 1.42.0.")
 
-	include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3
-		${BOOST_PATH})
+#	include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3
+#		${BOOST_PATH})
 
 	# Reduce size and crud in windows headers.
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
