@@ -1,4 +1,4 @@
-
+find_package(OpenGL)
 
 SET(RENDER_SRCS
   RenderThreadContext.cpp
