@@ -30,27 +30,23 @@ include_directories(src
 
 
 # include boost for all
-set(BOOST_PATH ${PROJECT_SOURCE_DIR}/external/boost_1_42_0
-	CACHE PATH "Path to boost 1.42.0.")
+SET(Boost_ADDITIONAL_VERSIONS "1.42.0")
+SET(BOOST_ROOT ${PROJECT_SOURCE_DIR}/external/boost_1_42_0)
+find_package(Boost)
+if(Boost_FOUND)
+	include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3
-	${BOOST_PATH})
+#Include neon
+include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3)
 
 	
 if(CMAKE_HOST_WIN32)
-#	set(BOOST_PATH C:/Program\ Files/boost/boost_1_42
-#		CACHE PATH "Path to boost 1.42.0.")
-
-#	include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3
-#		${BOOST_PATH})
-
 	# Reduce size and crud in windows headers.
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 	
 	# Silence warnings about insecure stdlib functions. We already know what they are.
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
-elseif(CMAKE_HOST_UNIX)
 endif(CMAKE_HOST_WIN32)
 
 add_subdirectory(src)
