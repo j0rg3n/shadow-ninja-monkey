@@ -140,15 +140,16 @@ void Socket::Disconnect()
 }
 
 
-bool Socket::Write(std::string sMessage)
+bool Socket::Write(const char* pBuffer, size_t nLength)
 {
-	const char* pszSendPos = sMessage.c_str();
-	const char* pszSendEnd = sMessage.c_str() + sMessage.length();
+	const char* pszSendPos = pBuffer;
+	const char* pszSendEnd = pBuffer + nLength;
 	while(pszSendPos < pszSendEnd)
 	{
 		int nResult = send(m_socket, pszSendPos, pszSendEnd - pszSendPos, 0);
 		if(nResult == SOCKET_ERROR)
 		{
+			Disconnect();
 			return false;
 		}
 
@@ -159,16 +160,35 @@ bool Socket::Write(std::string sMessage)
 }
 
 
+size_t Socket::Read(char* pBuffer, size_t nLength)
+{
+	int nResult = recv(m_socket, pBuffer, nLength, 0);
+	if(nResult == SOCKET_ERROR)
+	{
+		Disconnect();
+		return READ_ERROR;
+	}
+
+	return (size_t) nResult;
+}
+
+
+bool Socket::Write(std::string sMessage)
+{
+	return Write(sMessage.c_str(), sMessage.length());
+}
+
+
 bool Socket::Read(std::string& sMessage)
 {
 	char szBuffer[RECEIVE_BUFFER_LENGTH];
-	int nResult = recv(m_socket, szBuffer, RECEIVE_BUFFER_LENGTH, 0);
-	if(nResult == SOCKET_ERROR)
+	size_t nLength = Read(szBuffer, RECEIVE_BUFFER_LENGTH);
+	if(nLength == READ_ERROR)
 	{
 		return false;
 	}
 
-	sMessage.assign(szBuffer, (size_t) nResult);
+	sMessage.assign(szBuffer, nLength);
 	return true;
 }
 

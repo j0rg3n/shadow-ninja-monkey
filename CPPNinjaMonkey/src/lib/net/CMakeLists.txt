@@ -7,6 +7,10 @@ SET(NET_SRCS
   HTTPClient.h
   PeerClient.cpp
   PeerClient.h
+  NetworkPacket.cpp
+  NetworkPacket.h
+  NetworkPacketMarshaller.cpp
+  NetworkPacketMarshaller.h
   PeerServerConnectionListener.cpp
   PeerServerConnectionListener.h
   PeerServer.cpp
@@ -19,11 +23,9 @@ SET(NET_SRCS
   JSONRPC.h
   Neon.h
   Neon.cpp
-  #internal/Peer.cpp 
-  #Peer.h
 )
 
-# Comment this line to disable precompiled headers.
+# Comment this line to disable precompiled headers for this project only.
 add_msvc_precompiled_header(build/PrecompiledHeaders.h ${PROJECT_SOURCE_DIR}/src/build/PrecompiledHeaders.cpp NET_SRCS)
 
 ADD_LIBRARY(shadowNinjaNet STATIC ${NET_SRCS})

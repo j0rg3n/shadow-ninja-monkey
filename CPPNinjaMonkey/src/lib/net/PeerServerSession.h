@@ -3,8 +3,12 @@
 #define PEERSERVERSESSION_H_INCLUDED
 
 
-#include "Socket.h"
+#include <vector>
 
+#include "boost/function.hpp"
+
+#include "Socket.h"
+#include "NetworkPacket.h"
 
 // -----------------------------------------------------------------------------
 
@@ -12,10 +16,13 @@
 class PeerServerSession
 {
 public:
-	PeerServerSession(Socket* pSocket);
+	PeerServerSession(Socket* pSocket, boost::function<void (std::vector<NetworkPacket>)> packetsReceived);
 	~PeerServerSession();
 
-	
+	void Start();
+	void Stop();
+
+	void Send(std::vector<NetworkPacket> packets);
 
 private:
 	class Impl;

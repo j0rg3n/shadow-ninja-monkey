@@ -8,6 +8,7 @@
 #include "boost/thread/locks.hpp"
 
 #include <vector>
+#include <iostream>
 
 
 // ----------------------------------------------------------------------------
@@ -23,7 +24,7 @@ using namespace std;
 class PeerServer::Impl
 {
 public:
-	Impl()
+	Impl() : m_nSessionIDSeed(0)
 	{
 		m_pListener.reset(new PeerServerConnectionListener(4242, bind(&Impl::AddSession, this, _1)));
 		m_pListener->Start();
@@ -37,6 +38,7 @@ public:
 
 		for(PeerServerSessionList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
 		{
+			(*i)->Stop();
 			delete *i;
 		}
 
@@ -53,10 +55,31 @@ private:
 	{
 		lock_guard<mutex> lock(m_sessionsMutex);
 
-		m_sessions.push_back(new PeerServerSession(pSocket));
+		uint32_t nSessionID = m_nSessionIDSeed;
+		++m_nSessionIDSeed;
+
+		PeerServerSession* pSession = new PeerServerSession(pSocket, bind(&Impl::OnPacketsReceived, this, nSessionID, _1));
+		m_sessions.push_back(pSession);
+		
+		cout << "Starting incoming session " << nSessionID << "...";
+		pSession->Start();
+
+		vector<NetworkPacket> initPackets;
+		initPackets.push_back(NetworkPacket(NETWORK_PACKET_TYPE_WELCOME, 0, NULL));
+		pSession->Send(initPackets);
 	}
 
 
+	void OnPacketsReceived(size_t nSessionID, vector<NetworkPacket> packets)
+	{
+		for(vector<NetworkPacket>::const_iterator i = packets.begin(); i != packets.end(); ++i)
+		{
+			cout << "Received packet: Session: " << nSessionID << ", Type: " << i->Type() << ", Length: " << i->Length() << endl;
+		}
+	}
+
+
+	uint32_t m_nSessionIDSeed;
 	mutex m_sessionsMutex;
 	PeerServerSessionList m_sessions;
 
