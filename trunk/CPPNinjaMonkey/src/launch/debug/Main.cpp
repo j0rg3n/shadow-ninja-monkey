@@ -133,15 +133,31 @@ private:
 	{
 		Socket::InitNetwork();
 		m_pServer.reset(new PeerServer());
-		m_pClient.reset(new PeerClient());
+		m_pClient.reset(new PeerClient(bind(&App::OnPacketsReceived, this, _1)));
+
+		m_pClient->Connect("127.0.0.1", 4242);
+
+		vector<NetworkPacket> initPackets;
+		initPackets.push_back(NetworkPacket(NETWORK_PACKET_TYPE_WELCOME, 0, NULL));
+		m_pClient->Send(initPackets);
 	}
 
 
 	void ShutdownNetwork()
 	{
+		m_pClient->Disconnect();
 		m_pClient.reset();
 		m_pServer.reset();
 		Socket::DeinitNetwork();
+	}
+
+
+	void OnPacketsReceived(vector<NetworkPacket> packets)
+	{
+		for(vector<NetworkPacket>::const_iterator i = packets.begin(); i != packets.end(); ++i)
+		{
+			cout << "Received packet from server: Type: " << i->Type() << ", Length: " << i->Length() << endl;
+		}
 	}
 
 

@@ -19,6 +19,8 @@ typedef unsigned int SOCKET;
 class Socket
 {
 public:
+	static const size_t READ_ERROR = 0xFFFFFFFF;
+
 	Socket();
 	~Socket();
 
@@ -27,6 +29,8 @@ public:
 	bool Listen(boost::uint32_t nPort);
 	bool Accept(Socket** ppConnection);
 	void Disconnect();
+	bool Write(const char* pBuffer, size_t nLength);
+	size_t Read(char* pBuffer, size_t nLength);
 	bool Write(std::string sMessage);
 	bool Read(std::string& sMessage);
 

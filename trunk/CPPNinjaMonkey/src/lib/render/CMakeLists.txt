@@ -8,7 +8,7 @@ SET(RENDER_SRCS
   ${PROJECT_SOURCE_DIR}/include/render/RenderWindow.h
 )
 
-# Comment this line to disable precompiled headers.
+# Comment this line to disable precompiled headers for this project only.
 add_msvc_precompiled_header(build/PrecompiledHeaders.h ${PROJECT_SOURCE_DIR}/src/build/PrecompiledHeaders.cpp RENDER_SRCS)
 
 ADD_LIBRARY(shadowNinjaRender STATIC ${RENDER_SRCS})

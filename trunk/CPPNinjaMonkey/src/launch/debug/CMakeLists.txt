@@ -13,7 +13,7 @@ set(DEBUG_LAUNCH_SRCS
 link_directories(${BOOST_PATH}/lib 
 	${PROJECT_SOURCE_DIR}/neon-0.29.3)
 
-# Comment this line to disable precompiled headers.
+# Comment this line to disable precompiled headers for this project only.
 # Should be done once in a while.
 add_msvc_precompiled_header(build/PrecompiledHeaders.h ${PROJECT_SOURCE_DIR}/src/build/PrecompiledHeaders.cpp DEBUG_LAUNCH_SRCS)
 	
