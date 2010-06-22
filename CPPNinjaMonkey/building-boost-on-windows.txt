@@ -1,0 +1,1 @@
+CPPNinjaMonkey\external\boost_1_42_0>.\bjam --build-dir="D:\jbuild" variant=debug,release link=static threading=multi runtime-link=shared --with-thread --with-signals --with-test
