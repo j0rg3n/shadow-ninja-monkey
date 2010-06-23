@@ -1,8 +1,11 @@
 
 
 set(FRAMEWORK_SRCS
-  Dispatcher.cpp
-  ${PROJECT_SOURCE_DIR}/include/framework/Dispatcher.h
+  ${PROJECT_SOURCE_DIR}/include/framework/AutoResetEvent.h
+  CallQueue.cpp
+  ${PROJECT_SOURCE_DIR}/include/framework/CallQueue.h
+  DispatchThread.cpp
+  ${PROJECT_SOURCE_DIR}/include/framework/DispatchThread.h
 )
 
 # Comment this line to disable precompiled headers for this project only.

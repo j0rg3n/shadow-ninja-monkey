@@ -7,12 +7,16 @@
 #include "render/RenderWindow.h"
 #include "RenderWorker.h"
 
+#include "diag/Trace.h"
+
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
 
-#include "lib/net/PeerServer.h"
+#include "net/PeerServer.h"
 #include "lib/net/PeerClient.h"
 #include "lib/net/Socket.h"
+
+#include "framework/DispatchThread.h"
 
 #include <GL.h>
 #include <GLU.h>
@@ -33,15 +37,19 @@ class App
 public:
 	void Init()
 	{
+		TRACE("Starting debug launcher...");
 		InitRender();
 		InitNetwork();
+		TRACE("Debug launcher started.");
 	}
 
 
 	void Shutdown()
 	{
+		TRACE("Shutting down debug launcher...");
 		ShutdownNetwork();
 		ShutdownRender();
+		TRACE("Debug launcher shut down.");
 	}
 
 
@@ -92,6 +100,7 @@ private:
 		}
 
 		// TODO: Move away: Perspective matrix should be set in render code, not here.
+		TRACE("Updating projection for new viewport size %dx%d", width, height);
 		glViewport(0, 0, width, height);
 
 		glMatrixMode(GL_PROJECTION);
@@ -102,6 +111,7 @@ private:
 
 	void OnClosed()
 	{
+		TRACE("Window closed.");
 		PostQuitMessage(0);
 	}
 
@@ -132,14 +142,12 @@ private:
 	void InitNetwork()
 	{
 		Socket::InitNetwork();
-		m_pServer.reset(new PeerServer());
-		m_pClient.reset(new PeerClient(bind(&App::OnPacketsReceived, this, _1)));
+		
+		m_pServer.reset(new PeerServer(m_networkThread.GetCallQueue(), bind(&App::OnPacketsReceived, this, _1, _2)));
+		m_pServer->Start();
 
+		m_pClient.reset(new PeerClient(bind(&App::OnPacketsReceived, this, (SessionID) -1, _1)));
 		m_pClient->Connect("127.0.0.1", 4242);
-
-		vector<NetworkPacket> initPackets;
-		initPackets.push_back(NetworkPacket(NETWORK_PACKET_TYPE_WELCOME, 0, NULL));
-		m_pClient->Send(initPackets);
 	}
 
 
@@ -147,20 +155,25 @@ private:
 	{
 		m_pClient->Disconnect();
 		m_pClient.reset();
+
+		const bool bInvokedOnDispatchThread = false;
+		m_pServer->Stop(bInvokedOnDispatchThread);
 		m_pServer.reset();
+		
 		Socket::DeinitNetwork();
 	}
 
 
-	void OnPacketsReceived(vector<NetworkPacket> packets)
+	void OnPacketsReceived(SessionID nSessionID, vector<NetworkPacket> packets)
 	{
 		for(vector<NetworkPacket>::const_iterator i = packets.begin(); i != packets.end(); ++i)
 		{
-			cout << "Received packet from server: Type: " << i->Type() << ", Length: " << i->Length() << endl;
+			TRACE("Received packet from peer %d: Type: %d, Length: %d", nSessionID, i->Type(), i->Length());
 		}
 	}
 
 
+	DispatchThread m_networkThread;
 	scoped_ptr<PeerServer> m_pServer;
 	scoped_ptr<PeerClient> m_pClient;
 	RenderWindow m_renderWindow;
@@ -173,8 +186,6 @@ private:
 
 int main(int argc, char* argv[])
 {
-	cout << "Hello world." << endl;
-
 	App app;
 
 	app.Init();

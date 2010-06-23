@@ -54,6 +54,8 @@ public:
 
 private:
 	scoped_ptr<Socket> m_pSocket;
+
+	// TODO: Replace thread with overlapped IO.
 	thread m_receiverThread;
 	NetworkPacketMarshaller m_marshaller;
 	boost::function<void (std::vector<NetworkPacket>)> m_packetsReceived;

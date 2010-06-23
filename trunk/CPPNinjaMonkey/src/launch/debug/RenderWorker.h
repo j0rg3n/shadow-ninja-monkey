@@ -15,7 +15,7 @@ public:
 	RenderWorker(RenderWindow& renderWindow);
 	~RenderWorker();
 
-	//void AddTask(Dispatcher::DispatchEntry task);
+	//void AddTask(CallQueue::DispatchEntry task);
 	//!\brief Render one frame.
 	void Run();
 

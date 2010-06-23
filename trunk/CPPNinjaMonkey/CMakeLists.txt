@@ -22,19 +22,20 @@ macro(add_msvc_precompiled_header PrecompiledHeader PrecompiledSource SourcesVar
     
     # Set macro to enable actual inclusion of headers into the precompiled header
 	add_definitions(-DUSING_PRECOMPILED_HEADERS)
-  endif(MSVC)
+  endif()
 endmacro(add_msvc_precompiled_header)
 
 include_directories(src 
 	include)
-
+	
 
 # include boost for all
 SET(Boost_ADDITIONAL_VERSIONS "1.42.0")
 SET(BOOST_ROOT ${PROJECT_SOURCE_DIR}/external/boost_1_42_0)
-find_package(Boost)
+find_package(Boost REQUIRED)
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
+	link_directories(${Boost_LIBRARY_DIRS})
 endif()
 
 #Include neon

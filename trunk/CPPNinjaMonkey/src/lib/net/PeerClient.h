@@ -9,7 +9,7 @@
 #include "boost/cstdint.hpp"
 #include "boost/function.hpp"
 
-#include "NetworkPacket.h"
+#include "net/NetworkPacket.h"
 
 
 // -----------------------------------------------------------------------------

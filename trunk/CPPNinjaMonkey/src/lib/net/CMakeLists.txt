@@ -8,13 +8,13 @@ SET(NET_SRCS
   PeerClient.cpp
   PeerClient.h
   NetworkPacket.cpp
-  NetworkPacket.h
+  ${PROJECT_SOURCE_DIR}/include/net/NetworkPacket.h
   NetworkPacketMarshaller.cpp
   NetworkPacketMarshaller.h
   PeerServerConnectionListener.cpp
   PeerServerConnectionListener.h
   PeerServer.cpp
-  PeerServer.h
+  ${PROJECT_SOURCE_DIR}/include/net/PeerServer.h
   PeerServerSession.cpp
   PeerServerSession.h
   Socket.cpp

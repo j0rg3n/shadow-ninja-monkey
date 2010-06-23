@@ -1,4 +1,4 @@
-#include "framework/Dispatcher.h"
+#include "framework/CallQueue.h"
 #include "boost/test/unit_test.hpp"
 #include <iostream>
 
@@ -16,12 +16,12 @@ using namespace boost;
 // ----------------------------------------------------------------------------
 
 
-BOOST_AUTO_TEST_SUITE(DispatcherBasic)
+BOOST_AUTO_TEST_SUITE(CallQueueBasic)
 
 
 BOOST_AUTO_TEST_CASE(Construction)
 {
-	Dispatcher c;
+	CallQueue c;
 }
 
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(MakeCalls)
 {
 	string sResult;
 
-	Dispatcher c;
+	CallQueue c;
 	c.Enqueue(bind(&AppendToString, ref(sResult), "one, "));
 	c.Enqueue(bind(&AppendToString, ref(sResult), "two, "));
 	c.Enqueue(bind(&AppendToString, sResult, "lost to a copy, "));
