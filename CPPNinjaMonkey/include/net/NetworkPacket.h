@@ -13,7 +13,8 @@
 enum ENetworkPacketType
 {
 	NETWORK_PACKET_TYPE_DISCONNECT = 0,
-	NETWORK_PACKET_TYPE_WELCOME = 1,
+	NETWORK_PACKET_TYPE_CONNECT = 1,
+	NETWORK_PACKET_TYPE_USER = 2
 };
 
 
@@ -65,8 +66,9 @@ public:
 
 	ENetworkPacketType Type() const { return m_eType; }
 	size_t Length() const { return m_nLength; }
-	const char* Data() const { return m_pData.get(); }
 
+	//!\brief Remember to use NetworkEndian::Swap when interpreting the data.
+	const char* Data() const { return m_pData.get(); }
 
 private:
 	boost::uint32_t m_nLength;

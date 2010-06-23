@@ -9,17 +9,21 @@
 // -----------------------------------------------------------------------------
 
 
-//!\brief Thread-safe dispatcher queue.
-class Dispatcher
+//!\brief Thread-safe callQueue queue.
+class CallQueue
 {
 public:
 	typedef boost::function<void()> DispatchEntry;
 
-	Dispatcher();
-	~Dispatcher();
+	CallQueue();
+	~CallQueue();
 
 	void Enqueue(DispatchEntry call);
-	void Dispatch();
+
+	void Dispatch(bool bBlock = false);
+	void CancelBlockingCalls();
+
+	void WaitForPendingCalls(bool bInvokedOnDispatchThread);
 
 private:
 	class Impl;

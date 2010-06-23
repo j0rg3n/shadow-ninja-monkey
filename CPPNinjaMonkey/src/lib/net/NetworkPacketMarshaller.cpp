@@ -1,8 +1,7 @@
 #include "NetworkPacketMarshaller.h"
 
-#include "boost/thread/condition_variable.hpp"
-#include "boost/thread/locks.hpp"
-#include "boost/thread/mutex.hpp"
+#include "net/NetworkEndian.h"
+#include "framework/AutoResetEvent.h"
 
 
 // ----------------------------------------------------------------------------
@@ -21,15 +20,14 @@ public:
 	Impl(Socket& socket, boost::function<void (std::vector<NetworkPacket>)> packetsReceived) : 
 	  m_socket(socket),
 	  m_packetsReceived(packetsReceived),
-	  m_bLoginSent(false),
-	  m_bConnected(false)
+	  m_bLoginSent(false)
 	{
 	}
 
 
 	void Receive()
 	{
-		SignalConnected();
+		m_connectedEvent.Set();
 
 		vector<NetworkPacket> receivedPackets;
 
@@ -69,7 +67,7 @@ public:
 					break;
 				}
 
-				uint32_t nDataLength = ((uint32_t*)pPacketStart)[0];
+				uint32_t nDataLength = NetworkEndian::Swap(((uint32_t*)pPacketStart)[0]);
 				uint32_t nPacketLength = nDataLength + PACKET_HEADER_SIZE;
 				assert(nPacketLength <= NetworkPacket::MAX_PACKET_LENGTH);
 				if (nReceivedBytesLeft < nPacketLength)
@@ -77,7 +75,7 @@ public:
 					break;
 				}
 
-				ENetworkPacketType eType = (ENetworkPacketType) ((uint32_t*)pPacketStart)[1];
+				ENetworkPacketType eType = (ENetworkPacketType) NetworkEndian::Swap(((uint32_t*)pPacketStart)[1]);
 				receivedPackets.push_back(NetworkPacket(eType, nDataLength, pPacketStart + PACKET_HEADER_SIZE));
 
 				pPacketStart += nPacketLength;
@@ -105,7 +103,7 @@ public:
 	{
 		if(!m_bLoginSent)
 		{
-			WaitUntilConnected();
+			m_connectedEvent.Wait();
 
 			m_socket.Write((const char*) &NetworkPacket::BYTE_ORDER_MARK, 4);
 			m_bLoginSent = true;
@@ -136,26 +134,6 @@ public:
 	}
 
 
-	// TODO: Move into Socket
-	void SignalConnected() 
-	{
-		unique_lock<mutex> lock(m_connectionMutex);
-		m_bConnected = true;
-		m_connectedEvent.notify_all();
-	}
-
-
-	// TODO: Move into Socket
-	void WaitUntilConnected() 
-	{
-		unique_lock<mutex> lock(m_connectionMutex);
-		while(!m_bConnected)
-		{
-			m_connectedEvent.wait(lock);
-		}
-	}
-
-
 private:
 	static const size_t PACKET_HEADER_SIZE = 8;
 
@@ -168,9 +146,7 @@ private:
 	// Common data: Must be threadsafe.
 	Socket& m_socket;
 
-	volatile bool m_bConnected;
-	condition_variable m_connectedEvent;
-	mutex m_connectionMutex;
+	AutoResetEvent m_connectedEvent;
 };
 
 

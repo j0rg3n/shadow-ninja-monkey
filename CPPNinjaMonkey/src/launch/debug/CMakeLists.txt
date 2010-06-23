@@ -35,4 +35,10 @@ elseif(CMAKE_HOST_UNIX)
 	# (on windows, auto-linking through the header is used)
 endif(CMAKE_HOST_WIN32)
 
-target_link_libraries(debugLaunch shadowNinjaMath shadowNinjaNet shadowNinjaFramework shadowNinjaRender)
+target_link_libraries(debugLaunch 
+	shadowNinjaMath 
+	shadowNinjaNet 
+	shadowNinjaFramework 
+	shadowNinjaRender
+	shadowNinjaGame
+	shadowNinjaDiag)

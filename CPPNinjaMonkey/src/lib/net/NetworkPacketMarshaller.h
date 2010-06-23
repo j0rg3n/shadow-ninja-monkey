@@ -5,7 +5,7 @@
 
 #include <vector>
 #include "boost/function.hpp"
-#include "NetworkPacket.h"
+#include "net/NetworkPacket.h"
 #include "Socket.h"
 
 

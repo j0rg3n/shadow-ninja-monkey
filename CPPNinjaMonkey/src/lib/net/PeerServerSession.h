@@ -8,7 +8,7 @@
 #include "boost/function.hpp"
 
 #include "Socket.h"
-#include "NetworkPacket.h"
+#include "net/NetworkPacket.h"
 
 // -----------------------------------------------------------------------------
 

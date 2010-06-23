@@ -1,5 +1,5 @@
 #include "PeerServerConnectionListener.h"
-#include "PeerServer.h"
+#include "net/PeerServer.h"
 #include "Socket.h"
 
 #include "boost/thread.hpp"
@@ -72,6 +72,8 @@ private:
 
 	uint32_t m_nPort;
 	Socket m_listenerSocket;
+
+	// TODO: Replace thread with overlapped IO.
 	thread m_listenerThread;
 	volatile bool m_bQuit;
 	boost::function<void (Socket*)> m_connectionAccepted;

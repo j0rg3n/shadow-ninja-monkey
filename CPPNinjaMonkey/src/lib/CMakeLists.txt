@@ -1,1 +1,1 @@
-SUBDIRS(math net framework render)
+SUBDIRS(math net framework render game diag)
