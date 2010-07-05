@@ -32,6 +32,8 @@ public:
 	void Start();
 	void Stop(bool bInvokedOnDispatchThread);
 
+	void InitiateSession(std::string sAddress, boost::uint32_t nPort);
+
 private:
 	class Impl;
 

@@ -2,6 +2,7 @@
 
 #include "boost/cstdint.hpp"
 #include "net/NetworkEndian.h"
+#include "diag/Trace.h"
 
 
 // ----------------------------------------------------------------------------
@@ -42,6 +43,8 @@ public:
 	{
 		for(std::vector<NetworkPacket>::const_iterator i = packets.begin(); i != packets.end(); ++i)
 		{
+			TRACE("Received packet from peer %d: Type: %d, Length: %d", nSessionID, i->Type(), i->Length());
+
 			switch (i->Type())
 			{
 			case GAME_NETWORK_PACKET_TYPE_POSITION:

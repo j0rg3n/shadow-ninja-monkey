@@ -38,7 +38,7 @@ void TraceMessage(const char* pszFormat, const char* pszFile, int nLine, ...)
 	va_start(pArgs, nLine);
 
 	char* pszWritePos = g_szTraceBuffer;
-	char* pszWriteEnd = g_szTraceBuffer + TRACE_BUFFER_SIZE - 1;
+	char* pszWriteEnd = g_szTraceBuffer + TRACE_BUFFER_SIZE - 2;
 
 	{
 		lock_guard<mutex> lock(g_traceBufferMutex);
@@ -58,9 +58,10 @@ void TraceMessage(const char* pszFormat, const char* pszFile, int nLine, ...)
 			pszWritePos += nCharCount;
 		}
 
-		*pszWritePos = 0;
+		pszWritePos[0] = '\n';
+		pszWritePos[1] = 0;
 
-		puts(g_szTraceBuffer);
+		fputs(g_szTraceBuffer, stdout);
 #ifdef _WINDOWS
 		OutputDebugString(g_szTraceBuffer);
 #endif

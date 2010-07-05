@@ -13,9 +13,9 @@
 #include "boost/bind.hpp"
 
 #include "net/PeerServer.h"
-#include "lib/net/PeerClient.h"
 #include "lib/net/Socket.h"
-
+#include "lib/game/GameLoop.h"
+#include "lib/game/GameNetworkPacketTranslator.h"
 #include "framework/DispatchThread.h"
 
 #include <GL.h>
@@ -35,6 +35,11 @@ using namespace boost;
 class App
 {
 public:
+	App() : m_gameNetworkPacketTranslator(m_gameLoop)
+	{
+	}
+
+
 	void Init()
 	{
 		TRACE("Starting debug launcher...");
@@ -143,19 +148,14 @@ private:
 	{
 		Socket::InitNetwork();
 		
-		m_pServer.reset(new PeerServer(m_networkThread.GetCallQueue(), bind(&App::OnPacketsReceived, this, _1, _2)));
+		m_pServer.reset(new PeerServer(m_networkThread.GetCallQueue(), bind(&GameNetworkPacketTranslator::HandlePackets, &m_gameNetworkPacketTranslator, _1, _2)));
 		m_pServer->Start();
-
-		m_pClient.reset(new PeerClient(bind(&App::OnPacketsReceived, this, (SessionID) -1, _1)));
-		m_pClient->Connect("127.0.0.1", 4242);
+		m_pServer->InitiateSession("127.0.0.1", 4242);
 	}
 
 
 	void ShutdownNetwork()
 	{
-		m_pClient->Disconnect();
-		m_pClient.reset();
-
 		const bool bInvokedOnDispatchThread = false;
 		m_pServer->Stop(bInvokedOnDispatchThread);
 		m_pServer.reset();
@@ -164,18 +164,10 @@ private:
 	}
 
 
-	void OnPacketsReceived(SessionID nSessionID, vector<NetworkPacket> packets)
-	{
-		for(vector<NetworkPacket>::const_iterator i = packets.begin(); i != packets.end(); ++i)
-		{
-			TRACE("Received packet from peer %d: Type: %d, Length: %d", nSessionID, i->Type(), i->Length());
-		}
-	}
-
-
+	GameNetworkPacketTranslator m_gameNetworkPacketTranslator;
+	GameLoop m_gameLoop;
 	DispatchThread m_networkThread;
 	scoped_ptr<PeerServer> m_pServer;
-	scoped_ptr<PeerClient> m_pClient;
 	RenderWindow m_renderWindow;
 	scoped_ptr<RenderWorker> m_pWorker;
 };

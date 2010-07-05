@@ -19,6 +19,7 @@ public:
 	PeerServerSession(Socket* pSocket, boost::function<void (std::vector<NetworkPacket>)> packetsReceived);
 	~PeerServerSession();
 
+	void Start(std::string sAddress, boost::uint32_t nPort);
 	void Start();
 	void Stop();
 

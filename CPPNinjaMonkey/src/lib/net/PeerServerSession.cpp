@@ -3,6 +3,8 @@
 #include "boost/scoped_ptr.hpp"
 #include "boost/thread.hpp"
 
+#include "diag/Trace.h"
+
 #include "NetworkPacketMarshaller.h"
 
 
@@ -32,9 +34,15 @@ public:
 	}
 
 
+	void Start(std::string sAddress, boost::uint32_t nPort)
+	{
+		m_receiverThread = thread(bind(&Impl::ConnectAndReceive, this, sAddress, nPort));
+	}
+
+
 	void Start()
 	{
-		m_receiverThread = thread(bind(&NetworkPacketMarshaller::Receive, &m_marshaller));
+		m_receiverThread = thread(bind(&Impl::Receive, this));
 	}
 
 
@@ -53,6 +61,31 @@ public:
 
 
 private:
+	void ConnectAndReceive(std::string sAddress, boost::uint32_t nPort)
+	{
+		TRACE("Connecting to %s:%d...", sAddress.c_str(), nPort);
+		vector<NetworkPacket> receivedPackets;
+		if(!m_pSocket->Connect(sAddress, nPort))
+		{
+			receivedPackets.push_back(NetworkPacket(NETWORK_PACKET_TYPE_DISCONNECT, 0, NULL));
+			m_packetsReceived(receivedPackets);
+			return;
+		}
+
+		TRACE("Connected to %s:%d.", sAddress.c_str(), nPort);
+		Receive();
+		TRACE("Disconnected from %s:%d.", sAddress.c_str(), nPort);
+	}
+
+
+	void Receive()
+	{
+		TRACE("Receiving data...");
+		m_marshaller.Receive();
+		TRACE("Receiving stopped.");
+	}
+
+
 	scoped_ptr<Socket> m_pSocket;
 
 	// TODO: Replace thread with overlapped IO.
@@ -74,6 +107,12 @@ PeerServerSession::PeerServerSession(Socket* pSocket, boost::function<void (std:
 PeerServerSession::~PeerServerSession()
 {
 	delete m_pImpl;
+}
+
+
+void PeerServerSession::Start(std::string sAddress, boost::uint32_t nPort)
+{
+	m_pImpl->Start(sAddress, nPort);
 }
 
 

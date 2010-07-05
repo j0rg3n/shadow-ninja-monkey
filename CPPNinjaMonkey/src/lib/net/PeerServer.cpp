@@ -49,12 +49,14 @@ public:
 	}
 
 
+	// Thread: Any.
 	void Start()
 	{
 		m_pListener->Start();
 	}
 
 
+	// Thread: Any.
 	void Stop(bool bInvokedOnDispatchThread)
 	{
 		// 1) Stop accepting new sessions.
@@ -71,6 +73,13 @@ public:
 
 		// 3) Wait until all queued calls have been dispatched.
 		m_callQueue.WaitForPendingCalls(bInvokedOnDispatchThread);
+	}
+
+
+	// Thread: Any.
+	void InitiateSession(std::string sAddress, boost::uint32_t nPort)
+	{
+		m_callQueue.Enqueue(bind(&Impl::CreateAndStartSession, this, sAddress, nPort));
 	}
 
 
@@ -94,7 +103,7 @@ private:
 	// Thread: PeerServerConnectionListener connection listener thread
 	void AddSession(Socket* pSocket)
 	{
-		m_callQueue.Enqueue(bind(&Impl::CreateSession, this, pSocket));
+		m_callQueue.Enqueue(bind(&Impl::CreateAndStartSession, this, pSocket));
 	}
 
 
@@ -112,7 +121,7 @@ private:
 			switch(i->Type())
 			{
 			case NETWORK_PACKET_TYPE_DISCONNECT:
-				DeleteSession(nSessionID);
+				StopAndDeleteSession(nSessionID);
 				break;
 			default:
 				break;
@@ -124,7 +133,22 @@ private:
 	}
 
 
-	void CreateSession(Socket* pSocket) 
+	void CreateAndStartSession(Socket* pSocket) 
+	{
+		PeerServerSession* pSession = CreateSession(pSocket);
+		pSession->Start();
+	}
+
+
+	void CreateAndStartSession(string sAddress, uint32_t nPort) 
+	{
+		Socket* pSocket = new Socket();
+		PeerServerSession* pSession = CreateSession(pSocket);
+		pSession->Start(sAddress, nPort);
+	}
+
+
+	PeerServerSession* CreateSession(Socket* pSocket) 
 	{
 		SessionID nSessionID = BOOST_INTERLOCKED_INCREMENT(&m_nSessionIDSeed);
 
@@ -140,11 +164,11 @@ private:
 		initialPackets.push_back(NetworkPacket(NETWORK_PACKET_TYPE_CONNECT, 0, NULL));
 		OnPacketsReceived(nSessionID, initialPackets);
 
-		pSession->Start();
+		return pSession;
 	}
 
 
-	void DeleteSession(SessionID nSessionID)
+	void StopAndDeleteSession(SessionID nSessionID)
 	{
 		PeerServerSession* pSession = NULL;
 
@@ -200,4 +224,10 @@ void PeerServer::Start()
 void PeerServer::Stop(bool bInvokedOnDispatchThread)
 {
 	m_pImpl->Stop(bInvokedOnDispatchThread);
+}
+
+
+void PeerServer::InitiateSession(std::string sAddress, boost::uint32_t nPort)
+{
+	m_pImpl->InitiateSession(sAddress, nPort);
 }
