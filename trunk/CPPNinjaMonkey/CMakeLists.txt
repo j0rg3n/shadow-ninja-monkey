@@ -5,7 +5,7 @@ project(ShadowNinjaMonkey)
 # Note: Currently broken: Causes lots of unresolved externals.
 # TODO: Make work.
 macro(add_msvc_precompiled_header PrecompiledHeader PrecompiledSource SourcesVar)
-  if(_MSVC)
+  if(MSVC)
     get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
     set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
     set(Sources ${${SourcesVar}})
