@@ -32,7 +32,7 @@ public:
 	    m_packetsReceived(packetsReceived),
 		m_nSessionIDSeed(0)
 	{
-		m_pListener.reset(new PeerServerConnectionListener(4242, bind(&Impl::AddSession, this, _1)));
+		m_pListener.reset(new PeerServerConnectionListener(4242, boost::bind(&Impl::AddSession, this, _1)));
 	}
 
 
@@ -79,7 +79,7 @@ public:
 	// Thread: Any.
 	void InitiateSession(std::string sAddress, boost::uint32_t nPort)
 	{
-		m_callQueue.Enqueue(bind(&Impl::CreateAndStartSession, this, sAddress, nPort));
+		m_callQueue.Enqueue(boost::bind(&Impl::CreateAndStartSession, this, sAddress, nPort));
 	}
 
 
@@ -103,14 +103,14 @@ private:
 	// Thread: PeerServerConnectionListener connection listener thread
 	void AddSession(Socket* pSocket)
 	{
-		m_callQueue.Enqueue(bind(&Impl::CreateAndStartSession, this, pSocket));
+		m_callQueue.Enqueue(boost::bind(&Impl::CreateAndStartSession, this, pSocket));
 	}
 
 
 	// Thread: PeerServerSession receiver thread
 	void OnPacketsReceived(SessionID nSessionID, vector<NetworkPacket> packets)
 	{
-		m_callQueue.Enqueue(bind(&Impl::HandlePackets, this, nSessionID, packets));
+		m_callQueue.Enqueue(boost::bind(&Impl::HandlePackets, this, nSessionID, packets));
 	}
 
 
@@ -152,7 +152,7 @@ private:
 	{
 		SessionID nSessionID = BOOST_INTERLOCKED_INCREMENT(&m_nSessionIDSeed);
 
-		PeerServerSession* pSession = new PeerServerSession(pSocket, bind(&Impl::OnPacketsReceived, this, nSessionID, _1));
+		PeerServerSession* pSession = new PeerServerSession(pSocket, boost::bind(&Impl::OnPacketsReceived, this, nSessionID, _1));
 
 		{
 			lock_guard<mutex> lock(m_sessionsMutex);

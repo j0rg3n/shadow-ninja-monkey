@@ -51,12 +51,12 @@ BOOST_AUTO_TEST_CASE(MakeCalls)
 	string sResult;
 
 	CallQueue c;
-	c.Enqueue(bind(&AppendToString, ref(sResult), "one, "));
-	c.Enqueue(bind(&AppendToString, ref(sResult), "two, "));
-	c.Enqueue(bind(&AppendToString, sResult, "lost to a copy, "));
+	c.Enqueue(boost::bind(&AppendToString, boost::ref(sResult), "one, "));
+	c.Enqueue(boost::bind(&AppendToString, boost::ref(sResult), "two, "));
+	c.Enqueue(boost::bind(&AppendToString, sResult, "lost to a copy, "));
 
 	Appender a(sResult);
-	c.Enqueue(bind(&Appender::Append, a, "three."));
+	c.Enqueue(boost::bind(&Appender::Append, a, "three."));
 
 	BOOST_CHECK(sResult == "");
 

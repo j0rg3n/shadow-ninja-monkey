@@ -1,10 +1,18 @@
 Jørgen
 ---
-Find workaround for VC2010 containing conflicting bind implementation: 
-C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xxbind1: 'std::tr1::_Bind<_Result_type,_Ret,_BindN> ...
+Give precompiled headers another try. (Compile times on the laptop are killing me.)
 
 Try to implement DXInput (multiple) mouse input. (Needed for testing network on single machine.) 
 If costly, implement rudimentary windows message-based mouse and keyboard input.
+
+
+Jørgen: DONE
+---
+Make work with VC2010 Express:
+1) Find workaround for VC2010 containing conflicting bind implementation: 
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xxbind1: 'std::tr1::_Bind<_Result_type,_Ret,_BindN> ...
+Only working workaround for now is fully qualifying the boost::bind.
+2) Hidden in the flood of compiler errors was also a breakage in boost::property_tree related to a std::pair interface change in VS2010. This has been worked around in boost, and a suitable external (to boost/property_tree_vs2010, not to contaminate boost on other platforms, as the workaround is not yet in a production release of boost) has been added.
 
 
 Backlog

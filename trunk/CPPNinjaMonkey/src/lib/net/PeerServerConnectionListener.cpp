@@ -36,7 +36,7 @@ public:
 			return false;
 		}
 
-		m_listenerThread = thread(bind(&Impl::AcceptIncomingConnections, this));
+		m_listenerThread = thread(boost::bind(&Impl::AcceptIncomingConnections, this));
 		return true;
 	}
 

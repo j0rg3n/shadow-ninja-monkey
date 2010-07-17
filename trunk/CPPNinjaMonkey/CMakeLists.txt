@@ -40,7 +40,7 @@ endif()
 
 #Include neon
 include_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3)
-
+link_directories(${PROJECT_SOURCE_DIR}/neon-0.29.3)
 	
 if(CMAKE_HOST_WIN32)
 	# Reduce size and crud in windows headers.

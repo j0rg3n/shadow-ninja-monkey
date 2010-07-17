@@ -36,13 +36,13 @@ public:
 
 	void Start(std::string sAddress, boost::uint32_t nPort)
 	{
-		m_receiverThread = thread(bind(&Impl::ConnectAndReceive, this, sAddress, nPort));
+		m_receiverThread = thread(boost::bind(&Impl::ConnectAndReceive, this, sAddress, nPort));
 	}
 
 
 	void Start()
 	{
-		m_receiverThread = thread(bind(&Impl::Receive, this));
+		m_receiverThread = thread(boost::bind(&Impl::Receive, this));
 	}
 
 

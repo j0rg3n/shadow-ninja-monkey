@@ -18,8 +18,8 @@
 #include "lib/game/GameNetworkPacketTranslator.h"
 #include "framework/DispatchThread.h"
 
-#include <GL.h>
-#include <GLU.h>
+#include <gl/GL.h>
+#include <gl/GLU.h> //< gluPerspective
 
 
 // -----------------------------------------------------------------------------
@@ -125,8 +125,8 @@ private:
 	{
 		m_renderWindow.Init();
 
-		m_renderWindow.SizeChanged().connect(bind(&App::OnSizeChanged, this, _1, _2));
-		m_renderWindow.Closed().connect(bind(&App::OnClosed, this));
+		m_renderWindow.SizeChanged().connect(boost::bind(&App::OnSizeChanged, this, _1, _2));
+		m_renderWindow.Closed().connect(boost::bind(&App::OnClosed, this));
 
 		// Create worker before calling OnSizeChanged, as the worker internally
 		// creates an OpenGL render context for this thread.
@@ -148,7 +148,7 @@ private:
 	{
 		Socket::InitNetwork();
 		
-		m_pServer.reset(new PeerServer(m_networkThread.GetCallQueue(), bind(&GameNetworkPacketTranslator::HandlePackets, &m_gameNetworkPacketTranslator, _1, _2)));
+		m_pServer.reset(new PeerServer(m_networkThread.GetCallQueue(), boost::bind(&GameNetworkPacketTranslator::HandlePackets, &m_gameNetworkPacketTranslator, _1, _2)));
 		m_pServer->Start();
 		m_pServer->InitiateSession("127.0.0.1", 4242);
 	}
