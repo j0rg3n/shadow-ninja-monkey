@@ -9,8 +9,8 @@
 #include <fstream>
 #include <cassert>
 
-#include "boost/property_tree/ptree.hpp"
-#include "boost/property_tree/ini_parser.hpp"
+#include "boost/property_tree_vs2010/ptree.hpp"
+#include "boost/property_tree_vs2010/ini_parser.hpp"
 
 
 // -----------------------------------------------------------------------------

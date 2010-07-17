@@ -6,7 +6,7 @@
 #include <windows.h>
 #endif // _WINDOWS
 
-#include <GL.h>
+#include <gl/GL.h>
 
 #include <string>
 

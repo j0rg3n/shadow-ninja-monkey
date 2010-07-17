@@ -4,7 +4,7 @@
 
 #include <string>
 #include "boost/cstdint.hpp"
-#include "boost/property_tree/ptree_fwd.hpp"
+#include "boost/property_tree_vs2010/ptree_fwd.hpp"
 #include "boost/function.hpp"
 
 // -----------------------------------------------------------------------------

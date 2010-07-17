@@ -8,10 +8,12 @@
 #include <windows.h>
 #endif // _WINDOWS
 
-#include <GL.h>
-#include <GLU.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
 
+#include <cassert>
 #include <vector>
+#include <map>
 #include <list>
 #include <string>
 #include <iostream>
@@ -19,15 +21,18 @@
 
 #include "boost/scoped_ptr.hpp"
 
-#include "boost/property_tree/ptree.hpp"
-#include "boost/property_tree/json_parser.hpp"
-#include "boost/property_tree/xml_parser.hpp"
+#include "boost/property_tree_vs2010/ptree.hpp"
+#include "boost/property_tree_vs2010/json_parser.hpp"
+#include "boost/property_tree_vs2010/xml_parser.hpp"
 
 #include "boost/bind.hpp"
-
 #include "boost/function.hpp"
 
+#include "boost/cstdint.hpp"
+
 #include "boost/signal.hpp"
+
+#include "boost/thread.hpp"
 
 #endif // USING_PRECOMPILED_HEADERS
 
