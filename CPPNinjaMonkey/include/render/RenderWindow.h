@@ -3,7 +3,7 @@
 #define RENDERWINDOW_H_INCLUDED
 
 
-#include "boost/signal.hpp"
+#include "boost/signals2.hpp"
 
 
 // -----------------------------------------------------------------------------
@@ -31,8 +31,8 @@ public:
 
 	RenderThreadContext* CreateRenderThreadContext();
 
-	boost::signal<void (int, int)>& SizeChanged();
-	boost::signal<void ()>& Closed();
+	boost::signals2::signal<void (int, int)>& SizeChanged();
+	boost::signals2::signal<void ()>& Closed();
 
 private:
 	class Impl;

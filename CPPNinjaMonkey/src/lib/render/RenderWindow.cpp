@@ -13,6 +13,7 @@
 
 
 using namespace boost;
+using namespace boost::signals2;
 
 
 // ----------------------------------------------------------------------------
@@ -69,8 +70,8 @@ public:
 	}
 
 
-	boost::signal<void (int, int)>& SizeChanged() { return m_sizeChanged; }
-	boost::signal<void ()>& Closed() { return m_quit; }
+	boost::signals2::signal<void (int, int)>& SizeChanged() { return m_sizeChanged; }
+	boost::signals2::signal<void ()>& Closed() { return m_quit; }
 
 private:
 	static LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -258,13 +259,13 @@ RenderThreadContext* RenderWindow::CreateRenderThreadContext()
 }
 
 
-boost::signal<void (int, int)>& RenderWindow::SizeChanged()
+boost::signals2::signal<void (int, int)>& RenderWindow::SizeChanged()
 {
 	return m_pImpl->SizeChanged();
 }
 
 
-boost::signal<void ()>& RenderWindow::Closed()
+boost::signals2::signal<void ()>& RenderWindow::Closed()
 {
 	return m_pImpl->Closed();
 }

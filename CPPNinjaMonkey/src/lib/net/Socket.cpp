@@ -91,7 +91,7 @@ bool Socket::Listen(boost::uint32_t nPort)
 	address.sin_addr.s_addr = inet_addr("127.0.0.1");
 	address.sin_port = htons((u_short) nPort);
 
-	int nResult = bind(m_socket, (SOCKADDR*) &address, sizeof(address));
+	int nResult = ::bind(m_socket, (SOCKADDR*) &address, sizeof(address));
 	if(nResult != 0)
 	{
 		Disconnect();
