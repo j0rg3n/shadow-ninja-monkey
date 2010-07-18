@@ -70,8 +70,17 @@ public:
 	}
 
 
-	boost::signals2::signal<void (int, int)>& SizeChanged() { return m_sizeChanged; }
-	boost::signals2::signal<void ()>& Closed() { return m_quit; }
+	boost::signals2::connection ConnectSizeChangedSlot(const RenderWindow::SizeChangedSignal::slot_type& slot) 
+	{ 
+		return m_sizeChanged.connect(slot); 
+	}
+
+
+	boost::signals2::connection ConnectClosedSlot(const RenderWindow::ClosedSignal::slot_type& slot) 
+	{ 
+		return m_quit.connect(slot); 
+	}
+
 
 private:
 	static LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -259,13 +268,13 @@ RenderThreadContext* RenderWindow::CreateRenderThreadContext()
 }
 
 
-boost::signals2::signal<void (int, int)>& RenderWindow::SizeChanged()
+boost::signals2::connection RenderWindow::ConnectSizeChangedSlot(const SizeChangedSignal::slot_type& slot)
 {
-	return m_pImpl->SizeChanged();
+	return m_pImpl->ConnectSizeChangedSlot(slot);
 }
 
 
-boost::signals2::signal<void ()>& RenderWindow::Closed()
+boost::signals2::connection RenderWindow::ConnectClosedSlot(const ClosedSignal::slot_type& slot)
 {
-	return m_pImpl->Closed();
+	return m_pImpl->ConnectClosedSlot(slot);
 }
