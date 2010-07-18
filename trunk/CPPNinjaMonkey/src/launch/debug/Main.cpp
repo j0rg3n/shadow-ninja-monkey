@@ -4,6 +4,7 @@
 #include <windows.h>
 #endif // _WINDOWS
 
+#include "input/win32/WindowsMessageInput.h"
 #include "render/RenderWindow.h"
 #include "RenderWorker.h"
 
@@ -45,6 +46,7 @@ public:
 		TRACE("Starting debug launcher...");
 		InitRender();
 		InitNetwork();
+		InitInput();
 		TRACE("Debug launcher started.");
 	}
 
@@ -52,6 +54,7 @@ public:
 	void Shutdown()
 	{
 		TRACE("Shutting down debug launcher...");
+		ShutdownInput();
 		ShutdownNetwork();
 		ShutdownRender();
 		TRACE("Debug launcher shut down.");
@@ -121,12 +124,24 @@ private:
 	}
 
 
+	void InitInput()	
+	{
+		m_pWindowsMessageInput.reset(CreateWindowsMessageInput(&m_renderWindow));
+	}
+
+
+	void ShutdownInput()	
+	{
+		m_pWindowsMessageInput.reset();
+	}
+
+
 	void InitRender()
 	{
 		m_renderWindow.Init();
 
-		m_renderWindow.SizeChanged().connect(boost::bind(&App::OnSizeChanged, this, _1, _2));
-		m_renderWindow.Closed().connect(boost::bind(&App::OnClosed, this));
+		m_renderWindow.ConnectSizeChangedSlot(boost::bind(&App::OnSizeChanged, this, _1, _2));
+		m_renderWindow.ConnectClosedSlot(boost::bind(&App::OnClosed, this));
 
 		// Create worker before calling OnSizeChanged, as the worker internally
 		// creates an OpenGL render context for this thread.
@@ -164,6 +179,7 @@ private:
 	}
 
 
+	scoped_ptr<WindowsMessageInput> m_pWindowsMessageInput;
 	GameNetworkPacketTranslator m_gameNetworkPacketTranslator;
 	GameLoop m_gameLoop;
 	DispatchThread m_networkThread;

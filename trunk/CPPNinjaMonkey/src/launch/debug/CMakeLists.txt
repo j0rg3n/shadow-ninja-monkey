@@ -38,4 +38,5 @@ target_link_libraries(debugLaunch
 	shadowNinjaFramework 
 	shadowNinjaRender
 	shadowNinjaGame
-	shadowNinjaDiag)
+	shadowNinjaDiag
+	shadowNinjaInput)
