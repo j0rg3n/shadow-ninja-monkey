@@ -7,7 +7,7 @@
 class WindowsMessageInputImpl : public WindowsMessageInput
 {
 public:
-	WindowsMessageInputImpl(RenderWindow* pRenderWindow)
+	WindowsMessageInputImpl(RenderWindow& renderWindow)
 	{
 		// TODO: Refactor render window into win32 and platform-independent parts.
 		// TODO: Use Win32-specific render window interface and connect to message 
@@ -29,7 +29,7 @@ private:
 // -----------------------------------------------------------------------------
 
 
-WindowsMessageInput* CreateWindowsMessageInput(RenderWindow* pRenderWindow)
+WindowsMessageInput* WindowsMessageInput::CreateInstance(RenderWindow& renderWindow)
 {
-	return new WindowsMessageInputImpl(pRenderWindow);
+	return new WindowsMessageInputImpl(renderWindow);
 }

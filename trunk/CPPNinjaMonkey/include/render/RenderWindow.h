@@ -9,38 +9,33 @@
 // -----------------------------------------------------------------------------
 
 
-class RenderThreadContext;
+struct RenderThreadContext;
 
 
 // -----------------------------------------------------------------------------
 
 
-class RenderWindow
+struct RenderWindow
 {
-public:
 	typedef boost::signals2::signal<void (int, int)> SizeChangedSignal;
 	typedef boost::signals2::signal<void ()> ClosedSignal;
 
-	RenderWindow();
-	~RenderWindow();
+	virtual ~RenderWindow() {}
 
-	void Init();
-	void Shutdown();
+	virtual void Init() = 0;
+	virtual void Shutdown() = 0;
 
-	void Swap();
+	virtual void Swap() = 0;
 
-	int Width() const;
-	int Height() const;
+	virtual int Width() const = 0;
+	virtual int Height() const = 0;
 
-	RenderThreadContext* CreateRenderThreadContext();
+	virtual RenderThreadContext* CreateRenderThreadContext() = 0;
 
-	boost::signals2::connection ConnectSizeChangedSlot(const SizeChangedSignal::slot_type& slot);
-	boost::signals2::connection ConnectClosedSlot(const ClosedSignal::slot_type& slot);
+	virtual boost::signals2::connection ConnectSizeChangedSlot(const SizeChangedSignal::slot_type& slot) = 0;
+	virtual boost::signals2::connection ConnectClosedSlot(const ClosedSignal::slot_type& slot) = 0;
 
-private:
-	class Impl;
-
-	Impl* m_pImpl;
+	static RenderWindow* CreateInstance();
 };
 
 

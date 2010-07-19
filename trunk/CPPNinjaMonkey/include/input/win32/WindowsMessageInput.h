@@ -9,21 +9,16 @@
 // -----------------------------------------------------------------------------
 
 
-class RenderWindow;
+struct RenderWindow;
 
 
 // -----------------------------------------------------------------------------
 
 
-struct WindowsMessageInput : public Input
+struct WindowsMessageInput : Input
 {
+	static WindowsMessageInput* CreateInstance(RenderWindow& renderWindow);
 };
-
-
-// -----------------------------------------------------------------------------
-
-
-extern WindowsMessageInput* CreateWindowsMessageInput(RenderWindow* pRenderWindow);
 
 
 #endif // WINDOWSMESSAGEINPUT_H_INCLUDED

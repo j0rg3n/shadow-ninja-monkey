@@ -1,11 +1,12 @@
 find_package(OpenGL)
 
 SET(RENDER_SRCS
-  RenderThreadContext.cpp
-  RenderThreadContextInternal.h
+  windows/WindowsRenderThreadContext.cpp
+  windows/WindowsRenderThreadContextInternal.h
   ${PROJECT_SOURCE_DIR}/include/render/RenderThreadContext.h
-  RenderWindow.cpp
+  windows/WindowsRenderWindow.cpp
   ${PROJECT_SOURCE_DIR}/include/render/RenderWindow.h
+  ${PROJECT_SOURCE_DIR}/include/render/windows/WindowsRenderWindow.h
 )
 
 # Comment this line to disable precompiled headers for this project only.

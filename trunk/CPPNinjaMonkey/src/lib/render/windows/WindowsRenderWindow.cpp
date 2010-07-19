@@ -1,12 +1,9 @@
-#include "render/RenderWindow.h"
-#include "RenderThreadContextInternal.h"
+#include "render/windows/WindowsRenderWindow.h"
+#include "WindowsRenderThreadContextInternal.h"
 
 #include <cassert>
 
-// TODO: Move this whole file into a win32-specific subfolder.
-#ifdef _WINDOWS
 #include <windows.h>
-#endif // _WINDOWS
 
 
 // ----------------------------------------------------------------------------
@@ -19,15 +16,15 @@ using namespace boost::signals2;
 // ----------------------------------------------------------------------------
 
 
-class RenderWindow::Impl
+class WindowsRenderWindowImpl : public WindowsRenderWindow
 {
 public:
-	Impl() : m_hDC(NULL), m_windowClass(0), m_hWnd(NULL), m_hInstance(NULL)
+	WindowsRenderWindowImpl() : m_hDC(NULL), m_windowClass(0), m_hWnd(NULL), m_hInstance(NULL)
 	{
 	}
 
 
-	void Init()
+	virtual void Init()
 	{
 		m_hInstance = (HINSTANCE) GetModuleHandle(NULL);
 		m_windowClass = RegisterWindowClass(m_hInstance);
@@ -37,7 +34,7 @@ public:
 	}
 
 
-	void Shutdown()
+	virtual void Shutdown()
 	{
 		DisableOpenGL(m_hWnd, m_hDC);
 		m_hDC = NULL;
@@ -47,36 +44,36 @@ public:
 	}
 
 
-	void Swap()
+	virtual void Swap()
 	{
 		SwapBuffers(m_hDC);
 	}
 
 
-	int Width() const { return m_nWidth; }
-	int Height() const { return m_nHeight; }
+	virtual int Width() const { return m_nWidth; }
+	virtual int Height() const { return m_nHeight; }
 
 
-	~Impl()
+	virtual ~WindowsRenderWindowImpl()
 	{
 		// TODO: Do something useful when we've decided on exception safety stuff.
 	}
 
 
-	RenderThreadContext* CreateRenderThreadContext()
+	virtual RenderThreadContext* CreateRenderThreadContext()
 	{
 		assert(m_hDC != NULL);
 		return ::CreateRenderThreadContext(m_hDC);
 	}
 
 
-	boost::signals2::connection ConnectSizeChangedSlot(const RenderWindow::SizeChangedSignal::slot_type& slot) 
+	virtual boost::signals2::connection ConnectSizeChangedSlot(const RenderWindow::SizeChangedSignal::slot_type& slot) 
 	{ 
 		return m_sizeChanged.connect(slot); 
 	}
 
 
-	boost::signals2::connection ConnectClosedSlot(const RenderWindow::ClosedSignal::slot_type& slot) 
+	virtual boost::signals2::connection ConnectClosedSlot(const RenderWindow::ClosedSignal::slot_type& slot) 
 	{ 
 		return m_quit.connect(slot); 
 	}
@@ -103,7 +100,7 @@ private:
 			{
 				int width = LOWORD(lParam);
 				int height = HIWORD(lParam);
-				Impl* pThis = GetThis(hwnd);
+				WindowsRenderWindowImpl* pThis = GetThis(hwnd);
 				pThis->m_nWidth = width;
 				pThis->m_nHeight = height;
 				pThis->m_sizeChanged(width, height);
@@ -116,9 +113,9 @@ private:
 
 
 	//!\brief Do not call before calling SetUserDataFromCreateStruct
-	static Impl* GetThis(HWND hwnd)
+	static WindowsRenderWindowImpl* GetThis(HWND hwnd)
 	{
-		Impl* pThis = (Impl*) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		WindowsRenderWindowImpl* pThis = (WindowsRenderWindowImpl*) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		assert(pThis != NULL);
 		return pThis;
 	}
@@ -213,68 +210,15 @@ private:
 	ATOM m_windowClass;
 	HWND m_hWnd;
 	HINSTANCE m_hInstance;
-	signal<void (int, int)> m_sizeChanged;
-	signal<void ()> m_quit;
+	RenderWindow::SizeChangedSignal m_sizeChanged;
+	RenderWindow::ClosedSignal m_quit;
 };
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 
-RenderWindow::RenderWindow() : m_pImpl(new Impl())
+RenderWindow* RenderWindow::CreateInstance()
 {
-}
-
-
-RenderWindow::~RenderWindow()
-{
-	delete m_pImpl;
-}
-
-
-void RenderWindow::Init()
-{
-	m_pImpl->Init();
-}
-
-
-void RenderWindow::Shutdown()
-{
-	m_pImpl->Shutdown();
-}
-
-
-void RenderWindow::Swap()
-{
-	m_pImpl->Swap();
-}
-
-
-int RenderWindow::Width() const
-{
-	return m_pImpl->Width();
-}
-
-
-int RenderWindow::Height() const
-{
-	return m_pImpl->Height();
-}
-
-
-RenderThreadContext* RenderWindow::CreateRenderThreadContext()
-{
-	return m_pImpl->CreateRenderThreadContext();
-}
-
-
-boost::signals2::connection RenderWindow::ConnectSizeChangedSlot(const SizeChangedSignal::slot_type& slot)
-{
-	return m_pImpl->ConnectSizeChangedSlot(slot);
-}
-
-
-boost::signals2::connection RenderWindow::ConnectClosedSlot(const ClosedSignal::slot_type& slot)
-{
-	return m_pImpl->ConnectClosedSlot(slot);
+	return new WindowsRenderWindowImpl();
 }

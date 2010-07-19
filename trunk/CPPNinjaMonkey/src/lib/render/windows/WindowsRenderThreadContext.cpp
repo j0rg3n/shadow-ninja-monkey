@@ -1,5 +1,5 @@
 #include "render/RenderThreadContext.h"
-#include "RenderThreadContextInternal.h"
+#include "WindowsRenderThreadContextInternal.h"
 
 #include <cassert>
 
@@ -7,10 +7,10 @@
 // -----------------------------------------------------------------------------
 
 
-class RenderThreadContext::Impl
+class WindowsRenderThreadContextImpl : public RenderThreadContext
 {
 public:
-	Impl(HDC hDC) : m_hRenderContext(NULL), m_hDC(hDC)
+	WindowsRenderThreadContextImpl(HDC hDC) : m_hRenderContext(NULL), m_hDC(hDC)
 	{
 		// create and enable the render context (RC)
 		m_hRenderContext = wglCreateContext(hDC);
@@ -21,7 +21,7 @@ public:
 	}
 
 
-	~Impl()
+	virtual ~WindowsRenderThreadContextImpl()
 	{
 		BOOL bResult;
 		
@@ -35,7 +35,7 @@ public:
 	}
 
 
-	void SetupFont()
+	virtual void SetupFont()
 	{
 		// make the system font the device context's selected font  
 		SelectObject(m_hDC, GetStockObject (SYSTEM_FONT)); 
@@ -56,28 +56,8 @@ private:
 // -----------------------------------------------------------------------------
 
 
-RenderThreadContext::RenderThreadContext(Impl* pImpl) : m_pImpl(pImpl)
-{
-}
-
-
-RenderThreadContext::~RenderThreadContext()
-{
-	delete m_pImpl;
-}
-
-
-void RenderThreadContext::SetupFont()
-{
-	m_pImpl->SetupFont();
-}
-
-
-// -----------------------------------------------------------------------------
-
-
 RenderThreadContext* CreateRenderThreadContext(HDC hDC)
 {
-	return new RenderThreadContext(new RenderThreadContext::Impl(hDC));
+	return new WindowsRenderThreadContextImpl(hDC);
 }
 
