@@ -4,6 +4,8 @@ SET(RENDER_SRCS
   windows/WindowsRenderThreadContext.cpp
   windows/WindowsRenderThreadContextInternal.h
   ${PROJECT_SOURCE_DIR}/include/render/RenderThreadContext.h
+  ${PROJECT_SOURCE_DIR}/include/render/GL.h
+  ${PROJECT_SOURCE_DIR}/include/render/GLU.h
   windows/WindowsRenderWindow.cpp
   ${PROJECT_SOURCE_DIR}/include/render/RenderWindow.h
   ${PROJECT_SOURCE_DIR}/include/render/windows/WindowsRenderWindow.h

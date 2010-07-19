@@ -1,10 +1,9 @@
+#include "App.h"
+
 #include <iostream>
 
-#ifdef _WINDOWS
-#include <windows.h>
-#endif // _WINDOWS
+#include "input/Input.h"
 
-#include "input/win32/WindowsMessageInput.h"
 #include "render/RenderWindow.h"
 #include "RenderWorker.h"
 
@@ -19,8 +18,8 @@
 #include "lib/game/GameNetworkPacketTranslator.h"
 #include "framework/DispatchThread.h"
 
-#include <gl/GL.h>
-#include <gl/GLU.h> //< gluPerspective
+#include "render/GL.h"
+#include "render/GLU.h" //< gluPerspective
 
 
 // -----------------------------------------------------------------------------
@@ -28,20 +27,21 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::signals2;
 
 
 // -----------------------------------------------------------------------------
 
 
-class App
+class AppImpl : public App
 {
 public:
-	App() : m_gameNetworkPacketTranslator(m_gameLoop)
+	AppImpl() : m_gameNetworkPacketTranslator(m_gameLoop)
 	{
 	}
 
 
-	void Init()
+	virtual void Init()
 	{
 		TRACE("Starting debug launcher...");
 		InitRender();
@@ -51,7 +51,7 @@ public:
 	}
 
 
-	void Shutdown()
+	virtual void Shutdown()
 	{
 		TRACE("Shutting down debug launcher...");
 		ShutdownInput();
@@ -61,33 +61,7 @@ public:
 	}
 
 
-	WPARAM MessageLoop()
-	{
-		while(true)
-		{
-			MSG msg;
-			BOOL bResult = PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
-			if(bResult == TRUE)
-			{
-				if(msg.message == WM_QUIT)
-				{
-					return msg.wParam;
-				}
-				else
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-			}
-			else
-			{
-				OnIdle();
-			}
-		}
-	}
-
-private:
-	void OnIdle()
+	virtual void OnIdle()
 	{
 		// TODO: Generalize with nice pool of worker threads and a barrier-style
 		// gizmo for letting them all complete before the swap, and restart after 
@@ -100,6 +74,13 @@ private:
 	}
 
 
+	virtual connection ConnectClosedSlot(const RenderWindow::ClosedSignal::slot_type& slot)
+	{
+		return m_pRenderWindow->ConnectClosedSlot(slot);
+	}
+
+
+private:
 	void OnSizeChanged(int width, int height)
 	{
 		if (height == 0)
@@ -117,22 +98,15 @@ private:
 	}
 
 
-	void OnClosed()
-	{
-		TRACE("Window closed.");
-		PostQuitMessage(0);
-	}
-
-
 	void InitInput()	
 	{
-		m_pWindowsMessageInput.reset(WindowsMessageInput::CreateInstance(*m_pRenderWindow));
+		m_pInput.reset(Input::CreateInstance(*m_pRenderWindow));
 	}
 
 
 	void ShutdownInput()	
 	{
-		m_pWindowsMessageInput.reset();
+		m_pInput.reset();
 	}
 
 
@@ -141,8 +115,7 @@ private:
 		m_pRenderWindow.reset(RenderWindow::CreateInstance());
 		m_pRenderWindow->Init();
 
-		m_pRenderWindow->ConnectSizeChangedSlot(boost::bind(&App::OnSizeChanged, this, _1, _2));
-		m_pRenderWindow->ConnectClosedSlot(boost::bind(&App::OnClosed, this));
+		m_pRenderWindow->ConnectSizeChangedSlot(boost::bind(&AppImpl::OnSizeChanged, this, _1, _2));
 
 		// Create worker before calling OnSizeChanged, as the worker internally
 		// creates an OpenGL render context for this thread.
@@ -181,7 +154,7 @@ private:
 	}
 
 
-	scoped_ptr<WindowsMessageInput> m_pWindowsMessageInput;
+	scoped_ptr<Input> m_pInput;
 	GameNetworkPacketTranslator m_gameNetworkPacketTranslator;
 	GameLoop m_gameLoop;
 	DispatchThread m_networkThread;
@@ -194,15 +167,7 @@ private:
 // -----------------------------------------------------------------------------
 
 
-int main(int argc, char* argv[])
+App* App::CreateInstance()
 {
-	App app;
-
-	app.Init();
-
-	WPARAM exitCode = app.MessageLoop();
-
-	app.Shutdown();
-
-	return exitCode;
+	return new AppImpl();
 }

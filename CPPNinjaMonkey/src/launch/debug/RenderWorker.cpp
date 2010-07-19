@@ -1,12 +1,6 @@
 #include "RenderWorker.h"
 #include "render/RenderThreadContext.h"
-
-// TODO: Find out how to include GL.h without including windows.h, if possible.
-#ifdef _WINDOWS
-#include <windows.h>
-#endif // _WINDOWS
-
-#include <gl/GL.h>
+#include "render/GL.h"
 
 #include <string>
 

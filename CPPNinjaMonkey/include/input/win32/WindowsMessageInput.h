@@ -9,15 +9,8 @@
 // -----------------------------------------------------------------------------
 
 
-struct RenderWindow;
-
-
-// -----------------------------------------------------------------------------
-
-
 struct WindowsMessageInput : Input
 {
-	static WindowsMessageInput* CreateInstance(RenderWindow& renderWindow);
 };
 
 

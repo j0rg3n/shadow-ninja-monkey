@@ -9,6 +9,12 @@
 // -----------------------------------------------------------------------------
 
 
+struct RenderWindow;
+
+
+// -----------------------------------------------------------------------------
+
+
 struct Input
 {
 	typedef int KeyCode;
@@ -17,6 +23,11 @@ struct Input
 	virtual ~Input() {}
 
 	virtual boost::signals2::connection ConnectKeySlot(const KeySignal::slot_type& slot) = 0;
+
+	// Discuss: This is cross-platform-contamination; input is not necessarily tied 
+	// to the window.
+	// TODO: Move this to the windows-specific implementation.
+	static Input* CreateInstance(RenderWindow& renderWindow);
 };
 
 
