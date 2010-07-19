@@ -29,7 +29,7 @@ private:
 // -----------------------------------------------------------------------------
 
 
-WindowsMessageInput* WindowsMessageInput::CreateInstance(RenderWindow& renderWindow)
+Input* Input::CreateInstance(RenderWindow& renderWindow)
 {
 	return new WindowsMessageInputImpl(renderWindow);
 }

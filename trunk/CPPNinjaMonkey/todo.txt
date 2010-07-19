@@ -20,12 +20,14 @@ Only working workaround for now is fully qualifying the boost::bind.
 
 Backlog
 ---
+Examine exception handling - we cannot remove exceptions entirely and at the same time use boost, but maybe we can encapsulate exception usage? C++' lack of Java-style "throws Foo" makes it easy to forget handling exceptions thrown.
+
 Add -D_SCL_SECURE_NO_WARNINGS to windows settings to suppress yet another useless security warning.
 
 Consider changing from PIMPL to pure virtual base class; less housekeeping, same compile-time and run-time profile.
 (See http://stackoverflow.com/questions/825018/pimpl-idiom-vs-pure-virtual-class-interface for a discussion.)
 
-Find solution to cost of virtual function calls. Virtual function calls are unacceptable on simpler (in-order) platforms (causes cache misses, branch mispredictions and more), and so we must find an easy switch to drop the pure virtual base class and just use the implementation directly on the platforms that require this additional speed. This will probably require keeping method bodies out of the *Impl class body.
+Find solution to cost of virtual function calls. Virtual function calls are unacceptable on simpler (in-order) platforms (causes cache misses, branch mispredictions and more), and so we must find an easy switch to drop the pure virtual base class and just use the implementation directly on the platforms that require this additional speed. This will probably require keeping method bodies out of the *Impl class body. Or maybe it is enough that the platform-specific Impl type is used everywhere where methods are invoked (with LTCG this should be enough for the compiler/linker to optimize out the vtable access - but this will require browsing some disassembled optimized code to clarify).
 
 Work on design of input binding, i.e. binding relative input axes (controllers), absolute input positions (mouse, touch screen), button presses to game action basis.
 

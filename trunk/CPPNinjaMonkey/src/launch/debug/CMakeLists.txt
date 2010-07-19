@@ -4,7 +4,9 @@
 #
 
 set(DEBUG_LAUNCH_SRCS
-  Main.cpp
+  App.cpp
+  App.h
+  windows/Main.cpp
   RenderWorker.cpp
   RenderWorker.h
   ${PROJECT_SOURCE_DIR}/include/build/PrecompiledHeaders.h 
