@@ -46,8 +46,13 @@ if(CMAKE_HOST_WIN32)
 	# Reduce size and crud in windows headers.
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 	
-	# Silence warnings about insecure stdlib functions. We already know what they are.
+	# Silence warnings about insecure stdlib functions. 
+	# We already know what they are.
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+	# Silence warnings about insecure C++ library functions. 
+	# (They're recommending "secure iterators". The nerve!)
+	add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 endif(CMAKE_HOST_WIN32)
 
 add_subdirectory(src)

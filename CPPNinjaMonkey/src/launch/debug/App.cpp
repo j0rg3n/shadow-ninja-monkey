@@ -98,9 +98,23 @@ private:
 	}
 
 
+	void OnAxisUpdate(const std::string& sAxisName, float nValue)
+	{
+		TRACE("%s = %.2f", sAxisName.c_str(), nValue);
+	}
+
+
+	void OnButtonUpdate(const std::string& sButtonName, bool bPressed)
+	{
+		TRACE("%s %s", sButtonName.c_str(), bPressed ? "down" : "up");
+	}
+
+
 	void InitInput()	
 	{
 		m_pInput.reset(Input::CreateInstance(*m_pRenderWindow));
+		m_pInput->ConnectButtonUpdateSlot(boost::bind(&AppImpl::OnButtonUpdate, this, _1, _2));
+		m_pInput->ConnectAxisUpdateSlot(boost::bind(&AppImpl::OnAxisUpdate, this, _1, _2));
 	}
 
 

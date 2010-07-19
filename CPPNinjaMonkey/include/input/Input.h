@@ -4,6 +4,7 @@
 
 
 #include "boost/signals2/signal.hpp"
+#include <string>
 
 
 // -----------------------------------------------------------------------------
@@ -17,12 +18,17 @@ struct RenderWindow;
 
 struct Input
 {
-	typedef int KeyCode;
-	typedef boost::signals2::signal<void (KeyCode, bool)> KeySignal;
+	typedef boost::signals2::signal<void (const std::string&, bool)> ButtonUpdateSignal;
+	typedef boost::signals2::signal<void (const std::string&, float)> AxisUpdateSignal;
 
 	virtual ~Input() {}
 
-	virtual boost::signals2::connection ConnectKeySlot(const KeySignal::slot_type& slot) = 0;
+	virtual bool IsAxisRelative(const std::string& sAxisName) const = 0;
+
+	virtual boost::signals2::connection ConnectButtonUpdateSlot(const ButtonUpdateSignal::slot_type& slot) = 0;
+	virtual boost::signals2::connection ConnectAxisUpdateSlot(const AxisUpdateSignal::slot_type& slot) = 0;
+
+	// TODO: Consider methods for enumerating axes and keys.
 
 	// Discuss: This is cross-platform-contamination; input is not necessarily tied 
 	// to the window.

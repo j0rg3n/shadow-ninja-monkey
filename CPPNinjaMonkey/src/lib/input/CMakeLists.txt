@@ -1,8 +1,8 @@
 
 set(INPUT_SRCS
   ${PROJECT_SOURCE_DIR}/include/input/Input.h
-  ${PROJECT_SOURCE_DIR}/include/input/win32/WindowsMessageInput.h
-  WindowsMessageInput.cpp
+  ${PROJECT_SOURCE_DIR}/include/input/windows/WindowsMessageInput.h
+  windows/WindowsMessageInput.cpp
 )
 
 # Comment this line to disable precompiled headers for this project only.
