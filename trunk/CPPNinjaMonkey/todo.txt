@@ -1,12 +1,17 @@
 Jørgen
 ---
-Implement rudimentary windows message-based mouse and keyboard input.
-1) Trying out pure virtual base class instead of PIMPL (makes platform-agnostic + platform-specific interface simpler, and keeps compile-time and encapsulation advantages, at (theoretically) the same run-time cost.
-2) Moved render code into windows-specific subfolder and added pure virtual base classes. Refactoring complete, now we can implement.
+Add keyboard-controlled thing to app, so that we get some network data to send.
 
 
 Jørgen: DONE (reverse chronological)
 ---
+Implement rudimentary windows message-based mouse and keyboard input.
+1) Refactor: Trying out pure virtual base class instead of PIMPL (makes platform-agnostic + platform-specific interface simpler, and keeps compile-time and encapsulation advantages, at (theoretically) the same run-time cost.
+2) Refactor: Move render code into windows-specific subfolder and added pure virtual base classes. 
+3) Implement: Handle WM_*KEY*, WM_*MOUSE* and output as classic input stream: digital keypresses plus axes.
+
+Add -D_SCL_SECURE_NO_WARNINGS to windows settings to suppress yet another useless security warning.
+
 Give precompiled headers another try. (Compile times on the laptop are killing me.)
 1) (Digression:) Upgraded signals library usage to the thread-safe boost::signals2 variety.
 2) OK with just "build" (with a few small compile fixes). Let's try "rebuild"... OK.
@@ -20,9 +25,13 @@ Only working workaround for now is fully qualifying the boost::bind.
 
 Backlog
 ---
-Examine exception handling - we cannot remove exceptions entirely and at the same time use boost, but maybe we can encapsulate exception usage? C++' lack of Java-style "throws Foo" makes it easy to forget handling exceptions thrown.
+Transmit position accross network.
 
-Add -D_SCL_SECURE_NO_WARNINGS to windows settings to suppress yet another useless security warning.
+Start looking at latency issues with network synchronization.
+
+Find out whether explicit public inheritance is necessary with structs.
+
+Examine exception handling - we cannot remove exceptions entirely and at the same time use boost, but maybe we can encapsulate exception usage? C++' lack of Java-style "throws Foo" makes it easy to forget handling exceptions thrown.
 
 Consider changing from PIMPL to pure virtual base class; less housekeeping, same compile-time and run-time profile.
 (See http://stackoverflow.com/questions/825018/pimpl-idiom-vs-pure-virtual-class-interface for a discussion.)

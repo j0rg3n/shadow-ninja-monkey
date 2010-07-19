@@ -5,7 +5,8 @@
 #ifdef USING_PRECOMPILED_HEADERS
 
 #ifdef _WINDOWS
-#include <windows.h>
+#include <Windows.h>
+#include <WindowsX.h>
 #endif // _WINDOWS
 
 #include <gl/GL.h>

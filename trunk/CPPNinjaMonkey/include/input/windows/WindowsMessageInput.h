@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 
 
-struct WindowsMessageInput : Input
+struct WindowsMessageInput : public Input
 {
 };
 

@@ -79,28 +79,38 @@ public:
 	}
 
 
+	virtual boost::signals2::connection ConnectWindowsMessageSlot(const WindowsMessageSignal::slot_type& slot)
+	{
+		return m_windowsMessage.connect(slot);
+	}
+
+
 private:
 	static LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		WindowsRenderWindowImpl* pThis = GetThis(hwnd);
+
 		switch (uMsg)
 		{
 		case WM_CREATE:
 			{
 				CREATESTRUCT* pCreateStruct = (CREATESTRUCT*) lParam;
 				SetUserDataFromCreateStruct(hwnd, pCreateStruct);
-				GetThis(hwnd)->m_sizeChanged(pCreateStruct->cx, pCreateStruct->cy);
+
+				pThis = GetThis(hwnd);
+				assert(pThis != NULL);
+				pThis->m_sizeChanged(pCreateStruct->cx, pCreateStruct->cy);
 			}
 			break;
 
 		case WM_CLOSE:
-			GetThis(hwnd)->m_quit();
+			pThis->m_quit();
 			break;
 
 		case WM_SIZE:
 			{
 				int width = LOWORD(lParam);
 				int height = HIWORD(lParam);
-				WindowsRenderWindowImpl* pThis = GetThis(hwnd);
 				pThis->m_nWidth = width;
 				pThis->m_nHeight = height;
 				pThis->m_sizeChanged(width, height);
@@ -108,15 +118,19 @@ private:
             break;
 		}
 
+		if(pThis != NULL)
+		{
+			pThis->m_windowsMessage(hwnd, uMsg, wParam, lParam);
+		}
+
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 
 
-	//!\brief Do not call before calling SetUserDataFromCreateStruct
+	//!\brief Will return NULL until SetUserDataFromCreateStruct is called.
 	static WindowsRenderWindowImpl* GetThis(HWND hwnd)
 	{
 		WindowsRenderWindowImpl* pThis = (WindowsRenderWindowImpl*) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-		assert(pThis != NULL);
 		return pThis;
 	}
 
@@ -212,6 +226,7 @@ private:
 	HINSTANCE m_hInstance;
 	RenderWindow::SizeChangedSignal m_sizeChanged;
 	RenderWindow::ClosedSignal m_quit;
+	WindowsRenderWindow::WindowsMessageSignal m_windowsMessage;
 };
 
 
