@@ -3,18 +3,11 @@
 #define RENDERTHREADCONTEXT_H_INCLUDED
 
 
-class RenderThreadContext
+struct RenderThreadContext
 {
-public:
-	class Impl;
+	virtual ~RenderThreadContext() {}
 
-	RenderThreadContext(Impl* pImpl);
-	~RenderThreadContext();
-
-	void SetupFont();
-
-private:
-	Impl* m_pImpl;
+	virtual void SetupFont() = 0;
 };
 
 

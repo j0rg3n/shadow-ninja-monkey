@@ -2,6 +2,7 @@ Jørgen
 ---
 Implement rudimentary windows message-based mouse and keyboard input.
 1) Trying out pure virtual base class instead of PIMPL (makes platform-agnostic + platform-specific interface simpler, and keeps compile-time and encapsulation advantages, at (theoretically) the same run-time cost.
+2) Moved render code into windows-specific subfolder and added pure virtual base classes. Refactoring complete, now we can implement.
 
 
 Jørgen: DONE (reverse chronological)

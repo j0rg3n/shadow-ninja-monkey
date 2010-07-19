@@ -96,7 +96,7 @@ private:
 		// This requires more knowledge about the main game logic thread, so
 		// postponing for now.
 		m_pWorker->Run();
-		m_renderWindow.Swap();
+		m_pRenderWindow->Swap();
 	}
 
 
@@ -126,7 +126,7 @@ private:
 
 	void InitInput()	
 	{
-		m_pWindowsMessageInput.reset(CreateWindowsMessageInput(&m_renderWindow));
+		m_pWindowsMessageInput.reset(WindowsMessageInput::CreateInstance(*m_pRenderWindow));
 	}
 
 
@@ -138,24 +138,26 @@ private:
 
 	void InitRender()
 	{
-		m_renderWindow.Init();
+		m_pRenderWindow.reset(RenderWindow::CreateInstance());
+		m_pRenderWindow->Init();
 
-		m_renderWindow.ConnectSizeChangedSlot(boost::bind(&App::OnSizeChanged, this, _1, _2));
-		m_renderWindow.ConnectClosedSlot(boost::bind(&App::OnClosed, this));
+		m_pRenderWindow->ConnectSizeChangedSlot(boost::bind(&App::OnSizeChanged, this, _1, _2));
+		m_pRenderWindow->ConnectClosedSlot(boost::bind(&App::OnClosed, this));
 
 		// Create worker before calling OnSizeChanged, as the worker internally
 		// creates an OpenGL render context for this thread.
 		// TODO: Solve this encapsulation issue.
-		m_pWorker.reset(new RenderWorker(m_renderWindow));
+		m_pWorker.reset(new RenderWorker(*m_pRenderWindow));
 
-		OnSizeChanged(m_renderWindow.Width(), m_renderWindow.Height());
+		OnSizeChanged(m_pRenderWindow->Width(), m_pRenderWindow->Height());
 	}
 
 
 	void ShutdownRender()
 	{
 		m_pWorker.reset();
-		m_renderWindow.Shutdown();
+		m_pRenderWindow->Shutdown();
+		m_pRenderWindow.reset();
 	}
 
 
@@ -184,7 +186,7 @@ private:
 	GameLoop m_gameLoop;
 	DispatchThread m_networkThread;
 	scoped_ptr<PeerServer> m_pServer;
-	RenderWindow m_renderWindow;
+	scoped_ptr<RenderWindow> m_pRenderWindow;
 	scoped_ptr<RenderWorker> m_pWorker;
 };
 
