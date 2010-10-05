@@ -44,6 +44,13 @@ public:
 	}
 
 
+	virtual void Close()
+	{
+		m_quit();
+		DestroyWindow(m_hWnd);
+	}
+
+
 	virtual void Swap()
 	{
 		SwapBuffers(m_hDC);
