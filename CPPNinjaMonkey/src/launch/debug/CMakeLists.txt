@@ -9,6 +9,8 @@ set(DEBUG_LAUNCH_SRCS
   windows/Main.cpp
   RenderWorker.cpp
   RenderWorker.h
+  Entity.cpp
+  Entity.h
   ${PROJECT_SOURCE_DIR}/include/build/PrecompiledHeaders.h 
 )
 

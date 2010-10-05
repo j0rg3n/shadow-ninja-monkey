@@ -239,6 +239,24 @@ private:
 		 * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
 		 */
 
+		static std::vector<std::string> alphaNumerics;
+		for (int code = 0x30; code <= 0x5A; ++code)
+		{
+			char buf[2];
+			buf[0] = code;
+			buf[1] = 0;
+
+			alphaNumerics.push_back(buf);
+		}
+
+		for (int code = 0x30; code <= 0x5A; ++code)
+		{
+			if (code != 0x40)
+			{
+				map[code] = alphaNumerics[code - 0x30].c_str();
+			}
+		}
+
 		map[VK_LWIN] = "LWIN";
 		map[VK_RWIN] = "RWIN";
 		map[VK_APPS] = "APPS";

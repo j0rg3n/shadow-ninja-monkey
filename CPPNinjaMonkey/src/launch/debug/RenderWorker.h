@@ -4,25 +4,22 @@
 
 
 #include "render/RenderWindow.h"
+#include "Entity.h"
 
 
 // -----------------------------------------------------------------------------
 
 
-class RenderWorker
+struct RenderWorker
 {
-public:
-	RenderWorker(RenderWindow& renderWindow);
-	~RenderWorker();
+	virtual ~RenderWorker() {}
 
-	//void AddTask(CallQueue::DispatchEntry task);
 	//!\brief Render one frame.
-	void Run();
+	virtual void Run() = 0;
 
-private:
-	class Impl;
+	virtual void AddEntity(Entity* pEntity) = 0;
 
-	Impl* m_pImpl;
+	static RenderWorker* CreateInstance(RenderWindow& renderWindow);
 };
 
 
