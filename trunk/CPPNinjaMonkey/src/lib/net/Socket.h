@@ -10,7 +10,12 @@
 // -----------------------------------------------------------------------------
 
 
+#if defined(_WINDOWS)
+#include <WinSock2.h>
+//typedef unsigned __int64 SOCKET;
+#else
 typedef unsigned int SOCKET;
+#endif
 
 
 // -----------------------------------------------------------------------------

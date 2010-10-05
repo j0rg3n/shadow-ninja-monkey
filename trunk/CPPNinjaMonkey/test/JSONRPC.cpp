@@ -1,8 +1,8 @@
 #include "lib/net/JSONRPC.h"
 #include "boost/test/unit_test.hpp"
 #include "lib/net/Socket.h"
-#include "boost/property_tree_vs2010/ptree.hpp"
-#include "boost/property_tree_vs2010/xml_parser.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/xml_parser.hpp"
 
 #include <iostream>
 

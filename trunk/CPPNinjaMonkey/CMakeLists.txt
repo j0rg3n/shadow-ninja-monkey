@@ -30,8 +30,8 @@ include_directories(src
 	
 
 # include boost for all
-SET(Boost_ADDITIONAL_VERSIONS "1.42.0")
-SET(BOOST_ROOT ${PROJECT_SOURCE_DIR}/external/boost_1_42_0)
+SET(Boost_ADDITIONAL_VERSIONS "1.44.0")
+SET(BOOST_ROOT ${PROJECT_SOURCE_DIR}/external/boost_1_44_0)
 find_package(Boost REQUIRED)
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
