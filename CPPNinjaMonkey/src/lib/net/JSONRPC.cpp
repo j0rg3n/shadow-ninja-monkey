@@ -2,8 +2,8 @@
 
 #include "Neon.h"
 #include "boost/smart_ptr/scoped_ptr.hpp"
-#include "boost/property_tree_vs2010/ptree.hpp"
-#include "boost/property_tree_vs2010/json_parser.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
 #include "boost/thread/mutex.hpp"
 
 

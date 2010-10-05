@@ -22,9 +22,9 @@
 
 #include "boost/scoped_ptr.hpp"
 
-#include "boost/property_tree_vs2010/ptree.hpp"
-#include "boost/property_tree_vs2010/json_parser.hpp"
-#include "boost/property_tree_vs2010/xml_parser.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
+#include "boost/property_tree/xml_parser.hpp"
 
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
