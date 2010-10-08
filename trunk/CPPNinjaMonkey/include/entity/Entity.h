@@ -5,7 +5,6 @@
 
 // TODO: Move Point.h to public includes.
 #include "../../lib/math/Point.h"
-//#include "render/RenderWindow.h"
 
 
 // -----------------------------------------------------------------------------
@@ -46,6 +45,7 @@ public:
 
 	Geometry* m_pGeometry;
 	Point m_pos;
+	std::string m_sName;
 };
 
 

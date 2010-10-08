@@ -12,18 +12,14 @@
 // -----------------------------------------------------------------------------
 
 
-class GameNetworkPacketTranslator
+struct GameNetworkPacketTranslator
 {
 public:
-	GameNetworkPacketTranslator(GameLoop& gameLoop);
-	~GameNetworkPacketTranslator();
+	virtual ~GameNetworkPacketTranslator() {};
 
-	void HandlePackets(SessionID nSessionID, std::vector<NetworkPacket> packets);
+	virtual void HandlePackets(SessionID nSessionID, std::vector<NetworkPacket> packets) = 0;
 
-private:
-	class Impl;
-
-	Impl* m_pImpl;
+	static GameNetworkPacketTranslator* CreateInstance(GameLoop& gameLoop);
 };
 
 

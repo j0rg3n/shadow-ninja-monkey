@@ -3,8 +3,10 @@
 #define RENDERWORKER_H_INCLUDED
 
 
+#include <vector>
+
 #include "render/RenderWindow.h"
-#include "Entity.h"
+#include "entity/Entity.h"
 
 
 // -----------------------------------------------------------------------------
@@ -17,7 +19,8 @@ struct RenderWorker
 	//!\brief Render one frame.
 	virtual void Run() = 0;
 
-	virtual void AddEntity(Entity* pEntity) = 0;
+	//!\brief Set game entities to render.
+	virtual void SetEntities(std::vector<Entity*>& entities) = 0;
 
 	static RenderWorker* CreateInstance(RenderWindow& renderWindow);
 };

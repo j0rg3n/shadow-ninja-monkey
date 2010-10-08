@@ -9,6 +9,8 @@ SET(RENDER_SRCS
   windows/WindowsRenderWindow.cpp
   ${PROJECT_SOURCE_DIR}/include/render/RenderWindow.h
   ${PROJECT_SOURCE_DIR}/include/render/windows/WindowsRenderWindow.h
+  RenderWorker.cpp
+  ${PROJECT_SOURCE_DIR}/include/render/RenderWorker.h
 )
 
 # Comment this line to disable precompiled headers for this project only.
