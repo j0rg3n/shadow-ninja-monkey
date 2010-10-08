@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "boost/cstdint.hpp"
+#include "boost/signals2/signal.hpp"
 #include "net/PeerServer.h"
 
 
@@ -19,6 +20,8 @@ class Entity;
 
 struct GameLoop
 {
+	typedef boost::signals2::signal<void (boost::int32_t x, boost::int32_t y)> PlayerPositionUpdatedSignal;
+
 	virtual ~GameLoop() {};
 
 	virtual void Run() = 0;
@@ -31,6 +34,8 @@ struct GameLoop
 
 	virtual void OnButtonUpdate(const std::string& sButtonName, bool bPressed) = 0;
 	virtual void OnAxisUpdate(const std::string& sAxisName, float nValue) = 0;
+
+	virtual boost::signals2::connection ConnectPlayerPositionUpdatedSlot(const PlayerPositionUpdatedSignal::slot_type& slot) = 0;
 
 	static GameLoop* CreateInstance();
 };

@@ -16,9 +16,9 @@ struct GameNetworkPacketTranslator
 {
 	virtual ~GameNetworkPacketTranslator() {};
 
-	virtual void HandlePackets(SessionID nSessionID, std::vector<NetworkPacket> packets) = 0;
+	virtual void HandleIncomingPackets(SessionID nSessionID, std::vector<NetworkPacket> packets) = 0;
 
-	static GameNetworkPacketTranslator* CreateInstance(GameLoop& gameLoop);
+	static GameNetworkPacketTranslator* CreateInstance(GameLoop& gameLoop, boost::function<void (SessionID, std::vector<NetworkPacket>)> packetsSent);
 };
 
 

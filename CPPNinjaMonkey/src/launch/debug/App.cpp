@@ -39,7 +39,7 @@ public:
 	AppImpl()
 	{
 		m_pGameLoop.reset(GameLoop::CreateInstance());
-		m_pGameNetworkPacketTranslator.reset(GameNetworkPacketTranslator::CreateInstance(*m_pGameLoop));
+		m_pGameNetworkPacketTranslator.reset(GameNetworkPacketTranslator::CreateInstance(*m_pGameLoop, boost::bind(&AppImpl::OnPacketsSent, this, _1, _2)));
 	}
 
 
@@ -109,6 +109,12 @@ private:
 	}
 
 
+	void OnPacketsSent(SessionID nSessionID, vector<NetworkPacket> packets)
+	{
+		m_pServer->Send(nSessionID, packets);
+	}
+
+
 	void InitInput()	
 	{
 		m_pInput.reset(Input::CreateInstance(*m_pRenderWindow));
@@ -145,9 +151,10 @@ private:
 	{
 		Socket::InitNetwork();
 		
-		m_pServer.reset(PeerServer::CreateInstance(m_networkThread.GetCallQueue(), boost::bind(&GameNetworkPacketTranslator::HandlePackets, m_pGameNetworkPacketTranslator.get(), _1, _2)));
-		m_pServer->Start();
-		m_pServer->InitiateSession("127.0.0.1", 4242);
+		m_pServer.reset(PeerServer::CreateInstance(m_networkThread.GetCallQueue(), boost::bind(&GameNetworkPacketTranslator::HandleIncomingPackets, m_pGameNetworkPacketTranslator.get(), _1, _2)));
+		bool bSuccess = m_pServer->Start(4250);
+		assert(bSuccess); // Cannot listen on socket.
+		m_pServer->InitiateSession("127.0.0.1", 4250);
 	}
 
 

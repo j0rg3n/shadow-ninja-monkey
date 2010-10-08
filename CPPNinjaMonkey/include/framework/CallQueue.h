@@ -20,6 +20,8 @@ public:
 
 	void Enqueue(DispatchEntry call);
 
+	//!\param bBlock If true, will block until there is anything queued. If false,
+	//!it will return immediately if the queue is empty.
 	void Dispatch(bool bBlock = false);
 	void CancelBlockingCalls();
 
