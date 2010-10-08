@@ -14,7 +14,6 @@
 
 struct GameNetworkPacketTranslator
 {
-public:
 	virtual ~GameNetworkPacketTranslator() {};
 
 	virtual void HandlePackets(SessionID nSessionID, std::vector<NetworkPacket> packets) = 0;

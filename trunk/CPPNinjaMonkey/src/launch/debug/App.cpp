@@ -145,7 +145,7 @@ private:
 	{
 		Socket::InitNetwork();
 		
-		m_pServer.reset(new PeerServer(m_networkThread.GetCallQueue(), boost::bind(&GameNetworkPacketTranslator::HandlePackets, m_pGameNetworkPacketTranslator.get(), _1, _2)));
+		m_pServer.reset(PeerServer::CreateInstance(m_networkThread.GetCallQueue(), boost::bind(&GameNetworkPacketTranslator::HandlePackets, m_pGameNetworkPacketTranslator.get(), _1, _2)));
 		m_pServer->Start();
 		m_pServer->InitiateSession("127.0.0.1", 4242);
 	}
@@ -153,8 +153,8 @@ private:
 
 	void ShutdownNetwork()
 	{
-		const bool bInvokedOnDispatchThread = false;
-		m_pServer->Stop(bInvokedOnDispatchThread);
+		const bool NOT_INVOKED_ON_DISPATCH_THREAD = false;
+		m_pServer->Stop(NOT_INVOKED_ON_DISPATCH_THREAD);
 		m_pServer.reset();
 		
 		Socket::DeinitNetwork();
