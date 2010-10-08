@@ -63,6 +63,7 @@ public:
 	virtual void SetEntities(std::vector<Entity*>& entities)
 	{
 		// TODO: Clone entities to fix encapsulation.
+		m_entities.reserve(entities.size());			
 		m_entities.assign(entities.begin(), entities.end());
 	}
 

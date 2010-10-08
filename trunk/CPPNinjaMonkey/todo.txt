@@ -1,10 +1,14 @@
 Jørgen
 ---
-Add keyboard-controlled thing to app, so that we get some network data to send.
+Start working on NAT breakthrough and P2P. Check what's already available in the iPhone SDK for that kind of stuff.
 
 
 Jørgen: DONE (reverse chronological)
 ---
+Transmit position accross network.
+
+Add keyboard-controlled thing to app, so that we get some network data to send.
+
 Implement rudimentary windows message-based mouse and keyboard input.
 1) Refactor: Trying out pure virtual base class instead of PIMPL (makes platform-agnostic + platform-specific interface simpler, and keeps compile-time and encapsulation advantages, at (theoretically) the same run-time cost.
 2) Refactor: Move render code into windows-specific subfolder and added pure virtual base classes. 
@@ -25,7 +29,12 @@ Only working workaround for now is fully qualifying the boost::bind.
 
 Backlog
 ---
-Transmit position accross network.
+Replace boost::bind and CallQueue with MessageBuffer: 
+1) Simple struct with type and length header that's in-place-new'ed into a dynamically growing buffer.
+2) Enumerator-style interface for iterating over the messages.
+3) Dispatch becomes lock + copy-out-buffer + unlock + iterate over messages outside of the MessageBuffer, i.e. at the site calling Dispatch. 
+Currently this will work for us, as we always know fairly well what we're putting into the message buffer.
+4) Reserve ranges of IDs globally and use as enum type basis for each subsystem (to avoid putting all message IDs in a global header - that sucks).
 
 Start looking at latency issues with network synchronization.
 

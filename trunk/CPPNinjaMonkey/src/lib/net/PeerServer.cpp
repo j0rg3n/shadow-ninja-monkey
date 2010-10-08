@@ -45,10 +45,30 @@ struct SessionInfo
 class SessionManager
 {
 public:
+	typedef vector<PeerServerSession*> SessionList;
+
+
+	SessionList GetAll()
+	{
+		SessionList sessions;
+		sessions.reserve(m_sessions.size());
+
+		{
+			lock_guard<mutex> lock(m_sessionsMutex);
+			for(SessionInfoList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
+			{
+				sessions.push_back(i->m_pSession);
+			}
+		}
+
+		return sessions;
+	}
+
+
 	PeerServerSession* Find(SessionID nSessionID)
 	{
 		lock_guard<mutex> lock(m_sessionsMutex);
-		SessionList::iterator i = FindInternal(nSessionID);
+		SessionInfoList::iterator i = FindInternal(nSessionID);
 		return i != m_sessions.end() ? i->m_pSession : NULL;
 	}
 
@@ -63,7 +83,7 @@ public:
 	PeerServerSession* Remove(SessionID nSessionID)
 	{
 		lock_guard<mutex> lock(m_sessionsMutex);
-		SessionList::iterator i = FindInternal(nSessionID);
+		SessionInfoList::iterator i = FindInternal(nSessionID);
 		if (i == m_sessions.end())
 		{
 			return NULL;
@@ -78,7 +98,7 @@ public:
 	void StopAll()
 	{
 		lock_guard<mutex> lock(m_sessionsMutex);
-		for(SessionList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
+		for(SessionInfoList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
 		{
 			i->m_pSession->Stop();
 		}
@@ -89,7 +109,7 @@ public:
 	// longer active.
 	void DeleteAll()
 	{
-		for(SessionList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
+		for(SessionInfoList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
 		{
 			delete i->m_pSession;
 		}
@@ -98,12 +118,12 @@ public:
 
 
 private:
-	typedef vector<SessionInfo> SessionList;
+	typedef vector<SessionInfo> SessionInfoList;
 
 
-	SessionList::iterator FindInternal(SessionID nSessionID)
+	SessionInfoList::iterator FindInternal(SessionID nSessionID)
 	{
-		for(SessionList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
+		for(SessionInfoList::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
 		{
 			if(i->m_nSessionID == nSessionID)
 			{
@@ -115,7 +135,7 @@ private:
 	}
 
 
-	SessionList m_sessions;
+	SessionInfoList m_sessions;
 	mutex m_sessionsMutex;
 };
 
@@ -131,7 +151,7 @@ public:
 	    m_packetsReceived(packetsReceived),
 		m_nSessionIDSeed(0)
 	{
-		m_pListener.reset(new PeerServerConnectionListener(4242, boost::bind(&PeerServerImpl::AddSession, this, _1)));
+		m_pListener.reset(new PeerServerConnectionListener(boost::bind(&PeerServerImpl::AddSession, this, _1)));
 	}
 
 
@@ -144,9 +164,9 @@ public:
 
 
 	// Thread: Any.
-	virtual void Start()
+	virtual bool Start(boost::uint32_t nPort)
 	{
-		m_pListener->Start();
+		return m_pListener->Start(nPort);
 	}
 
 
@@ -195,12 +215,24 @@ private:
 
 	void HandleOutgoingPackets(SessionID nSessionID, vector<NetworkPacket> packets)
 	{
-		// Note: This is safe because HandleOutgoingPackets and StopAndDeleteSession runs
-		// on the same thread.
-		PeerServerSession* pSession = m_sessions.Find(nSessionID);
-		if(pSession != NULL)
+		if (nSessionID != BROADCAST_SESSION_ID)
 		{
-			pSession->Send(packets);
+			// Note: This is safe because HandleOutgoingPackets and StopAndDeleteSession runs
+			// on the same thread.
+			PeerServerSession* pSession = m_sessions.Find(nSessionID);
+			if(pSession != NULL)
+			{
+				pSession->Send(packets);
+			}
+		}
+		else
+		{
+			SessionManager::SessionList sessions = m_sessions.GetAll();
+			for(SessionManager::SessionList::iterator i = sessions.begin(); i != sessions.end(); ++i)
+			{
+				// TODO: Make PeerServerSession::Send non-blocking so these sends may be done in parallel.
+				(*i)->Send(packets);
+			}
 		}
 	}
 

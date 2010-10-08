@@ -18,19 +18,18 @@ using namespace boost;
 class PeerServerConnectionListener::Impl
 {
 public:
-	Impl(uint32_t nPort, boost::function<void (Socket*)> connectionAccepted) : 
-	  m_nPort(nPort), 
+	Impl(boost::function<void (Socket*)> connectionAccepted) : 
 	  m_connectionAccepted(connectionAccepted),
 	  m_bQuit(false)
 	{
 	}
 
 
-	bool Start()
+	bool Start(uint32_t nPort)
 	{
 		assert(!m_listenerSocket.IsConnected());
 
-		bool bResult = m_listenerSocket.Listen(m_nPort);
+		bool bResult = m_listenerSocket.Listen(nPort);
 		if(!bResult)
 		{
 			return false;
@@ -70,7 +69,6 @@ private:
 	}
 
 
-	uint32_t m_nPort;
 	Socket m_listenerSocket;
 
 	// TODO: Replace thread with overlapped IO.
@@ -83,8 +81,8 @@ private:
 // -----------------------------------------------------------------------------
 
 
-PeerServerConnectionListener::PeerServerConnectionListener(boost::uint32_t nPort, boost::function<void (Socket*)> connectionAccepted) : 
-	m_pImpl(new Impl(nPort, connectionAccepted))
+PeerServerConnectionListener::PeerServerConnectionListener(boost::function<void (Socket*)> connectionAccepted) : 
+	m_pImpl(new Impl(connectionAccepted))
 {
 }
 
@@ -95,9 +93,9 @@ PeerServerConnectionListener::~PeerServerConnectionListener()
 }
 
 
-bool PeerServerConnectionListener::Start()
+bool PeerServerConnectionListener::Start(boost::uint32_t nPort)
 {
-	return m_pImpl->Start();
+	return m_pImpl->Start(nPort);
 }
 
 

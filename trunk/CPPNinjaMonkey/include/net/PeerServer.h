@@ -24,9 +24,11 @@ class CallQueue;
 
 struct PeerServer
 {
+	static const boost::uint32_t BROADCAST_SESSION_ID = 0xFFFFFFFF;
+
 	virtual ~PeerServer() {};
 
-	virtual void Start() = 0;
+	virtual bool Start(boost::uint32_t nPort) = 0;
 	virtual void Stop(bool bInvokedOnDispatchThread) = 0;
 
 	virtual void InitiateSession(std::string sAddress, boost::uint32_t nPort) = 0;

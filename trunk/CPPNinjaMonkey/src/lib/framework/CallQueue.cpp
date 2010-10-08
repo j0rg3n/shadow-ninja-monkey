@@ -41,6 +41,11 @@ public:
 		{
 			unique_lock<mutex> lock(m_queueMutex);
 
+			if(!bBlock && m_queue.size() == 0)
+			{
+				return;
+			}
+
 			while(m_queue.size() == 0 && !m_bCancelBlocking)
 			{
 				m_queueNotEmptyCondition.wait(lock);

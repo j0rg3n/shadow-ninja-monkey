@@ -15,10 +15,10 @@ class PeerServerConnectionListener
 {
 public:
 	//!\brief Warning: The connectionAccepted callback will be performed on an arbitrary thread.
-	PeerServerConnectionListener(boost::uint32_t nPort, boost::function<void (Socket*)> connectionAccepted);
+	PeerServerConnectionListener(boost::function<void (Socket*)> connectionAccepted);
 	~PeerServerConnectionListener();
 
-	bool Start();
+	bool Start(boost::uint32_t nPort);
 	void Stop();
 
 private:
