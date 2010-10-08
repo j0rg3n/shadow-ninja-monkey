@@ -22,22 +22,19 @@ class CallQueue;
 // -----------------------------------------------------------------------------
 
 
-class PeerServer
+struct PeerServer
 {
-public:
+	virtual ~PeerServer() {};
+
+	virtual void Start() = 0;
+	virtual void Stop(bool bInvokedOnDispatchThread) = 0;
+
+	virtual void InitiateSession(std::string sAddress, boost::uint32_t nPort) = 0;
+
+	virtual void Send(SessionID nSessionID, std::vector<NetworkPacket> packets) = 0;
+
 	//!\brief Note: Callback may be invoked on any thread.
-	PeerServer(CallQueue& callQueue, boost::function<void (SessionID, std::vector<NetworkPacket>)> packetsReceived);
-	~PeerServer();
-
-	void Start();
-	void Stop(bool bInvokedOnDispatchThread);
-
-	void InitiateSession(std::string sAddress, boost::uint32_t nPort);
-
-private:
-	class Impl;
-
-	Impl* m_pImpl;
+	static PeerServer* CreateInstance(CallQueue& callQueue, boost::function<void (SessionID, std::vector<NetworkPacket>)> packetsReceived);
 };
 
 

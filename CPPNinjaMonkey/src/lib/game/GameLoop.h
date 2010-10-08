@@ -19,7 +19,6 @@ class Entity;
 
 struct GameLoop
 {
-public:
 	virtual ~GameLoop() {};
 
 	virtual void Run() = 0;
