@@ -7,10 +7,6 @@ set(DEBUG_LAUNCH_SRCS
   App.cpp
   App.h
   windows/Main.cpp
-  RenderWorker.cpp
-  RenderWorker.h
-  Entity.cpp
-  Entity.h
   ${PROJECT_SOURCE_DIR}/include/build/PrecompiledHeaders.h 
 )
 
@@ -42,5 +38,6 @@ target_link_libraries(debugLaunch
 	shadowNinjaFramework 
 	shadowNinjaRender
 	shadowNinjaGame
+	shadowNinjaEntity
 	shadowNinjaDiag
 	shadowNinjaInput)

@@ -1,12 +1,14 @@
-#include "RenderWorker.h"
+#include "render/RenderWorker.h"
 #include "render/RenderThreadContext.h"
 #include "render/GL.h"
+
+#include "diag/Trace.h"
 
 #include <string>
 
 #include "boost/scoped_ptr.hpp"
 
-#include "Entity.h"
+#include "entity/Entity.h"
 
 
 // ----------------------------------------------------------------------------
@@ -26,6 +28,9 @@ public:
 		m_pRenderThreadContext(renderWindow.CreateRenderThreadContext()),
 		m_nAngle(0)
 	{
+		SetViewport(renderWindow.Width(), renderWindow.Height());
+		renderWindow.ConnectSizeChangedSlot(boost::bind(&RenderWorkerImpl::OnSizeChanged, this, _1, _2));
+
 		m_pRenderThreadContext->SetupFont();
 	}
 
@@ -55,13 +60,37 @@ public:
 	}
 
 
-	virtual void AddEntity(Entity* pEntity)
+	virtual void SetEntities(std::vector<Entity*>& entities)
 	{
-		m_entities.push_back(pEntity);
+		// TODO: Clone entities to fix encapsulation.
+		m_entities.assign(entities.begin(), entities.end());
 	}
 
 
 private:
+	void OnSizeChanged(int nWidth, int nHeight)
+	{
+		SetViewport(nWidth, nHeight);
+	}
+
+
+	void SetViewport(int nWidth, int nHeight)
+	{
+		if (nHeight == 0)
+		{
+			nHeight = 1;
+		}
+
+		// TODO: Move away: Perspective matrix should be set in render code, not here.
+		TRACE("Updating projection for new viewport size %dx%d", nWidth, nHeight);
+		glViewport(0, 0, nWidth, nHeight);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(54.0f, (GLfloat) nWidth / (GLfloat) nHeight, 1.0f, 1000.0f);
+	}
+
+
 	void DrawEntities()
 	{
 		glLoadIdentity();
@@ -69,12 +98,20 @@ private:
 
 		for (EntityList::const_iterator entity = m_entities.begin(); entity != m_entities.end(); ++entity)
 		{
+			string& sLabel = (*entity)->m_sName;
 			Geometry* pGeometry = (*entity)->m_pGeometry;
 			if (pGeometry)
 			{
 				glPushMatrix();
 				{
 					glTranslatef((*entity)->m_pos.x, (*entity)->m_pos.y, 0);
+
+					// Draw text. 
+					glColor3f(1.0f, 0.0f, 0.0f);
+					glRasterPos3f(0, 0, 0);
+					glListBase(1000); //< 1000 is an arbitrary constant used in SetupFont().
+					glCallLists(sLabel.size(), GL_UNSIGNED_BYTE, sLabel.c_str()); 
+
 					glColor3f(0.0f, 0.0f, 1.0f);
 
 					glBegin(GL_TRIANGLES);

@@ -31,10 +31,10 @@ struct PositionData
 // ----------------------------------------------------------------------------
 
 
-class GameNetworkPacketTranslator::Impl
+class GameNetworkPacketTranslatorImpl : public GameNetworkPacketTranslator
 {
 public:
-	Impl(GameLoop& gameLoop) : m_gameLoop(gameLoop)
+	GameNetworkPacketTranslatorImpl(GameLoop& gameLoop) : m_gameLoop(gameLoop)
 	{
 	}
 
@@ -53,11 +53,11 @@ public:
 				break;
 
 			case NETWORK_PACKET_TYPE_CONNECT:
-				m_gameLoop.PeerJoined(nSessionID);
+				m_gameLoop.OnPeerJoined(nSessionID);
 				break;
 
 			case NETWORK_PACKET_TYPE_DISCONNECT:
-				m_gameLoop.PeerLeft(nSessionID);
+				m_gameLoop.OnPeerLeft(nSessionID);
 				break;
 
 			default:
@@ -71,7 +71,7 @@ public:
 private:
 	void HandlePacket(SessionID nSessionID, const PositionData* position) 
 	{
-		m_gameLoop.UpdatePosition(nSessionID,
+		m_gameLoop.OnPeerUpdatePosition(nSessionID,
 			NetworkEndian::Swap(position->x),
 			NetworkEndian::Swap(position->y));
 	}
@@ -84,18 +84,7 @@ private:
 // -----------------------------------------------------------------------------
 
 
-GameNetworkPacketTranslator::GameNetworkPacketTranslator(GameLoop& gameLoop) : m_pImpl(new Impl(gameLoop))
+GameNetworkPacketTranslator* GameNetworkPacketTranslator::CreateInstance(GameLoop& gameLoop)
 {
-}
-
-
-GameNetworkPacketTranslator::~GameNetworkPacketTranslator()
-{
-	delete m_pImpl;
-}
-
-
-void GameNetworkPacketTranslator::HandlePackets(SessionID nSessionID, std::vector<NetworkPacket> packets)
-{
-	m_pImpl->HandlePackets(nSessionID, packets);
+	return new GameNetworkPacketTranslatorImpl(gameLoop);
 }

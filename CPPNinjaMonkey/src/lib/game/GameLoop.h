@@ -2,6 +2,7 @@
 #ifndef GAMELOOP_H_INCLUDED
 #define GAMELOOP_H_INCLUDED
 
+#include <vector>
 
 #include "boost/cstdint.hpp"
 #include "net/PeerServer.h"
@@ -10,22 +11,29 @@
 // -----------------------------------------------------------------------------
 
 
-class GameLoop
+class Entity;
+
+
+// -----------------------------------------------------------------------------
+
+
+struct GameLoop
 {
 public:
-	GameLoop();
-	~GameLoop();
+	virtual ~GameLoop() {};
 
-	void Run();
+	virtual void Run() = 0;
 
-	void PeerJoined(SessionID nSessionID);
-	void PeerLeft(SessionID nSessionID);
-	void UpdatePosition(SessionID nSessionID, boost::int32_t x, boost::int32_t y);
+	virtual std::vector<Entity*>& GetEntities() = 0;
 
-private:
-	class Impl;
+	virtual void OnPeerJoined(SessionID nSessionID) = 0;
+	virtual void OnPeerLeft(SessionID nSessionID) = 0;
+	virtual void OnPeerUpdatePosition(SessionID nSessionID, boost::int32_t x, boost::int32_t y) = 0;
 
-	Impl* m_pImpl;
+	virtual void OnButtonUpdate(const std::string& sButtonName, bool bPressed) = 0;
+	virtual void OnAxisUpdate(const std::string& sAxisName, float nValue) = 0;
+
+	static GameLoop* CreateInstance();
 };
 
 
