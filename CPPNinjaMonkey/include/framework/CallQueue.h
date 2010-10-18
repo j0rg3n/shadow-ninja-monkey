@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DISPATCHER_H_INCLUDED
-#define DISPATCHER_H_INCLUDED
+#ifndef CALL_QUEUE_H_INCLUDED
+#define CALL_QUEUE_H_INCLUDED
 
 
 #include "boost/function.hpp"
@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 
 
-//!\brief Thread-safe callQueue queue.
+//!\brief Thread-safe call queue.
 class CallQueue
 {
 public:
@@ -34,4 +34,4 @@ private:
 };
 
 
-#endif // DISPATCHER_H_INCLUDED
+#endif // CALL_QUEUE_H_INCLUDED

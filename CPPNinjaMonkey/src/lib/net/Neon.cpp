@@ -39,6 +39,8 @@ public:
 
 		if(ReadProxyCredentials("proxy.ini"))
 		{
+			// TODO: Consider using ne_session_system_proxy.
+
 			ne_session_proxy(m_pSession, "eurprx01", 8080);
 			ne_set_proxy_auth(m_pSession, &GetProxyAuthentication, this);
 		}
