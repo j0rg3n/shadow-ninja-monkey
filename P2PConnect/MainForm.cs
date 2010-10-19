@@ -26,6 +26,7 @@ namespace P2PConnect
                 Client client = new Client(clientID, sessionID);
                 client.MessageLogged += client_MessageLogged;
                 client.Start();
+                clients.Add(client);
             }
         }
 
