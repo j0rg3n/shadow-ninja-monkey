@@ -1,10 +1,19 @@
 Jørgen
 ---
-Start working on NAT breakthrough and P2P. Check what's already available in the iPhone SDK for that kind of stuff.
+Implement neon+sockets based version of NAT punchthrough and P2P in C++.
+1) Connect to mediator server using a ne_request. Make sure the connection stays open.
+2) On windows (and possibly other platforms), the default implementation of ne_socket will issue a SO_REUSEADDR on the socket before binding, which is exactly what we need.
+3) ne_socket has the "fd" (the socket handle) as its first field, and so can be reinterpret_cast to a SOCKET.
+4) Use getsockname on that to obtain the bound address, and continue from there.
+5) Once P2P connection is obtained, close the request.
+
+Check what's already available in the iPhone SDK for NAT punchthrough and P2P of stuff.
 
 
 Jørgen: DONE (reverse chronological)
 ---
+Implement prototype in C# for NAT punchthrough and P2P. 
+
 Transmit position accross network.
 
 Add keyboard-controlled thing to app, so that we get some network data to send.
