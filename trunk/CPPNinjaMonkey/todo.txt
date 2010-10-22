@@ -12,6 +12,11 @@ For now, we have to do a dummy request first - this works because the server is 
 persists the connection.. Most of the time, anyways.
 6) Once P2P connection is obtained, close the request.
 
+Figure out how to POST with neon:
+1) Clear NE_REQFLAG_IDEMPOTENT with ne_set_request_flag: http://www.webdav.org/neon/doc/html/refreqflags.html
+2) Put data into the request body, in the application/x-www-form-urlencoded encoding: http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1. 
+This should be easy as we already have the url-encoding tools available.
+3) Call ne_set_request_body_buffer to set the body: http://www.webdav.org/neon/doc/html/refreqbody.html
 
 Check what's already available in the iPhone SDK for NAT punchthrough and P2P of stuff.
 
