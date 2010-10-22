@@ -1,14 +1,18 @@
 #include "lib/net/Neon.h"
+#include "lib/net/Socket.h"
+#include "diag/Trace.h"
 
 #include "neon/ne_session.h"
 #include "neon/ne_request.h"
 #include "neon/ne_auth.h" // for authorization.
+#include "neon/ne_socket.h"
 
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <cassert>
 
+#include "boost/scoped_ptr.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/ini_parser.hpp"
 
@@ -30,10 +34,10 @@ static int GetProxyAuthentication(void *pUserdata, const char *pszRealm, int nAt
 // -----------------------------------------------------------------------------
 
 
-class HTTPSession::Impl
+class HTTPSessionImpl : public HTTPSession
 {
 public:
-	Impl(const char* pszScheme, const char* pszHostName, boost::uint32_t nPort)
+	HTTPSessionImpl(const char* pszScheme, const char* pszHostName, boost::uint32_t nPort)
 	{
 		m_pSession = ne_session_create(pszScheme, pszHostName, nPort);
 
@@ -41,20 +45,33 @@ public:
 		{
 			// TODO: Consider using ne_session_system_proxy.
 
-			ne_session_proxy(m_pSession, "eurprx01", 8080);
+			ne_session_proxy(m_pSession, GetProxy().c_str(), 8080);
 			ne_set_proxy_auth(m_pSession, &GetProxyAuthentication, this);
 		}
+
+		ne_set_notifier(m_pSession, &HTTPSessionImpl::OnSessionStatusNotify, this);
 	}
 
 
-	~Impl()
+	virtual ~HTTPSessionImpl()
 	{
 		ne_session_destroy(m_pSession);
 	}
 
 
-	void* GetInternalSession() { return m_pSession; }
+	virtual const std::string& GetBoundAddress() const { return m_sBoundAddress; }
+	virtual boost::uint32_t GetBoundPort() const { return m_nBoundPort; }
 
+
+	ne_session* GetNeonSession() { return m_pSession; }
+
+
+	const std::string& GetProxy() const { return m_sProxy; }
+	const std::string& GetUsername() const { return m_sUsername; }
+	const std::string& GetPassword() const { return m_sPassword; }
+
+
+private:
 
 	bool ReadProxyCredentials(std::string sFilename)
 	{
@@ -87,56 +104,70 @@ public:
 	}
 
 
-	static std::string GetURLEscaped(const std::string& sText)
+	//! \brief Gets the socket field of a session.
+	//! Peeking into ne_private.h reveals that this is the first field in the structure.
+	static ne_socket* GetSessionSocket(ne_session* pSession)
 	{
-		char* pszEscapedText = ne_path_escape(sText.c_str());
-		string result(pszEscapedText);
-		free(pszEscapedText);
-
-		return result;
+		return *reinterpret_cast<ne_socket**>(pSession);
 	}
 
 
-	static void WriteURLEscaped(std::ostream& out, const std::string& sText)
+	//! \brief Gets a Socket from a ne_socket.
+	//! Peeking into ne_socket.c reveals that the socket handle is the first field in the structure.
+	static int GetSocketHandle(ne_socket* pSocket)
 	{
-		char* pszEscapedText = ne_path_escape(sText.c_str());
-		out << pszEscapedText;
-		free(pszEscapedText);
+		return *reinterpret_cast<int*>(pSocket);
+	}
+
+	static void OnSessionStatusNotify(void *userdata, ne_session_status status, const ne_session_status_info *info)
+	{
+		HTTPSessionImpl* pThis = (HTTPSessionImpl*) userdata;
+		if (status == ne_status_connected)
+		{
+			// Destination host: info->cd.hostname;
+
+			// Grab bound address.
+			int nSocketHandle = GetSocketHandle(GetSessionSocket(pThis->m_pSession));
+			scoped_ptr<Socket> pSocket(new Socket((SOCKET) nSocketHandle));
+
+			bool bSuccess = pSocket->GetLocalEndPoint(pThis->m_sBoundAddress, pThis->m_nBoundPort);
+			assert(bSuccess);
+
+			TRACE("Connected to web server; bound address is %s:%d.", pThis->m_sBoundAddress.c_str(), pThis->m_nBoundPort);
+		}
 	}
 
 
-	const std::string& GetProxy() const { return m_sProxy; }
-	const std::string& GetUsername() const { return m_sUsername; }
-	const std::string& GetPassword() const { return m_sPassword; }
-
-
-private:
 	ne_session* m_pSession;
 
 	std::string m_sProxy;
 	std::string m_sUsername;
 	std::string m_sPassword;
+
+	std::string m_sBoundAddress;
+	boost::uint32_t m_nBoundPort;
 };
 
 
-class HTTPRequest::Impl
+class HTTPRequestImpl : public HTTPRequest
 {
 public:
-	Impl(HTTPSession& session, const char* pszMethod, const string& sPath) : m_session(session)
+
+	HTTPRequestImpl(HTTPSession& session, const char* pszMethod, const string& sPath) : m_session((HTTPSessionImpl&)session)
 	{
-		m_pRequest = ne_request_create(GetNeonSession(), pszMethod, sPath.c_str());
+		m_pRequest = ne_request_create(m_session.GetNeonSession(), pszMethod, sPath.c_str());
 
 		ne_add_response_body_reader(m_pRequest, Accept, Read, this);
 	}
 
 
-	~Impl()
+	virtual ~HTTPRequestImpl()
 	{
 		ne_request_destroy(m_pRequest);
 	}
 
 
-	bool Dispatch()
+	virtual bool Dispatch()
 	{
 		switch (ne_request_dispatch(m_pRequest))
 		{
@@ -162,13 +193,13 @@ public:
 			NE_TIMEOUT
 			A timeout occurred while waiting for the server to respond.
 			*/
-			std::cerr << "An error occurred: " << ne_get_error(GetNeonSession()) << std::endl;
+			std::cerr << "An error occurred: " << ne_get_error(m_session.GetNeonSession()) << std::endl;
 			return false;
 		}
 	}
 
 
-	std::string GetResult() const
+	virtual std::string GetResult() const
 	{
 		return m_resultStream.str();
 	}
@@ -205,7 +236,7 @@ private:
 
 	static int Read(void* pUserdata, const char* pszBuf, size_t nLen)
 	{
-		Impl* pThis = (Impl*) pUserdata;
+		HTTPRequestImpl* pThis = (HTTPRequestImpl*) pUserdata;
 
 		pThis->m_resultStream.write(pszBuf, nLen);
 
@@ -219,11 +250,8 @@ private:
 	}
 
 
-	ne_session* GetNeonSession() { return (ne_session*) m_session.GetInternalSession(); }
-
-
 	ostringstream m_resultStream;
-	HTTPSession& m_session;
+	HTTPSessionImpl& m_session;
 	ne_request* m_pRequest;
 };
 
@@ -231,57 +259,33 @@ private:
 // -----------------------------------------------------------------------------
 
 
-HTTPSession::HTTPSession(const char* pszScheme, const char* pszHostName, boost::uint32_t nPort) : 
-  pImpl(new Impl(pszScheme, pszHostName, nPort))
+HTTPSession* HTTPSession::CreateInstance(const char* pszScheme, const char* pszHostName, boost::uint32_t nPort)
 {
-}
-
-	
-HTTPSession::~HTTPSession()
-{
-	delete pImpl;
-}
-
-
-void* HTTPSession::GetInternalSession()
-{
-	return pImpl->GetInternalSession();
+	return new HTTPSessionImpl(pszScheme, pszHostName, nPort);
 }
 
 
 std::string HTTPSession::GetURLEscaped(const std::string& sText)
 {
-	return Impl::GetURLEscaped(sText);
+	char* pszEscapedText = ne_path_escape(sText.c_str());
+	string result(pszEscapedText);
+	free(pszEscapedText);
+
+	return result;
 }
 
 
 void HTTPSession::WriteURLEscaped(std::ostream& out, const std::string& sText)
 {
-	Impl::WriteURLEscaped(out, sText);
+	char* pszEscapedText = ne_path_escape(sText.c_str());
+	out << pszEscapedText;
+	free(pszEscapedText);
 }
 
 
-HTTPRequest::HTTPRequest(HTTPSession& session, const char* pszMethod, const char* pszPath) : 
-  pImpl(new Impl(session, pszMethod, pszPath))
+HTTPRequest* HTTPRequest::CreateInstance(HTTPSession& session, const char* pszMethod, const char* pszPath)
 {
-}
-
-
-HTTPRequest::~HTTPRequest()
-{
-	delete pImpl;
-}
-
-
-bool HTTPRequest::Dispatch()
-{
-	return pImpl->Dispatch();
-}
-
-
-std::string HTTPRequest::GetResult() const
-{
-	return pImpl->GetResult();
+	return new HTTPRequestImpl(session, pszMethod, pszPath);
 }
 
 
@@ -290,7 +294,7 @@ std::string HTTPRequest::GetResult() const
 
 static int GetProxyAuthentication(void *pUserdata, const char *pszRealm, int nAttempt, char *pszUsername, char *pszPassword)
 {
-	HTTPSession::Impl* pSession = (HTTPSession::Impl*) pUserdata;
+	HTTPSessionImpl* pSession = (HTTPSessionImpl*) pUserdata;
 
 	assert(pSession->GetUsername().size() + 1 <= NE_ABUFSIZ);
 	strcpy(pszUsername, pSession->GetUsername().c_str());

@@ -1,11 +1,17 @@
 Jørgen
 ---
 Implement neon+sockets based version of NAT punchthrough and P2P in C++.
-1) Connect to mediator server using a ne_request. Make sure the connection stays open.
-2) On windows (and possibly other platforms), the default implementation of ne_socket will issue a SO_REUSEADDR on the socket before binding, which is exactly what we need.
-3) ne_socket has the "fd" (the socket handle) as its first field, and so can be reinterpret_cast to a SOCKET.
-4) Use getsockname on that to obtain the bound address, and continue from there.
-5) Once P2P connection is obtained, close the request.
+1) v Connect to mediator server using a ne_request. Make sure the connection stays open.
+2) v On windows (and possibly other platforms), the default implementation of ne_socket will issue a SO_REUSEADDR on the socket before binding, which is exactly what we need.
+3) v ne_socket has the "fd" (the socket handle) as its first field, and so can be reinterpret_cast to a SOCKET.
+4) v Use getsockname on that to obtain the bound address, and
+5) Somehow insert that address into the output...! This is hard, as internally, ne_begin_request
+does build_request, send_request, and send_request does open_connection. Hence, when we're building
+the request, we don't have the connection that we need to know the bound address.
+For now, we have to do a dummy request first - this works because the server is HTTP/1.1, and thus
+persists the connection.. Most of the time, anyways.
+6) Once P2P connection is obtained, close the request.
+
 
 Check what's already available in the iPhone SDK for NAT punchthrough and P2P of stuff.
 

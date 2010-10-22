@@ -10,34 +10,25 @@
 // -----------------------------------------------------------------------------
 
 
-class HTTPSession
+struct HTTPSession
 {
-public:
-	class Impl;
+	static HTTPSession* CreateInstance(const char* pszScheme, const char* pszHostName, boost::uint32_t nPort);
+	virtual ~HTTPSession() {}
 
-	HTTPSession(const char* pszScheme, const char* pszHostName, boost::uint32_t nPort);
-	~HTTPSession();
-	void* GetInternalSession();
+	virtual const std::string& GetBoundAddress() const = 0;
+	virtual boost::uint32_t GetBoundPort() const = 0;
+
 	static std::string GetURLEscaped(const std::string& sText);
 	static void WriteURLEscaped(std::ostream& out, const std::string& sText);
-
-private:
-	Impl* pImpl;
 };
 
 
-class HTTPRequest
+struct HTTPRequest
 {
-public:
-	class Impl;
-
-	HTTPRequest(HTTPSession& session, const char* pszMethod, const char* pszPath);
-	~HTTPRequest();
-	bool Dispatch();
-	std::string GetResult() const;
-
-private:
-	Impl* pImpl;
+	static HTTPRequest* CreateInstance(HTTPSession& session, const char* pszMethod, const char* pszPath);
+	virtual ~HTTPRequest() {};
+	virtual bool Dispatch() = 0;
+	virtual std::string GetResult() const = 0;
 };
 
 
