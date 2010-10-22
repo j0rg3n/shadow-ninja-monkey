@@ -10,23 +10,20 @@
 // -----------------------------------------------------------------------------
 
 
-class JSONRPC
+struct JSONRPC
 {
-public:
 	typedef boost::function<void (const boost::property_tree::ptree&)> ResultCallback;
 
-	JSONRPC();
-	~JSONRPC();
+	static JSONRPC* CreateInstance();
+	virtual ~JSONRPC() {};
 
-	bool Connect(std::string sAddress, boost::uint32_t nPort = 80);
-	void Disconnect();
+	virtual bool Connect(std::string sAddress, boost::uint32_t nPort = 80) = 0;
+	virtual void Disconnect() = 0;
 
-	bool Call(std::string sFunction, const boost::property_tree::ptree& argProps, ResultCallback fResultCallback);
+	virtual bool Call(std::string sFunction, const boost::property_tree::ptree& argProps, ResultCallback fResultCallback) = 0;
 
-private:
-	class Impl;
-
-	Impl* m_pImpl;
+	virtual const std::string& GetBoundAddress() const = 0;
+	virtual const boost::uint32_t GetBoundPort() const = 0;
 };
 
 

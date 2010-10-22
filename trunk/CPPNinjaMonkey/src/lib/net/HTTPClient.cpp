@@ -32,14 +32,14 @@ public:
 	bool Connect(string sAddress, uint32_t nPort)
 	{
 		assert(NULL == pSession.get());
-		pSession.reset(new HTTPSession("http", sAddress.c_str(), nPort));
+		pSession.reset(HTTPSession::CreateInstance("http", sAddress.c_str(), nPort));
 		return true;
 	}
 
 	bool Get(std::string sPath, std::string& sResult)
 	{
 		assert(NULL == pRequest.get());
-		pRequest.reset(new HTTPRequest(*pSession, "GET", sPath.c_str()));
+		pRequest.reset(HTTPRequest::CreateInstance(*pSession, "GET", sPath.c_str()));
 		return pRequest->Dispatch();
 	}
 

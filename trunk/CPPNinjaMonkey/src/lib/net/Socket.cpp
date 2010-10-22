@@ -1,4 +1,5 @@
 #include "Socket.h"
+#include "diag/Trace.h"
 
 #ifdef _WINDOWS
 #include <winsock2.h>
@@ -19,20 +20,48 @@ using namespace std;
 // ----------------------------------------------------------------------------
 
 
-Socket::Socket() : m_socket(INVALID_SOCKET)
+Socket::Socket() : m_socket(INVALID_SOCKET), m_bSharedHandle(false)
 {
 }
 
 
+Socket::Socket(SOCKET socket) : m_socket(socket), m_bSharedHandle(true)
+{
+}
+
+	
 Socket::~Socket()
 {
-	Disconnect();
+	if (!m_bSharedHandle)
+	{
+		Disconnect();
+	}
 }
 
 
 bool Socket::IsConnected() const
 {
+	// TODO: This is not good enough if m_bSharedHandle == true.
 	return m_socket != INVALID_SOCKET;
+}
+
+
+bool Socket::GetLocalEndPoint(std::string& sAddress, boost::uint32_t& nPort) const
+{
+	sockaddr_in address;
+	int nNameLen = sizeof(address);
+	int nResult = ::getsockname(m_socket, (SOCKADDR*) &address, &nNameLen);
+	if (nResult != 0)
+	{
+		TRACE("Failed getting local endpoint: 0x%08x", WSAGetLastError());
+		return false;
+	}
+
+	assert(address.sin_family == AF_INET);
+	nPort = ntohs(address.sin_port);
+	sAddress.assign(inet_ntoa(address.sin_addr));
+	
+	return true;
 }
 
 
@@ -88,6 +117,8 @@ bool Socket::Listen(boost::uint32_t nPort)
 
 	sockaddr_in address;
 	address.sin_family = AF_INET;
+	// Binding to loopback is maybe a bad idea.
+	// TODO: Use ADDR_ANY?
 	address.sin_addr.s_addr = inet_addr("127.0.0.1");
 	address.sin_port = htons((u_short) nPort);
 
@@ -128,7 +159,8 @@ bool Socket::Accept(Socket** ppConnection)
 		return false;
 	}
 
-	*ppConnection = new Socket(incomingConnection);
+	const bool HANDLE_OWNED = false;
+	*ppConnection = new Socket(incomingConnection, HANDLE_OWNED);
 	return true;
 }
 
@@ -214,6 +246,6 @@ void Socket::DeinitNetwork()
 // -----------------------------------------------------------------------------
 
 
-Socket::Socket(SOCKET socket) : m_socket(socket)
+Socket::Socket(SOCKET socket, bool bSharedHandle) : m_socket(socket), m_bSharedHandle(bSharedHandle)
 { 
 }

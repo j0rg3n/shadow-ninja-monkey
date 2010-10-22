@@ -3,6 +3,7 @@
 #include "lib/net/Socket.h"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/xml_parser.hpp"
+#include "boost/scoped_ptr.hpp"
 
 #include <iostream>
 
@@ -11,6 +12,7 @@
 
 
 using namespace std;
+using namespace boost;
 using namespace boost::property_tree;
 
 
@@ -24,7 +26,7 @@ BOOST_AUTO_TEST_CASE(Construction)
 {
 	Socket::InitNetwork();
 	{
-		JSONRPC c;
+		scoped_ptr<JSONRPC> c(JSONRPC::CreateInstance());
 	}
 	Socket::DeinitNetwork();
 }
@@ -34,9 +36,9 @@ BOOST_AUTO_TEST_CASE(ConnectToPage)
 {
 	Socket::InitNetwork();
 	{
-		JSONRPC c;
+		scoped_ptr<JSONRPC> c(JSONRPC::CreateInstance());
 
-		c.Connect("fabeljet.com");
+		c->Connect("fabeljet.com");
 	}
 	Socket::DeinitNetwork();
 }
@@ -61,9 +63,9 @@ BOOST_AUTO_TEST_CASE(MakeSimpleCall)
 {
 	Socket::InitNetwork();
 	{
-		JSONRPC c;
+		scoped_ptr<JSONRPC> c(JSONRPC::CreateInstance());
 
-		c.Connect("fabeljet.com");
+		c->Connect("fabeljet.com");
 
 		ptree arguments;
 		arguments.put("name", "Sanchez");
@@ -72,7 +74,7 @@ BOOST_AUTO_TEST_CASE(MakeSimpleCall)
 		cout << endl;
 
 		ptree result;
-		bool bResult = c.Call("helloWorld", arguments, ResultCapturer(result));
+		bool bResult = c->Call("helloWorld", arguments, ResultCapturer(result));
 		BOOST_CHECK(bResult);
 
 		cout << "Result: " << endl;
@@ -84,6 +86,33 @@ BOOST_AUTO_TEST_CASE(MakeSimpleCall)
 
 		boost::optional<string> message = result.get_optional<string>("message");
 		BOOST_CHECK(message.is_initialized() && message.get() == "Hello, Sanchez!");
+	}
+	Socket::DeinitNetwork();
+}
+
+
+BOOST_AUTO_TEST_CASE(MakeMediatorCall)
+{
+	Socket::InitNetwork();
+	{
+		scoped_ptr<JSONRPC> c(JSONRPC::CreateInstance());
+
+		c->Connect("fabeljet.com");
+		ptree arguments;
+		arguments.put("name", "Mediatee");
+
+		// TODO: Call mediate stuff instead of helloWorld!
+		ptree result;
+		bool bResult = c->Call("helloWorld", arguments, ResultCapturer(result));
+		BOOST_CHECK(bResult);
+
+		boost::optional<string> error = result.get_optional<string>("error");
+		BOOST_CHECK(!error.is_initialized());
+
+		boost::optional<string> message = result.get_optional<string>("message");
+		BOOST_CHECK(message.is_initialized() && message.get() == "Hello, Mediatee!");
+
+		cout << "Connected to server, bound to " << c->GetBoundAddress() << ":" << c->GetBoundPort() << endl;
 	}
 	Socket::DeinitNetwork();
 }

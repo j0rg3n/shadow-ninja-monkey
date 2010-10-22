@@ -30,7 +30,7 @@ public:
 	CallInfo(HTTPSession& httpSession, string sPath, JSONRPC::ResultCallback fResultCallback) :
 		m_sPath(sPath),
 		m_fResultCallback(fResultCallback),
-		m_httpRequest(httpSession, "GET", sPath.c_str())
+		m_pHTTPRequest(HTTPRequest::CreateInstance(httpSession, "GET", sPath.c_str()))
 	{
 	}
 
@@ -38,9 +38,9 @@ public:
 	void Run()
 	{
 		ptree resultProps;
-		if (m_httpRequest.Dispatch())
+		if (m_pHTTPRequest->Dispatch())
 		{
-			istringstream resultStream(m_httpRequest.GetResult());
+			istringstream resultStream(m_pHTTPRequest->GetResult());
 			try
 			{
 				json_parser::read_json(resultStream, resultProps);
@@ -67,30 +67,41 @@ public:
 private:
 	string m_sPath;
 	JSONRPC::ResultCallback m_fResultCallback;
-	HTTPRequest m_httpRequest;
+	scoped_ptr<HTTPRequest> m_pHTTPRequest;
 };
 
 
 // ----------------------------------------------------------------------------
 
 
-class JSONRPC::Impl
+class JSONRPCImpl : public JSONRPC
 {
 public:
-	Impl()
+	JSONRPCImpl()
 	{
 	}
 
 
-	bool Connect(string sAddress, uint32_t nPort)
+	virtual ~JSONRPCImpl()
+	{
+	}
+
+
+	virtual bool Connect(string sAddress, uint32_t nPort)
 	{
 		assert(NULL == m_pSession.get());
-		m_pSession.reset(new HTTPSession("http", sAddress.c_str(), nPort));
+		m_pSession.reset(HTTPSession::CreateInstance("http", sAddress.c_str(), nPort));
 		return true;
 	}
 
 
-	bool Call(string sFunction, const ptree& argProps, ResultCallback fResultCallback)
+	virtual void Disconnect()
+	{
+		// TODO: Implement.
+	}
+
+
+	virtual bool Call(string sFunction, const ptree& argProps, ResultCallback fResultCallback)
 	{
 		assert(NULL != m_pSession.get());
 
@@ -118,6 +129,18 @@ public:
 	}
 
 
+	virtual const std::string& GetBoundAddress() const
+	{
+		return m_pSession->GetBoundAddress();
+	}
+
+
+	virtual const boost::uint32_t GetBoundPort() const
+	{
+		return m_pSession->GetBoundPort();
+	}
+
+
 private:
 	typedef map<int, CallInfo*> CallMap;
 	typedef uint32_t CallID;
@@ -133,30 +156,7 @@ private:
 // ----------------------------------------------------------------------------
 
 
-JSONRPC::JSONRPC() : m_pImpl(new Impl())
+JSONRPC* JSONRPC::CreateInstance()
 {
-}
-
-
-JSONRPC::~JSONRPC()
-{
-	delete m_pImpl;
-}
-
-
-bool JSONRPC::Connect(std::string sAddress, boost::uint32_t nPort)
-{
-	return m_pImpl->Connect(sAddress, nPort);
-}
-
-
-void JSONRPC::Disconnect()
-{
-	//m_pImpl->Disconnect();
-}
-
-
-bool JSONRPC::Call(std::string sFunction, const boost::property_tree::ptree& argProps, ResultCallback fResultCallback)
-{
-	return m_pImpl->Call(sFunction, argProps, fResultCallback);
+	return new JSONRPCImpl();
 }
