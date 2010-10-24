@@ -12,17 +12,28 @@ For now, we have to do a dummy request first - this works because the server is 
 persists the connection.. Most of the time, anyways.
 6) Once P2P connection is obtained, close the request.
 
+Check what's already available in the iPhone SDK for NAT punchthrough and P2P of stuff.
+
+Replace CallQueue with MessageQueue, only inspired by http://bitsquid.blogspot.com/2009/12/events.html:
+1) Calling thread has message buffer. 
+2) Callee has static methods that add event data in-place to that buffer.
+3) Caller turns in message buffer to the callee.
+4) Caller begins on a new message buffer.
+5) How will the caller get it's message buffer back? The only reason it would want back its own buffer would be the size, which might (or might not) match the size needed for the next batch of calls.
+"The speed difference between RAM and CPU means that memory is the new disk! If you are unsure about how to do data-oriented design, thinking "file formats for memory" is not a bad place to start." -- http://bitsquid.blogspot.com/2010/09/visual-scripting-data-oriented-way.html
+
+Implement sorting of entities by type. (Generally: Sort objects by type.)
+
+Jørgen: DONE (reverse chronological)
+---
+Read up on http://bitsquid.blogspot.com/.
+
 Figure out how to POST with neon:
 1) Clear NE_REQFLAG_IDEMPOTENT with ne_set_request_flag: http://www.webdav.org/neon/doc/html/refreqflags.html
 2) Put data into the request body, in the application/x-www-form-urlencoded encoding: http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1. 
 This should be easy as we already have the url-encoding tools available.
 3) Call ne_set_request_body_buffer to set the body: http://www.webdav.org/neon/doc/html/refreqbody.html
 
-Check what's already available in the iPhone SDK for NAT punchthrough and P2P of stuff.
-
-
-Jørgen: DONE (reverse chronological)
----
 Implement prototype in C# for NAT punchthrough and P2P. 
 
 Transmit position accross network.
