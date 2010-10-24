@@ -153,9 +153,56 @@ class HTTPRequestImpl : public HTTPRequest
 {
 public:
 
-	HTTPRequestImpl(HTTPSession& session, const char* pszMethod, const string& sPath) : m_session((HTTPSessionImpl&)session)
+	HTTPRequestImpl(HTTPSession& session, const char* pszMethod, const char* pszPath, const StringMap& fields) : m_session((HTTPSessionImpl&)session)
 	{
-		m_pRequest = ne_request_create(m_session.GetNeonSession(), pszMethod, sPath.c_str());
+		// Create encoded query string
+		ostringstream queryStream;
+		int index = 0;
+		for (StringMap::const_iterator i = fields.begin(); i != fields.end(); ++i)
+		{
+			if (index > 0)
+			{
+				queryStream << "&";
+			}
+
+			HTTPSession::WriteURLEscaped(queryStream, i->first);
+			queryStream << "=";
+			HTTPSession::WriteURLEscaped(queryStream, i->second);
+			++index;
+		}
+
+		if (pszMethod == "POST")
+		{
+			m_sRequestBody = queryStream.str();
+
+			m_pRequest = ne_request_create(m_session.GetNeonSession(), pszMethod, pszPath);
+
+			// A POST request must not have the NE_REQFLAG_IDEMPOTENT flag set.
+			ne_set_request_flag(m_pRequest, NE_REQFLAG_IDEMPOTENT, 0);
+
+			// TODO: See if this is the encoding we want to send.
+			ne_add_request_header(m_pRequest, 
+				"Content-Type", 
+				"application/x-www-form-urlencoded; charset=ISO-8859-15");
+			
+			// Note: We must keep m_sRequestBody around until the request is completed; neon
+			// does not copy this data.
+			ne_set_request_body_buffer(m_pRequest, m_sRequestBody.c_str(), m_sRequestBody.size());
+		}
+		else if (pszMethod == "GET")
+		{
+			ostringstream pathStream;
+			pathStream << pszPath;
+			pathStream << "?";
+			pathStream << queryStream.str();
+
+			m_pRequest = ne_request_create(m_session.GetNeonSession(), pszMethod, pathStream.str().c_str());
+		}
+		else
+		{
+			assert(false); // Unsupported method.
+			m_pRequest = NULL;
+		}
 
 		ne_add_response_body_reader(m_pRequest, Accept, Read, this);
 	}
@@ -249,7 +296,7 @@ private:
 		return bSuccess ? 0 : 1;
 	}
 
-
+	string m_sRequestBody;
 	ostringstream m_resultStream;
 	HTTPSessionImpl& m_session;
 	ne_request* m_pRequest;
@@ -283,9 +330,9 @@ void HTTPSession::WriteURLEscaped(std::ostream& out, const std::string& sText)
 }
 
 
-HTTPRequest* HTTPRequest::CreateInstance(HTTPSession& session, const char* pszMethod, const char* pszPath)
+HTTPRequest* HTTPRequest::CreateInstance(HTTPSession& session, const char* pszMethod, const char* pszPath, const StringMap& fields)
 {
-	return new HTTPRequestImpl(session, pszMethod, pszPath);
+	return new HTTPRequestImpl(session, pszMethod, pszPath, fields);
 }
 
 

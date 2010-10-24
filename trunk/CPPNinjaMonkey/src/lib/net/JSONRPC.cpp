@@ -27,10 +27,11 @@ typedef void (InternalResultCallback)(string sBody);
 class CallInfo
 {
 public:
-	CallInfo(HTTPSession& httpSession, string sPath, JSONRPC::ResultCallback fResultCallback) :
+	CallInfo(HTTPSession& httpSession, string sPath, const HTTPRequest::StringMap& fields, JSONRPC::ResultCallback fResultCallback) :
 		m_sPath(sPath),
+		m_fields(fields),
 		m_fResultCallback(fResultCallback),
-		m_pHTTPRequest(HTTPRequest::CreateInstance(httpSession, "GET", sPath.c_str()))
+		m_pHTTPRequest(HTTPRequest::CreateInstance(httpSession, "POST", sPath.c_str(), fields))
 	{
 	}
 
@@ -50,6 +51,9 @@ public:
 				resultProps.clear();
 				resultProps.put("error", e.what());
 				resultProps.put("path", m_sPath);
+				resultProps.put("callID", m_fields["id"]);
+				resultProps.put("function", m_fields["name"]);
+				resultProps.put("args", m_fields["args"]);
 				resultProps.put("content", resultStream.str());
 			}
 		}
@@ -66,6 +70,7 @@ public:
 
 private:
 	string m_sPath;
+	HTTPRequest::StringMap m_fields;
 	JSONRPC::ResultCallback m_fResultCallback;
 	scoped_ptr<HTTPRequest> m_pHTTPRequest;
 };
@@ -109,18 +114,18 @@ public:
 
 		++m_callID;
 
+		HTTPRequest::StringMap args;
+		args["name"] = sFunction;
+
+		char szCallID[32];
+		_itoa(m_callID, szCallID, 10);
+		args["id"] = szCallID;
+
 		ostringstream jsonStream;
 		json_parser::write_json(jsonStream, argProps);
-
-		ostringstream pathStream;
-		pathStream << "/snm/ajax.php";
-		pathStream << "?id=" << m_callID;
-		pathStream << "&name=";
-		HTTPSession::WriteURLEscaped(pathStream, sFunction);
-		pathStream << "&args=";
-		HTTPSession::WriteURLEscaped(pathStream, jsonStream.str());
+		args["args"] = jsonStream.str();
 		
-		CallInfo* pCallInfo = new CallInfo(*m_pSession, pathStream.str(), fResultCallback);
+		CallInfo* pCallInfo = new CallInfo(*m_pSession, "/snm/ajax.php", args, fResultCallback);
 
 		// TODO: Add call to call queue on separate thread where the call to Run is made.
 		pCallInfo->Run();

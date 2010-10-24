@@ -3,8 +3,6 @@
 SET(NET_SRCS
   Mediator.cpp
   ${PROJECT_SOURCE_DIR}/include/net/Mediator.h
-  HTTPClient.cpp
-  HTTPClient.h
   NetworkPacket.cpp
   ${PROJECT_SOURCE_DIR}/include/net/NetworkPacket.h
   NetworkPacketMarshaller.cpp
