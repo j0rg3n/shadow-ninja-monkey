@@ -16,6 +16,10 @@ function getDispatchTable()
     );
 }
 
+// TODO: Consider using the raw request body to 
+// provide your very own RPC call encoding.
+//$requestBody = file_get_contents("php://input");
+
 $db = new GameDB();
 $db->initPlayerSession();
 

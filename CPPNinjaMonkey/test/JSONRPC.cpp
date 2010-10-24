@@ -6,6 +6,7 @@
 #include "boost/scoped_ptr.hpp"
 
 #include <iostream>
+#include <conio.h>
 
 
 // ----------------------------------------------------------------------------
@@ -113,6 +114,9 @@ BOOST_AUTO_TEST_CASE(MakeMediatorCall)
 		BOOST_CHECK(message.is_initialized() && message.get() == "Hello, Mediatee!");
 
 		cout << "Connected to server, bound to " << c->GetBoundAddress() << ":" << c->GetBoundPort() << endl;
+
+		cout << "Press any key to continue...";
+		_getch();
 	}
 	Socket::DeinitNetwork();
 }

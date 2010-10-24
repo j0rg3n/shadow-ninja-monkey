@@ -4,6 +4,7 @@
 
 
 #include <string>
+#include <map>
 #include "boost/integer_fwd.hpp"
 
 
@@ -25,7 +26,9 @@ struct HTTPSession
 
 struct HTTPRequest
 {
-	static HTTPRequest* CreateInstance(HTTPSession& session, const char* pszMethod, const char* pszPath);
+	typedef std::map<std::string, std::string> StringMap;
+
+	static HTTPRequest* CreateInstance(HTTPSession& session, const char* pszMethod, const char* pszPath, const StringMap& fields);
 	virtual ~HTTPRequest() {};
 	virtual bool Dispatch() = 0;
 	virtual std::string GetResult() const = 0;
