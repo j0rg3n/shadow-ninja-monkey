@@ -1,0 +1,90 @@
+Step-by-step guide for putting it together
+---
+Sources:
+- http://code.google.com/p/iphone-dev/wiki/Building
+- http://www.pjtrix.com/blawg/2009/07/21/iphone-development-on-windows-linux-with-open-source-tools/
+
+WARNING: This gives you a 2.2.1 SDK-like environment, with gcc 4.0. These are old tools, but this is the best I can do with the prebuilt binaries.
+
+TODO: Build a GCC 4.2-based toolchain using the instructions on http://www.saurik.com/id/4. This looks like major pain.
+
+
+1. Install cygwin
+---
+Include patchutils and cpio.
+
+
+2. Extract SDK components
+---
+1) Download the latest iPhone SDK (I used 3.1.3).
+2) Use 7-zip to extract the .dmg. (Type: 7-Zip.dmg)
+3) Use 7-zip to extract "5.hfs". (Type: 7-Zip.?)
+4) Go into 5/iPhone SDK/Packages and pick out:
+- MacOSX10.4.Universal.pkg (required for iPhone-dev's header-generating magic)
+- iPhoneSDK2_2_1.pkg (the required frameworks etc. for linking)
+
+Avoid iPhoneSDKHeadersAndLibs.pkg and newer SDKs, as these require (it seems) GCC 4.2.
+
+You can also pick out documentation: DevDocumentation.pkg, iPhoneDocumentation.pkg.
+
+5) For each .pkg, extract with 7-zip (Type: 7-Zip.Xar), then 
+6) extract "Payload" again (Type: 7-Zip.GZip)
+Now you have a cpio archive, that must be extracted in cygwin to retain symlinks.
+7) Find a suitable path, then extract using cpio (I've changed the tilde (~) into an underscore to avoid escaping hell):
+
+cpio -id < Payload_
+
+
+3. Install the toolchain
+---
+1) Download iphone-toolchain-windows.tgz from 
+2) Extract using tar:
+cd /
+tar xzf iphone-toolchain-windows.tgz
+
+Yes, this is a mess, as it puts stuff everywhere.
+
+
+4. Use iPhone-dev to generate suitable headers
+---
+1) Extract MacOSX10.4.Universal as described in "Extract SDK components".
+2) mount c:/.../include-1.2-sdk ~/include-1.2-sdk
+3) cd ~/include-1.2-sdk
+4) ./configure --with-macosx-sdk=<extraction path>/SDKs/MacOSX10.4u.sdk
+5) ./install-headers.sh
+
+
+5. Provide frameworks
+---
+1) Extract iPhoneSDK2_2_1 as described in "Extract SDK components".
+2) Mount iPhoneOS2.2.1.sdk as your iphone-sysroot:
+mount <extraction path>/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS2.2.1.sdk \
+	/usr/local/iphone-sysroot
+
+
+5. Compile
+---
+/usr/local/bin/arm-apple-darwin9-gcc -c \
+	-I/usr/local/lib/gcc/arm-apple-darwin9/4.2.1/include \
+	-I/usr/local/arm-apple-darwin/include \
+	-isysroot /usr/local/iphone-sysroot HelloWorldApp.m	
+
+Notes:	
+-I/usr/local/arm-apple-darwin/include is where the iPhone-dev headers are put on installation.
+
+
+6. Link
+---	
+/usr/local/bin/arm-apple-darwin9-gcc \
+	-framework CoreFoundation \
+	-framework Foundation \
+	-framework UIKit \
+	-lobjc \
+	-bind_at_load \
+	-mmacosx-version-min=10.1 \
+	-isysroot /usr/local/iphone-sysroot HelloWorldApp.o -o HelloWorldApp
+
+Notes:	
+-mmacosx-version-min=10.1 is needed as you'll otherwise get linker errors of various kinds, as it tries to link with the wrong SDK version.
+
+-w (optional) If you don't want warnings about duplicate symbols in the frameworks (see http://www.telesphoreo.org/pipermail/iphone-gcc/2008-August/000159.html).
