@@ -8,11 +8,16 @@
 #include "Edge.h"
 
 
+namespace snm
+{
+
+
 // -----------------------------------------------------------------------------
 
 
 class EdgeSorter
 {
+public:
 	/**
 	 * Find the edge nearest the light.
 	 * 
@@ -20,7 +25,7 @@ class EdgeSorter
 	 * @param Edge[] edges
 	 * @return
 	 */
-	const Edge* FindNearestEdge(const Point& light, std::vector<Edge>& edges)
+	const Edge* FindNearestEdge(const Point& light, const std::vector<Edge>& edges) const
 	{
 		const Edge* result = NULL;
 		for(size_t i = 0; i < edges.size(); i++)
@@ -42,7 +47,7 @@ class EdgeSorter
 	 * @param Edge[] edges - An array of visible edges.
 	 * @return
 	 */
-	void SortEdgePoints(const Point& light, std::vector<Edge>& edges, std::vector<Point>& edgePoints)
+	void SortEdgePoints(const Point& light, const std::vector<Edge>& edges, std::vector<Point>& edgePoints) const
 	{
 		const Edge* nearestEdge = this->FindNearestEdge(light, edges);
 		assert(nearestEdge != NULL);
@@ -197,5 +202,7 @@ private:
 	 };
 	 */
 };
+
+}; // namespace snm	
 
 #endif // _EDGESORTER_H_INCLUDED

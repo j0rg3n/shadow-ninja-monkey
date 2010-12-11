@@ -6,6 +6,10 @@
 #include "Point.h"
 
 
+namespace snm
+{
+
+
 // -----------------------------------------------------------------------------
 
 
@@ -233,5 +237,7 @@ public:
 	 };
 	 */
 };
+
+}; // namespace snm	
 
 #endif // _EDGE_H_INCLUDED
