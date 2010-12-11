@@ -8,8 +8,13 @@
 #include "Point.h"
 
 
+namespace snm
+{
+
+
 class EdgeStack
 {
+public:
 	/**
 	 * A stack of edges sorted by their distance to the light-source.
 	 * 
@@ -208,5 +213,7 @@ public:
 	 };
 	 */
 };
+
+}; // namespace snm	
 
 #endif // _EDGESTACK_H_INCLUDED

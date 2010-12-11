@@ -8,6 +8,7 @@
 
 // Import the interfaces
 #import "HelloWorldScene.h"
+#import "CCShadows.h"
 
 // HelloWorld implementation
 @implementation HelloWorld
@@ -35,7 +36,8 @@
 	if( (self=[super init] )) {
 		
 		// create and initialize a Label
-		CCLabel* label = [CCLabel labelWithString:@"Hello World" fontName:@"Marker Felt" fontSize:64];
+		//CCLabel* label = [CCLabel labelWithString:@"Hello World" fontName:@"Marker Felt" fontSize:64];
+		CCShadows* label = [CCShadows shadowsWithDebugScene];
 
 		// ask director the the window size
 		CGSize size = [[CCDirector sharedDirector] winSize];

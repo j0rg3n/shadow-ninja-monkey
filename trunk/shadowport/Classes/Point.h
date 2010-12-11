@@ -7,6 +7,10 @@
 #include <math.h>
 
 
+namespace snm
+{
+
+
 // -------------------------------------------------------------------------
 
 
@@ -255,4 +259,6 @@ private:
 	 */
 };
 
+}; // namespace snm	
+	
 #endif // _POINT_H_INCLUDED
