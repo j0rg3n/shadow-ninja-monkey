@@ -31,8 +31,9 @@ public:
 		scene.VisibleEdges(light, visibleEdges);
 		
 		EdgeSorter sorter;
-		std::vector<Point> sortedEdges;
-		sorter.SortEdgePoints(light, visibleEdges, sortedEdges);
+		std::vector<EdgePointReference> sortedEdges;
+		std::vector<Edge> nearestEdgeParts;
+		sorter.SortEdgePoints(light, visibleEdges, nearestEdgeParts, sortedEdges);
 		
 		EdgeStack edgeStack(light);
 

@@ -16,6 +16,10 @@ namespace snm
 class Edge
 {
 public:
+	Edge()
+	{
+	}
+	
 	/**
 	 * Create an edge between two point - also known as a line segment.
 	 *   

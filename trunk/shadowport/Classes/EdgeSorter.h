@@ -6,6 +6,7 @@
 #include <vector>
 #include <cassert>
 #include "Edge.h"
+#include "EdgePointReference.h"
 
 
 namespace snm
@@ -47,44 +48,47 @@ public:
 	 * @param Edge[] edges - An array of visible edges.
 	 * @return
 	 */
-	void SortEdgePoints(const Point& light, const std::vector<Edge>& edges, std::vector<Point>& edgePoints) const
+	void SortEdgePoints(const Point& light, const std::vector<Edge>& edges, std::vector<Edge> &nearestEdgeParts, std::vector<EdgePointReference>& edgePoints) const
 	{
 		const Edge* nearestEdge = this->FindNearestEdge(light, edges);
 		assert(nearestEdge != NULL);
 		Point nearestPoint = nearestEdge->NearestPoint(light);
-		Edge nearestEdgePart2 = Edge(Point(nearestEdge->from.x, nearestEdge->from.y), Point(nearestPoint.x, nearestPoint.y));
-		Edge nearestEdgePart1 = Edge(Point(nearestPoint.x, nearestPoint.y), Point(nearestEdge->to.x, nearestEdge->to.y));
 		
-		if(nearestEdgePart1.LengthSquared() > 0)
+		nearestEdgeParts.resize(2);
+		nearestEdgeParts[0] = Edge(Point(nearestEdge->from.x, nearestEdge->from.y), Point(nearestPoint.x, nearestPoint.y));
+		nearestEdgeParts[1] = Edge(Point(nearestPoint.x, nearestPoint.y), Point(nearestEdge->to.x, nearestEdge->to.y));
+		
+		if(nearestEdgeParts[0].LengthSquared() > 0)
 		{
-			edgePoints.push_back(nearestEdgePart1.to);
+			edgePoints.push_back(ToOf(nearestEdgeParts[0]));
 		}
-		if(nearestEdgePart2.LengthSquared() > 0)
+		if(nearestEdgeParts[1].LengthSquared() > 0)
 		{
-			edgePoints.push_back(nearestEdgePart2.from);
+			edgePoints.push_back(FromOf(nearestEdgeParts[1]));
 		}
 		for(size_t i = 0; i < edges.size(); i++)
 		{
 			const Edge& edge = edges[i];
 			if(&edge != nearestEdge)
 			{
-				edgePoints.push_back(edge.from);
-				edgePoints.push_back(edge.to);
+				edgePoints.push_back(FromOf(edge));
+				edgePoints.push_back(ToOf(edge));
 			}
 		}
+		
 		// Sort these counter-clockwise, with  (light -> nearestPoint)
 		ComparePointsCCW comparison(light, nearestPoint);
 		std::sort(edgePoints.begin(), edgePoints.end(), comparison);
 		
 		
 		// Insert the divided edge at the start and at the end.
-		if(nearestEdgePart1.LengthSquared() > 0)
+		if(nearestEdgeParts[0].LengthSquared() > 0)
 		{
-			edgePoints.insert(edgePoints.begin(), nearestEdgePart1.from);
+			edgePoints.insert(edgePoints.begin(), FromOf(nearestEdgeParts[0]));
 		}
-		if(nearestEdgePart2.LengthSquared() > 0)
+		if(nearestEdgeParts[1].LengthSquared() > 0)
 		{
-			edgePoints.push_back(nearestEdgePart2.to);
+			edgePoints.push_back(ToOf(nearestEdgeParts[1]));
 		}
 	};
 
@@ -98,7 +102,7 @@ private:
 		}
 		
 		
-		bool operator()(const Point& p1, const Point& p2) const
+		bool operator()(const EdgePointReference& p1, const EdgePointReference& p2) const
 		{
 			return Compare(p1, p2) < 0;
 		}
