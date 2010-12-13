@@ -1,6 +1,6 @@
 #import "cocos2d.h"
 
-@interface CCShadows : CCNode 
+@interface CCShadows : CCLayer 
 {
 @private
 	id impl;

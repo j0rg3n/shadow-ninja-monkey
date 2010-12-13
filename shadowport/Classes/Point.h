@@ -4,7 +4,11 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include <cassert>
 #include <math.h>
+#ifdef __APPLE__
+#include <CoreGraphics/CGGeometry.h>
+#endif
 
 
 namespace snm
@@ -38,6 +42,17 @@ public:
 	Point(const Point& other) : x(other.x), y(other.y), m_nEdgeOffset(NO_EDGE)
 	{
 	}
+	
+	
+#ifdef __APPLE__
+	operator CGPoint() const
+	{
+		CGPoint p;
+		p.x = x;
+		p.y = y;
+		return p;
+	}
+#endif
 	
 	
 	/**
@@ -136,6 +151,7 @@ public:
 	
 	const Edge* GetEdge() const
 	{
+		assert(m_nEdgeOffset != NO_EDGE);
 		if (m_nEdgeOffset == NO_EDGE)
 		{
 			return NULL;

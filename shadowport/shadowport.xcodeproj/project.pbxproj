@@ -224,6 +224,7 @@
 		D591694312B4211F00EEF772 /* LightPolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D591694212B4211F00EEF772 /* LightPolygon.cpp */; };
 		D591694912B4224000EEF772 /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D591694812B4224000EEF772 /* Scene.cpp */; };
 		D59169E812B42BF100EEF772 /* CCShadows.mm in Sources */ = {isa = PBXBuildFile; fileRef = D59169E712B42BF100EEF772 /* CCShadows.mm */; };
+		D5CC427C12B6C70B0066F149 /* EdgePointReference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CC427B12B6C70B0066F149 /* EdgePointReference.cpp */; };
 		DC6640030F83B3EA000B3E49 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC6640020F83B3EA000B3E49 /* AudioToolbox.framework */; };
 		DC6640050F83B3EA000B3E49 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC6640040F83B3EA000B3E49 /* OpenAL.framework */; };
 		DCCBF1B70F6022AE0040855A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCCBF1B60F6022AE0040855A /* CoreGraphics.framework */; };
@@ -470,6 +471,8 @@
 		D591694812B4224000EEF772 /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		D59169E612B42BF100EEF772 /* CCShadows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCShadows.h; sourceTree = "<group>"; };
 		D59169E712B42BF100EEF772 /* CCShadows.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CCShadows.mm; sourceTree = "<group>"; };
+		D5CC427A12B6C70B0066F149 /* EdgePointReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EdgePointReference.h; sourceTree = "<group>"; };
+		D5CC427B12B6C70B0066F149 /* EdgePointReference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EdgePointReference.cpp; sourceTree = "<group>"; };
 		DC6640020F83B3EA000B3E49 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		DC6640040F83B3EA000B3E49 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		DCCBF1B60F6022AE0040855A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -587,6 +590,8 @@
 				D591694812B4224000EEF772 /* Scene.cpp */,
 				D59169E612B42BF100EEF772 /* CCShadows.h */,
 				D59169E712B42BF100EEF772 /* CCShadows.mm */,
+				D5CC427A12B6C70B0066F149 /* EdgePointReference.h */,
+				D5CC427B12B6C70B0066F149 /* EdgePointReference.cpp */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1076,6 +1081,7 @@
 				D591694312B4211F00EEF772 /* LightPolygon.cpp in Sources */,
 				D591694912B4224000EEF772 /* Scene.cpp in Sources */,
 				D59169E812B42BF100EEF772 /* CCShadows.mm in Sources */,
+				D5CC427C12B6C70B0066F149 /* EdgePointReference.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

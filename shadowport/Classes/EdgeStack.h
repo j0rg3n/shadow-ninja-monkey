@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <cassert>
-#include "Edge.h"
+#include "EdgePointReference.h"
 #include "Point.h"
 
 
@@ -31,19 +31,19 @@ public:
 	 * @param Point p
 	 * @return Point[] - array of points to be added to the light polygon.
 	 */
-	void AddEdgePoint(const Point& p, std::vector<Point>& lightPolyPoints)
+	void AddEdgePoint(const EdgePointReference& p, std::vector<Point>& lightPolyPoints)
 	{
-		if(p == p.GetEdge()->from)
+		if(p.IsFrom())
 		{
 			for(size_t i = 0; i < this->edges.size(); i++)
 			{
 				Point intersect;
 				bool bSuccess = this->edges[i].Intersection(this->light, p, intersect);
-				assert(bSuccess);
+				//assert(bSuccess);
 				
-				if(p.DistanceToSquared(this->light) <= intersect.DistanceToSquared(this->light))
+				if(bSuccess && p.GetPoint().DistanceToSquared(this->light) <= intersect.DistanceToSquared(this->light))
 				{
-					this->edges.insert(edges.begin() + i, *p.GetEdge());
+					this->edges.insert(edges.begin() + i, p.GetEdge());
 					if(i == 0)
 					{
 						// a point on the previous edge, and the new point
@@ -55,7 +55,7 @@ public:
 					return;
 				}
 			}
-			this->edges.push_back(*p.GetEdge());
+			this->edges.push_back(p.GetEdge());
 			if(this->edges.size() == 1)
 			{
 				// We are the first edge to be added
@@ -72,7 +72,7 @@ public:
 		{
 			for(size_t i = 0; i < this->edges.size(); i++)
 			{
-				if(this->edges[i] == *p.GetEdge())
+				if(this->edges[i] == p.GetEdge())
 				{
 					this->edges.erase(edges.begin() + i);
 					if(i == 0) // Was it the front edge that ended?
@@ -87,7 +87,11 @@ public:
 						{
 							Point intersect;
 							bool bSuccess = this->edges[0].Intersection(this->light, p, intersect);
-							assert(bSuccess);
+							//assert(bSuccess);
+							if (!bSuccess)
+							{
+								return;
+							}
 							
 							lightPolyPoints.push_back(p);
 							lightPolyPoints.push_back(intersect);

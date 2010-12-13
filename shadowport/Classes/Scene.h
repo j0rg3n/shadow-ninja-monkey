@@ -26,6 +26,19 @@ public:
 		this->height = height;
 	}
 	
+	
+	float GetWidth() const
+	{
+		return width;
+	}
+	
+	
+	float GetHeight() const
+	{
+		return height;
+	}
+	
+	
 	/**
 	 * Create an inverted rectangle used to "catch" all light.
 	 * 
@@ -85,6 +98,11 @@ public:
 			}
 		}
 	};
+	
+	const std::vector<Edge>& GetEdges() const
+	{
+		return edges;
+	}
 	
 private:
 	float width;
