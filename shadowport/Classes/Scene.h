@@ -14,50 +14,7 @@ class Scene
 {
 public:
 	/**
-	 * Create a new scene with the given width and height.
-	 * 
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	Scene(float width, float height)
-	{
-		this->width = width;
-		this->height = height;
-	}
-	
-	
-	float GetWidth() const
-	{
-		return width;
-	}
-	
-	
-	float GetHeight() const
-	{
-		return height;
-	}
-	
-	
-	/**
-	 * Create an inverted rectangle used to "catch" all light.
-	 * 
-	 * @return
-	 */
-	void AddLightBoundingBox()
-	{
-		// Add an inverse box around the scene to avoid light getting 'out'
-		this->AddEdge(Point(0,            0+this->height), Point(0,            0));
-		this->AddEdge(Point(0+this->width, 0+this->height), Point(0,            0+this->height));
-		this->AddEdge(Point(0+this->width, 0),             Point(0+this->width, 0+this->height));
-		this->AddEdge(Point(0,            0),             Point(0+this->width, 0));
-	};
-	
-	/**
 	 * Add a new edge between p1 and p2.
-	 * @param Point p1
-	 * @param Point p2
-	 * @return
 	 */
 	void AddEdge(const Point& p1, const Point& p2)
 	{
@@ -65,12 +22,20 @@ public:
 	};
 	
 	/**
+	 * Create an inverted rectangle used to "catch" all light.
+	 * 
+	 * NOTE: A valid scene must be contained in a closed, inside-out shape.
+	 */
+	void AddInverseRectangle(float x, float y, float w, float h)
+	{
+		this->AddEdge(Point(x,   y),   Point(x+w, y));
+		this->AddEdge(Point(x+w, y),   Point(x+w, y+h));
+		this->AddEdge(Point(x+w, y+h), Point(x,   y+h));
+		this->AddEdge(Point(x,   y+h), Point(x,   y));
+	};
+	
+	/**
 	 * Create a closed rectangle.
-	 * @param x
-	 * @param y
-	 * @param w
-	 * @param h
-	 * @return
 	 */
 	void AddRectangle(float x, float y, float w, float h)
 	{
@@ -105,10 +70,7 @@ public:
 	}
 	
 private:
-	float width;
-	float height;
 	std::vector<Edge> edges;
-	std::vector<Point> lights;
 	
 	/*
 	 Scene.unitTests()

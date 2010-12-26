@@ -4,17 +4,15 @@
 @interface CCShadows : CCLayer 
 {
 @private
-	id sceneWrapper;
 	NSMutableArray* lightNodes;
-	float time;
+	NSMutableArray* obstacleNodes;
 }
 
-+(id)shadowsWithDebugScene;
--(id)initWithDebugScene;
+-(id)init;
 -(void)dealloc;
 
 -(void)draw;
--(void)update:(ccTime)deltaTime;
 -(void)addLight:(CCNode*)light;
+-(void)addObstacle:(CCNode*)obstacle;
 
 @end
