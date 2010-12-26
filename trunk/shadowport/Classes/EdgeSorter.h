@@ -55,8 +55,8 @@ public:
 		Point nearestPoint = nearestEdge->NearestPoint(light);
 		
 		nearestEdgeParts.resize(2);
-		nearestEdgeParts[0] = Edge(Point(nearestEdge->from.x, nearestEdge->from.y), Point(nearestPoint.x, nearestPoint.y));
-		nearestEdgeParts[1] = Edge(Point(nearestPoint.x, nearestPoint.y), Point(nearestEdge->to.x, nearestEdge->to.y));
+		nearestEdgeParts[1] = Edge(nearestEdge->from, nearestPoint);
+		nearestEdgeParts[0] = Edge(nearestPoint, nearestEdge->to);
 		
 		if(nearestEdgeParts[0].LengthSquared() > 0)
 		{
@@ -79,7 +79,6 @@ public:
 		// Sort these counter-clockwise, with  (light -> nearestPoint)
 		ComparePointsCCW comparison(light, nearestPoint);
 		std::sort(edgePoints.begin(), edgePoints.end(), comparison);
-		
 		
 		// Insert the divided edge at the start and at the end.
 		if(nearestEdgeParts[0].LengthSquared() > 0)

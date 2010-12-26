@@ -13,6 +13,8 @@
 // HelloWorld Layer
 @interface HelloWorld : CCLayer
 {
+@private
+	CCSprite* light;
 }
 
 // returns a Scene that contains the HelloWorld as the only child

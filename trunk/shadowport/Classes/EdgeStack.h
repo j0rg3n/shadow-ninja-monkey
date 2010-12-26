@@ -88,14 +88,12 @@ public:
 							Point intersect;
 							bool bSuccess = this->edges[0].Intersection(this->light, p, intersect);
 							//assert(bSuccess);
-							if (!bSuccess)
+							if (bSuccess)
 							{
+								lightPolyPoints.push_back(p);
+								lightPolyPoints.push_back(intersect);
 								return;
 							}
-							
-							lightPolyPoints.push_back(p);
-							lightPolyPoints.push_back(intersect);
-							return;
 						}
 					}
 					else
