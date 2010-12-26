@@ -29,70 +29,15 @@ static void DrawEdge(const snm::Edge& edge)
 // ------------------------------------------------------------------------------
 
 
-/**
- * Wrapper around C++ state to avoid exposing this in the header.
- */
-@interface SceneWrapper : NSObject
-{	
-}
-
-+(id)sceneWrapperWithDebugScene;
--(id)initWithDebugScene;
--(void)dealloc;
-
-@property (readonly, nonatomic) snm::Scene* scene;
-@end
-
-@implementation SceneWrapper
-
-@synthesize scene;
-
-+(id)sceneWrapperWithDebugScene
-{
-	return [[self alloc] initWithDebugScene];
-}
-
--(id)initWithDebugScene
-{
-	if ((self=[super init])) 
-	{
-		scene = new snm::Scene(800, 600);
-		scene->AddLightBoundingBox();
-		scene->AddRectangle(400, 200, 100, 25);
-		//scene->AddRectangle(40, 150, 40, 35);
-		//scene->AddRectangle(250, 300, 200, 25);
-		//scene->AddRectangle(50, 500, 200, 50);
-		
-		//for(int i = 0; i < 5; i++)
-		{
-			//scene->AddRectangle(150+sin(i), 50+i*40, 40+i*25, 10);
-		}
-	}
-	return self;
-}
-
--(void)dealloc
-{
-	delete scene;
-	[super dealloc];
-}
-
-@end
-
 @implementation CCShadows
 
-+(id)shadowsWithDebugScene
-{
-	return [[self alloc] initWithDebugScene];
-}
-
--(id)initWithDebugScene
+-(id)init
 {
 	if ((self=[super init])) 
 	{
-		sceneWrapper = [SceneWrapper sceneWrapperWithDebugScene];
 		lightNodes = [[NSMutableArray alloc] init];
-		[self scheduleUpdate];
+		obstacleNodes = [[NSMutableArray alloc] init];
+		//[self scheduleUpdate];
 	}
 	
 	return self;
@@ -101,6 +46,7 @@ static void DrawEdge(const snm::Edge& edge)
 -(void)dealloc
 {
 	[lightNodes release];
+	[obstacleNodes release];
 	[super dealloc];
 }
 
@@ -112,22 +58,22 @@ static void DrawEdge(const snm::Edge& edge)
 	 * glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 	 * glEnable(GL_TEXTURE_2D)
 	 */	 
-	CGSize s = [[CCDirector sharedDirector] winSize];
+	CGSize size = [[CCDirector sharedDirector] winSize];
 	
-	const snm::Scene& scene = *((SceneWrapper*) sceneWrapper).scene;
-	
-	NSEnumerator* e = [lightNodes objectEnumerator];
+	snm::Scene scene;
+	scene.AddInverseRectangle(5, 5, size.width - 10, size.height - 10);
+
+	for (CCNode* obstacleNode in obstacleNodes)
+	{
+		CGRect rect = obstacleNode.boundingBox;
+		scene.AddRectangle(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+	}
 	
 	snm::Point light;
-	while (true)
+	for (CCNode* lightNode in lightNodes)
 	{
-		CCNode* lightNode = [e nextObject];
-		if (!lightNode)
-		{
-			break;
-		}
-		
-		light = [self convertToNodeSpace:[lightNode convertToWorldSpace:lightNode.position]];
+		light = snm::Point(lightNode.boundingBox.origin.x + lightNode.boundingBox.size.width / 2,
+						   lightNode.boundingBox.origin.y + lightNode.boundingBox.size.height / 2);
 		
 		snm::LightCalculator lightCalculator;
 		snm::LightPolygon lightPolygon;
@@ -171,13 +117,14 @@ static void DrawEdge(const snm::Edge& edge)
 	}
 }
 
--(void)update:(ccTime)deltaTime
-{
-}
-
 -(void)addLight:(CCNode*)light
 {
 	[lightNodes addObject: light];
+}
+
+-(void)addObstacle:(CCNode*)obstacle
+{
+	[obstacleNodes addObject: obstacle];
 }
 
 @end

@@ -14,7 +14,7 @@
 @interface HelloWorld : CCLayer
 {
 @private
-	CCSprite* light;
+	CCNode* touchedNode;
 }
 
 // returns a Scene that contains the HelloWorld as the only child
