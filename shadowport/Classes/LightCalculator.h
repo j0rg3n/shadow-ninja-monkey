@@ -34,7 +34,7 @@ public:
 		std::vector<EdgePointReference> sortedEdges;
 		std::vector<Edge> nearestEdgeParts;
 		sorter.SortEdgePoints(light, visibleEdges, nearestEdgeParts, sortedEdges);
-		
+
 		EdgeStack edgeStack(light);
 
 		// Allocate this temp buffer here to avoid reallocation for every edge.

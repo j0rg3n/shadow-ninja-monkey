@@ -29,12 +29,12 @@ public:
 	 * @param to
 	 * @return
 	 */
-	Edge(const Point& from, const Point& to) : from(from, *this), to(to, *this)
+	Edge(const Point& from, const Point& to) : from(from), to(to)
 	{	
 	}
 	
 	
-	Edge(const Edge& other) : from(other.from, *this), to(other.to, *this)
+	Edge(const Edge& other) : from(other.from), to(other.to)
 	{
 	}
 	

@@ -216,6 +216,7 @@
 		50F414F01069373D002A0D5E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 50F414EC1069373D002A0D5E /* Default.png */; };
 		50F414F11069373D002A0D5E /* fps_images.png in Resources */ = {isa = PBXBuildFile; fileRef = 50F414ED1069373D002A0D5E /* fps_images.png */; };
 		50F414F21069373D002A0D5E /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 50F414EE1069373D002A0D5E /* Icon.png */; };
+		D57ABA9012C696DB00A0E59B /* Schwarzwald Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D57ABA8F12C696DB00A0E59B /* Schwarzwald Regular.ttf */; };
 		D5887C1D12B17D660046D099 /* Point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5887C1C12B17D660046D099 /* Point.cpp */; };
 		D5887C3612B2B5190046D099 /* Edge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5887C3512B2B5190046D099 /* Edge.cpp */; };
 		D5887C6F12B2BBFC0046D099 /* EdgeSorter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5887C6E12B2BBFC0046D099 /* EdgeSorter.cpp */; };
@@ -454,6 +455,7 @@
 		50F414ED1069373D002A0D5E /* fps_images.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fps_images.png; sourceTree = "<group>"; };
 		50F414EE1069373D002A0D5E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		50F414EF1069373D002A0D5E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D57ABA8F12C696DB00A0E59B /* Schwarzwald Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Schwarzwald Regular.ttf"; sourceTree = "<group>"; };
 		D5887C1B12B17D660046D099 /* Point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Point.h; sourceTree = "<group>"; };
 		D5887C1C12B17D660046D099 /* Point.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Point.cpp; sourceTree = "<group>"; };
 		D5887C3412B2B5190046D099 /* Edge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Edge.h; sourceTree = "<group>"; };
@@ -868,6 +870,7 @@
 		50F414EB1069373D002A0D5E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D57ABA8F12C696DB00A0E59B /* Schwarzwald Regular.ttf */,
 				50F414EC1069373D002A0D5E /* Default.png */,
 				50F414ED1069373D002A0D5E /* fps_images.png */,
 				50F414EE1069373D002A0D5E /* Icon.png */,
@@ -1060,6 +1063,7 @@
 				50F414F01069373D002A0D5E /* Default.png in Resources */,
 				50F414F11069373D002A0D5E /* fps_images.png in Resources */,
 				50F414F21069373D002A0D5E /* Icon.png in Resources */,
+				D57ABA9012C696DB00A0E59B /* Schwarzwald Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

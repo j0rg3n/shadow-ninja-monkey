@@ -27,24 +27,29 @@ class Edge;
 class Point 
 {
 public:
-	Point() : x(0), y(0), m_nEdgeOffset(NO_EDGE)
+	Point() : x(0), y(0)
 	{
 	}
 
 	
-	Point(float x, float y) : m_nEdgeOffset(NO_EDGE)
+	Point(float x, float y)
 	{
 		this->x = x;
 		this->y = y;	
 	}
 	
 	
-	Point(const Point& other) : x(other.x), y(other.y), m_nEdgeOffset(NO_EDGE)
+	Point(const Point& other) : x(other.x), y(other.y)
 	{
 	}
 	
 	
 #ifdef __APPLE__
+	Point(const CGPoint& other) : x(other.x), y(other.y)
+	{
+	}
+	
+	
 	operator CGPoint() const
 	{
 		CGPoint p;
@@ -79,6 +84,15 @@ public:
 		return Point(x-p.x, y-p.y);
 	}
 	
+	/**
+	 * @param Point p
+	 * @return Point
+	 */
+	Point Add(const Point& p) const
+	{
+		return Point(x+p.x, y+p.y);
+	}
+		
 	
 	/**
 	 * @param float x
@@ -86,7 +100,7 @@ public:
 	 * @param Point p2
 	 * @return Point 
 	 */
-	Point &xIntersectionLocal(float x, const Point& p1, const Point& p2)
+	Point &XIntersectionLocal(float x, const Point& p1, const Point& p2)
 	{
 		this->x = x;
 		Point dir = p2.Subtract(p1);
@@ -149,18 +163,6 @@ public:
 	}
 	
 	
-	const Edge* GetEdge() const
-	{
-		assert(m_nEdgeOffset != NO_EDGE);
-		if (m_nEdgeOffset == NO_EDGE)
-		{
-			return NULL;
-		}
-		
-		return reinterpret_cast<const Edge *> (reinterpret_cast<const char *> (this) + m_nEdgeOffset);
-	}
-	
-	
 	bool operator==(const Point &other) const
 	{
 		return x == other.x && y == other.y;
@@ -171,28 +173,6 @@ public:
 	// TODO: Protect with read-only accessors.
 	float x;
 	float y;
-	
-	
-private:
-	friend class Edge;
-	
-	
-	Point(const Point& other, const Edge& edge) : x(other.x), y(other.y), m_nEdgeOffset(GetEdgeOffset(*this, edge))
-	{
-	}
-	
-	
-	static int GetEdgeOffset(const Point& point, const Edge& edge)
-	{
-		return reinterpret_cast<const char *> (&point) - reinterpret_cast<const char *> (&edge);
-	}
-	
-	
-	//!\brief Want to use sizeof(Edge), but that's not available.
-	static const int NO_EDGE = INT_MAX;
-	
-	//!\brief Relative offset to edge, or NO_EDGE for detached points.
-	int m_nEdgeOffset;
 	
 	/*
 	 Point.unitTests()

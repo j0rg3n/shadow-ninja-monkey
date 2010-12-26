@@ -9,6 +9,7 @@
 // Import the interfaces
 #import "HelloWorldScene.h"
 #import "CCShadows.h"
+#import "CCTouchDispatcher.h"
 
 // HelloWorld implementation
 @implementation HelloWorld
@@ -38,17 +39,44 @@
 		// create and initialize a Label
 		//CCLabel* label = [CCLabel labelWithString:@"Hello World" fontName:@"Marker Felt" fontSize:64];
 		CCShadows* label = [CCShadows shadowsWithDebugScene];
+		
+		light = [CCSprite spriteWithFile: @"Icon.png"];
+		light.position = ccp(50, 50);
 
 		// ask director the the window size
 		CGSize size = [[CCDirector sharedDirector] winSize];
 	
 		// position the label on the center of the screen
-		label.position =  ccp(0,0);//ccp( size.width /2 , size.height/2 );
+		label.position =  ccp(-80,-70);//ccp( size.width /2 , size.height/2 );
+		label.scale = .5f;
 		
-		// add the label as a child to this Layer
-		[self addChild: label];
+		[label addLight:light];
+		
+		[self addChild:label];
+		[self addChild:light];
+		
+		self.isTouchEnabled = TRUE;
 	}
 	return self;
+}
+
+-(void) registerWithTouchDispatcher
+{
+	[[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
+}
+
+- (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
+    return YES;
+}
+
+- (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event {
+	CGPoint location = [self convertTouchToNodeSpace: touch];
+	light.position = location;
+}
+
+- (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event {
+	CGPoint location = [self convertTouchToNodeSpace: touch];
+	light.position = location;
 }
 
 // on "dealloc" you need to release all your retained objects
