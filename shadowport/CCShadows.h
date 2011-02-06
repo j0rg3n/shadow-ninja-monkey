@@ -8,6 +8,9 @@
 	NSMutableArray* obstacleNodes;
 }
 
+@property (readwrite) CGRect shadowBounds;
+
+
 -(id)init;
 -(void)dealloc;
 
