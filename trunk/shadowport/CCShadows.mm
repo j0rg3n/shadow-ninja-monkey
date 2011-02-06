@@ -31,6 +31,8 @@ static void DrawEdge(const snm::Edge& edge)
 
 @implementation CCShadows
 
+@synthesize shadowBounds;
+
 -(id)init
 {
 	if ((self=[super init])) 
@@ -38,6 +40,9 @@ static void DrawEdge(const snm::Edge& edge)
 		lightNodes = [[NSMutableArray alloc] init];
 		obstacleNodes = [[NSMutableArray alloc] init];
 		//[self scheduleUpdate];
+		
+		CGSize size = [[CCDirector sharedDirector] winSize];
+		shadowBounds = CGRectMake(0, 0, size.width, size.height);
 	}
 	
 	return self;
@@ -58,13 +63,16 @@ static void DrawEdge(const snm::Edge& edge)
 	 * glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 	 * glEnable(GL_TEXTURE_2D)
 	 */	 
-	CGSize size = [[CCDirector sharedDirector] winSize];
 	
 	snm::Scene scene;
-	scene.AddInverseRectangle(5, 5, size.width - 10, size.height - 10);
+
+	scene.AddInverseRectangle(shadowBounds.origin.x, shadowBounds.origin.y, shadowBounds.size.width, shadowBounds.size.height);
 
 	for (CCNode* obstacleNode in obstacleNodes)
 	{
+		// TODO: Expose shadow bounds as polygon rather than rect,
+		// and make it a protocol that shadowcasters should implement,
+		// including a castShadows property.		
 		CGRect rect = obstacleNode.boundingBox;
 		scene.AddRectangle(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 	}
